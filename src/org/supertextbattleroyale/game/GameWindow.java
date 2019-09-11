@@ -3,7 +3,11 @@ package org.supertextbattleroyale.game;
 import javax.swing.*;
 
 public class GameWindow extends JFrame {
-    private JButton testButton;
     private JPanel mainPanel;
+    private JTextPane aaaaaaaaaaaaaaaaaaaaTextPane;
+
+    public GameWindow() {
+        this.add(this.mainPanel);
+    }
 
 }

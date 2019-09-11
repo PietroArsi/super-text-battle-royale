@@ -5,6 +5,7 @@ import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Potion;
 import org.supertextbattleroyale.items.Weapon;
+import org.supertextbattleroyale.players.Player;
 
 import javax.swing.*;
 import java.io.File;
@@ -20,6 +21,8 @@ public class GameLauncher {
     private List<Armor> armors;
     private List<Potion> potions;
     private List<Weapon> weapons;
+    private List<Player> players;
+
 
     public GameLauncher() {
         this.workingDirectory = new File(System.getProperty("user.dir"), "settings");
@@ -27,6 +30,7 @@ public class GameLauncher {
         this.armors = new ArrayList<>();
         this.potions = new ArrayList<>();
         this.weapons = new ArrayList<>();
+        this.players = new ArrayList<>();
     }
 
     public void loadWindow() {
@@ -91,6 +95,16 @@ public class GameLauncher {
     private void loadPlayers(File folder) throws GameLoadException {
         if(!folder.exists()) throw new GameLoadException();
 
+        for (File playerFolder : Objects.requireNonNull(folder.listFiles())) {
+            try {
+                this.players.add(new Player(playerFolder));
+
+                System.out.printf("Loaded '%s'\n", playerFolder.getName());
+            }catch (JsonLoadFailException ex) {
+                ex.printStackTrace();
+                System.out.printf("Failed to load '%s'\n", playerFolder.getName());
+            }
+        }
     }
 
     private void setupFrame(JFrame frame) {
