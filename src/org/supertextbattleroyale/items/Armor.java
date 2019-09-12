@@ -17,6 +17,7 @@ public class Armor extends Collectible {
         this.hitPoints = maximumHitPoints;
     }
 
+
     public boolean isBroken() {
         return this.hitPoints <= 0;
     }
@@ -24,4 +25,5 @@ public class Armor extends Collectible {
     public int getMitigatedDamage(int damage) {
         return damage - (int) Math.floor(damage * shieldPercentage);
     }
+
 }
