@@ -2,13 +2,16 @@ package org.supertextbattleroyale.items;
 
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.items.base.Collectible;
+import org.supertextbattleroyale.utils.Setting;
 
 import java.io.File;
 import java.util.AbstractMap;
 
 public class Weapon extends Collectible {
 
+    @Setting
     private int baseDamage;
+
     private int level;
 
     public enum HitType {

@@ -24,6 +24,8 @@ public class GameLauncher {
     private List<Weapon> weapons;
     private List<Player> players;
 
+
+
     public GameLauncher() {
         this.workingDirectory = new File(System.getProperty("user.dir"), "settings");
 

@@ -2,13 +2,17 @@ package org.supertextbattleroyale.items;
 
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.items.base.Collectible;
+import org.supertextbattleroyale.utils.Setting;
 
 import java.io.File;
 
 public class Armor extends Collectible {
 
+    @Setting
     private float shieldPercentage;
+    @Setting
     private int maximumHitPoints;
+
     private int hitPoints;
 
     public Armor(File settingsFolder) throws JsonLoadFailException {

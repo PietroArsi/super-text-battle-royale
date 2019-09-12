@@ -14,7 +14,6 @@ public class Map {
 
     public Map(File directory) {
 
-
     }
 
     private void setupMap(File config) throws MapLoadException {
@@ -34,15 +33,8 @@ public class Map {
 
             for(int w = 0; w < line.length(); w++) {
                 this.matrixMap[w][h] = getTile(line.charAt(w));
-
-
             }
-
-
-
         }
-
-
     }
 
     private Tile getTile(char symbol) {
