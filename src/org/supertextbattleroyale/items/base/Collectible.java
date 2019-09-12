@@ -23,7 +23,11 @@ public class Collectible {
     private String name;
     private BufferedImage icon;
 
+    protected File settingsFolder;
+
     public Collectible(File settingsFolder) throws JsonLoadFailException {
+        this.settingsFolder = settingsFolder;
+
         this.setupFromJson(new File(settingsFolder, "config.json"));
         this.setupIcon(settingsFolder);
     }

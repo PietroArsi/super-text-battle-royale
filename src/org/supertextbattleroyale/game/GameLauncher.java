@@ -26,6 +26,8 @@ public class GameLauncher {
     private List<Player> players;
     private List<GameMap> maps;
 
+    private GameInstance gameInstance;
+
     public GameLauncher() {
         this.workingDirectory = new File(System.getProperty("user.dir"), "settings");
 
@@ -51,6 +53,25 @@ public class GameLauncher {
         this.loadWeapons(new File(this.getWorkingDirectory(), "weapons"));
         this.loadPlayers(new File(this.getWorkingDirectory(), "players"));
         this.loadMaps(new File(this.getWorkingDirectory(), "maps"));
+
+        gameInstance = new GameInstance(this);
+
+        //TODO: HEAVY TESTING: DO NOT MESS
+        gameInstance.setCurrentMap(this.maps.get(0));
+
+        for (Player player : this.players) {
+            try {
+                Player p = new Player(player);
+                gameInstance.getAllPlayers().add(p);
+                gameInstance.getAlivePlayers().add(p);
+                p.setX(0);
+                p.setY(0);
+                p.setCurrentMap(gameInstance.getCurrentMap());
+                p.equipArmor(new Armor(this.armors.get(0), p));
+            }catch (JsonLoadFailException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     private void loadArmors(File folder) throws GameLoadException {
@@ -133,6 +154,10 @@ public class GameLauncher {
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setResizable(false);
+    }
+
+    public GameInstance getGameInstance() {
+        return this.gameInstance;
     }
 
     public File getWorkingDirectory() {

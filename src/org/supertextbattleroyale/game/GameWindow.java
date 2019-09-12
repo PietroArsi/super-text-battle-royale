@@ -57,6 +57,8 @@ public class GameWindow extends JFrame {
     }
 
     private void drawGameScreen(Graphics2D g) {
+        //TODO: HEAVY TESTING: DO NOT MESS
+
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, this.gamePanel.getWidth(), this.gamePanel.getHeight());
 
@@ -83,6 +85,8 @@ public class GameWindow extends JFrame {
                 g.drawRect(xDist + i * tileWidth, yDist + j * tileWidth, tileWidth, tileWidth);
             }
         }
+
+        this.launcher.getGameInstance().drawComponents(g);
     }
 
     public JPanel getGamePanel() {

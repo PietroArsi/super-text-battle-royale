@@ -4,13 +4,16 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
+import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Potion;
 import org.supertextbattleroyale.items.Weapon;
+import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.utils.JsonUtils;
 import org.supertextbattleroyale.utils.Setting;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,10 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class Player {
+public class Player implements Drawable {
 
     @Setting
     private String name;
+
+    private final File settingsFolder;
 
     private BufferedImage icon;
 
@@ -35,7 +40,13 @@ public class Player {
     private Weapon equippedWeapon;
     private List<Potion> equippedPotions;
 
+    private GameMap currentMap;
+
+    private int x, y;
+
     public Player(File settingsFolder) throws JsonLoadFailException {
+        this.settingsFolder = settingsFolder;
+
         this.setupFromJson(new File(settingsFolder, "config.json"));
         this.setupIcon(settingsFolder);
 
@@ -46,6 +57,10 @@ public class Player {
         this.equippedPotions = new ArrayList<>();
     }
 
+    public Player(Player in) throws JsonLoadFailException {
+        this(in.settingsFolder);
+    }
+
     public int getDamageVsPlayer(Weapon weapon, Player player) {
         //TODO: finish
         return 0;
@@ -53,6 +68,30 @@ public class Player {
 
     public String getName() {
         return this.name;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public GameMap getCurrentMap() {
+        return currentMap;
+    }
+
+    public void setCurrentMap(GameMap currentMap) {
+        this.currentMap = currentMap;
     }
 
     public int getLevel() {
@@ -71,7 +110,7 @@ public class Player {
         this.hitPoints = hitPoints;
     }
 
-    public void setEquippedArmor(Armor equippedArmor) {
+    public void equipArmor(Armor equippedArmor) {
         this.equippedArmor = equippedArmor;
     }
 
@@ -123,5 +162,17 @@ public class Player {
             e.printStackTrace();
             throw new JsonLoadFailException();
         }
+    }
+
+    @Override
+    public void draw(Graphics2D g) {
+        g.drawImage(this.icon,
+                this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH + (int) (this.currentMap.CELL_WIDTH * 0.1),
+                this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT + (int) (this.currentMap.CELL_HEIGHT * 0.1),
+                this.currentMap.CELL_WIDTH - (int) (this.currentMap.CELL_WIDTH * 0.2),
+                this.currentMap.CELL_HEIGHT - (int) (this.currentMap.CELL_HEIGHT * 0.2),
+                null);
+
+        if(this.equippedArmor != null) this.equippedArmor.draw(g);
     }
 }
