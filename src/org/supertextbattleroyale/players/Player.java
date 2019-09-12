@@ -8,6 +8,7 @@ import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Potion;
 import org.supertextbattleroyale.items.Weapon;
 import org.supertextbattleroyale.utils.JsonUtils;
+import org.supertextbattleroyale.utils.Setting;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -22,7 +23,9 @@ import java.util.Optional;
 
 public class Player {
 
+    @Setting
     private String name;
+
     private BufferedImage icon;
 
     private int hitPoints;
@@ -44,6 +47,7 @@ public class Player {
     }
 
     public int getDamageVsPlayer(Weapon weapon, Player player) {
+        //TODO: finish
         return 0;
     }
 

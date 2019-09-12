@@ -25,12 +25,7 @@ public class Collectible {
 
     public Collectible(File settingsFolder) throws JsonLoadFailException {
         this.setupFromJson(new File(settingsFolder, "config.json"));
-        try {
-            this.icon = ImageIO.read(new FileInputStream(new File(settingsFolder, "icon.png")));
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new JsonLoadFailException();
-        }
+        this.setupIcon(settingsFolder);
     }
 
     private void setupFromJson(File config) throws JsonLoadFailException {
@@ -41,22 +36,26 @@ public class Collectible {
         JsonObject jsonObject = jsonElement.get().getAsJsonObject();
         Gson gson = new Gson();
 
+        //TODO: fix if something is not found
         for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
             try {
-                Field field = this.getClass().getDeclaredField(entry.getKey());
-                field.setAccessible(true);
-                field.set(this, gson.fromJson(entry.getValue(), field.getType()));
-            } catch (NoSuchFieldException | IllegalAccessException ex) {
-                try {
-                    Field field = this.getClass().getSuperclass().getDeclaredField(entry.getKey());
+                for(Class c = this.getClass(); c != Object.class; c = c.getSuperclass()) {
+                    Field field = c.getDeclaredField(entry.getKey());
                     field.setAccessible(true);
                     field.set(this, gson.fromJson(entry.getValue(), field.getType()));
-                } catch (NoSuchFieldException | IllegalAccessException exx) {
-                    exx.printStackTrace();
-
-                    throw new JsonLoadFailException();
                 }
+            } catch (NoSuchFieldException | IllegalAccessException ex) {
+//                throw new JsonLoadFailException();
             }
+        }
+    }
+
+    private void setupIcon(File settingsFolder) throws JsonLoadFailException {
+        try {
+            this.icon = ImageIO.read(new FileInputStream(new File(settingsFolder, "icon.png")));
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new JsonLoadFailException();
         }
     }
 

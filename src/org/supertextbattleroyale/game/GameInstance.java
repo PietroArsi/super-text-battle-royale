@@ -1,13 +1,13 @@
 package org.supertextbattleroyale.game;
 
-import org.supertextbattleroyale.maps.Map;
+import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.players.Player;
 
 import java.util.List;
 
 public class GameInstance {
 
-    private Map currentMap;
+    private GameMap currentMap;
 
     private List<Player> allPlayers, alivePlayers, deadPlayers;
 

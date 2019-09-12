@@ -2,18 +2,19 @@ package org.supertextbattleroyale.maps;
 
 import org.supertextbattleroyale.exceptions.MapLoadException;
 import org.supertextbattleroyale.maps.tiles.Ground;
+import org.supertextbattleroyale.maps.tiles.Wall;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.utils.FileUtils;
 
 import java.io.File;
 import java.util.List;
 
-public class Map {
+public class GameMap {
 
     private Tile[][] matrixMap;
 
-    public Map(File directory) {
-
+    public GameMap(File directory) throws MapLoadException {
+        this.setupMap(new File(directory, "map.data"));
     }
 
     private void setupMap(File config) throws MapLoadException {
@@ -38,9 +39,12 @@ public class Map {
     }
 
     private Tile getTile(char symbol) {
-        Tile tile = new Ground();
+        if(symbol == '0') return new Ground();
+        else return new Wall();
+    }
 
-        return tile;
+    public Tile[][] getMatrixMap() {
+        return this.matrixMap;
     }
 
 }
