@@ -8,6 +8,7 @@ import org.supertextbattleroyale.items.Weapon;
 import org.supertextbattleroyale.players.Player;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,6 @@ public class GameLauncher {
     private List<Weapon> weapons;
     private List<Player> players;
 
-
     public GameLauncher() {
         this.workingDirectory = new File(System.getProperty("user.dir"), "settings");
 
@@ -35,7 +35,7 @@ public class GameLauncher {
 
     public void loadWindow() {
         SwingUtilities.invokeLater(() -> {
-            this.mainFrame = new GameWindow();
+            this.mainFrame = new GameWindow(this);
             this.setupFrame(this.mainFrame);
         });
     }
@@ -108,12 +108,46 @@ public class GameLauncher {
     }
 
     private void setupFrame(JFrame frame) {
-        frame.setSize(400, 400);
+        frame.setSize(540, 650);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+//        ((GameWindow)frame).mainPanel = new JPanel() {
+//            @Override
+//            protected void paintComponent(Graphics g1) {
+//                super.paintComponent(g1);
+//
+//                Graphics2D g = (Graphics2D) g1;
+//                g.setRenderingHint(
+//                        RenderingHints.KEY_ANTIALIASING,
+//                        RenderingHints.VALUE_ANTIALIAS_ON);
+//
+//                g.setRenderingHint(
+//                        RenderingHints.KEY_TEXT_ANTIALIASING,
+//                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+//
+//                g.drawImage(getWeapons().get(0).getImage(), 100, 100, 100, 100, null);
+//            }
+//        };
     }
 
     public File getWorkingDirectory() {
         return this.workingDirectory;
+    }
+
+    public List<Armor> getArmors() {
+        return armors;
+    }
+
+    public List<Potion> getPotions() {
+        return potions;
+    }
+
+    public List<Weapon> getWeapons() {
+        return weapons;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
     }
 }
