@@ -3,15 +3,15 @@
 
 # TODO:
 Lato gameplay:
-- Definire statistiche dei giocatori/oggetti
+- Definire statistiche dei giocatori/oggetti [SEMI-DONE]
 - Creare un sistema di livelli
 - Concordare sul tipo di gameplay generale da dare al gioco
 - Pathfinding per i giocatori
 - Sistema di movimento
 
 Lato grafico:
-- Gestione delle mappe
-- Abbozzare una grafica
+- Gestione delle mappe ✔
+- Abbozzare una grafica ✔
 - Animazioni
 - Creare immagini per ogni personaggio/oggetto
 

@@ -2,13 +2,14 @@ package org.supertextbattleroyale.game;
 
 import org.supertextbattleroyale.exceptions.GameLoadException;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
+import org.supertextbattleroyale.exceptions.MapLoadException;
 import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Potion;
 import org.supertextbattleroyale.items.Weapon;
+import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.players.Player;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +24,9 @@ public class GameLauncher {
     private List<Potion> potions;
     private List<Weapon> weapons;
     private List<Player> players;
+    private List<GameMap> maps;
 
-
+    private GameInstance gameInstance;
 
     public GameLauncher() {
         this.workingDirectory = new File(System.getProperty("user.dir"), "settings");
@@ -33,6 +35,9 @@ public class GameLauncher {
         this.potions = new ArrayList<>();
         this.weapons = new ArrayList<>();
         this.players = new ArrayList<>();
+        this.maps = new ArrayList<>();
+
+        //TODO: this.getWeapons().get(0).getClass().getSuperclass();
     }
 
     public void loadWindow() {
@@ -47,6 +52,26 @@ public class GameLauncher {
         this.loadPotions(new File(this.getWorkingDirectory(), "potions"));
         this.loadWeapons(new File(this.getWorkingDirectory(), "weapons"));
         this.loadPlayers(new File(this.getWorkingDirectory(), "players"));
+        this.loadMaps(new File(this.getWorkingDirectory(), "maps"));
+
+        gameInstance = new GameInstance(this);
+
+        //TODO: HEAVY TESTING: DO NOT MESS
+        gameInstance.setCurrentMap(this.maps.get(0));
+
+        for (Player player : this.players) {
+            try {
+                Player p = new Player(player);
+                gameInstance.getAllPlayers().add(p);
+                gameInstance.getAlivePlayers().add(p);
+                p.setX(0);
+                p.setY(0);
+                p.setCurrentMap(gameInstance.getCurrentMap());
+                p.equipArmor(new Armor(this.armors.get(0), p));
+            }catch (JsonLoadFailException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     private void loadArmors(File folder) throws GameLoadException {
@@ -109,47 +134,54 @@ public class GameLauncher {
         }
     }
 
+    private void loadMaps(File folder) throws GameLoadException {
+        if(!folder.exists()) throw new GameLoadException();
+
+        for (File mapFolder : Objects.requireNonNull(folder.listFiles())) {
+            try {
+                this.maps.add(new GameMap(mapFolder));
+
+                System.out.printf("Loaded '%s'\n", mapFolder.getName());
+            }catch (MapLoadException ex) {
+                ex.printStackTrace();
+                System.out.printf("Failed to load '%s'\n", mapFolder.getName());
+            }
+        }
+    }
+
     private void setupFrame(JFrame frame) {
         frame.setSize(540, 650);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setResizable(false);
-//        ((GameWindow)frame).mainPanel = new JPanel() {
-//            @Override
-//            protected void paintComponent(Graphics g1) {
-//                super.paintComponent(g1);
-//
-//                Graphics2D g = (Graphics2D) g1;
-//                g.setRenderingHint(
-//                        RenderingHints.KEY_ANTIALIASING,
-//                        RenderingHints.VALUE_ANTIALIAS_ON);
-//
-//                g.setRenderingHint(
-//                        RenderingHints.KEY_TEXT_ANTIALIASING,
-//                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-//
-//                g.drawImage(getWeapons().get(0).getImage(), 100, 100, 100, 100, null);
-//            }
-//        };
+    }
+
+    public GameInstance getGameInstance() {
+        return this.gameInstance;
     }
 
     public File getWorkingDirectory() {
         return this.workingDirectory;
     }
 
-    public List<Armor> getArmors() {
+    public List<Armor> getLoadedArmors() {
         return armors;
     }
 
-    public List<Potion> getPotions() {
+    public List<Potion> getLoadedPotions() {
         return potions;
     }
 
-    public List<Weapon> getWeapons() {
+    public List<Weapon> getLoadedWeapons() {
         return weapons;
     }
 
-    public List<Player> getPlayers() {
+    public List<Player> getLoadedPlayers() {
         return players;
     }
+
+    public List<GameMap> getLoadedMaps() {
+        return maps;
+    }
+
 }
