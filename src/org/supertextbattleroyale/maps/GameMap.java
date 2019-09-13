@@ -6,6 +6,7 @@ import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.maps.tiles.Ground;
 import org.supertextbattleroyale.maps.tiles.Wall;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
+import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.FileUtils;
 
 import javax.imageio.ImageIO;
@@ -17,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameMap implements Drawable {
 
@@ -31,12 +33,16 @@ public class GameMap implements Drawable {
 
     private GameLauncher launcher;
 
+    private final List<Player> playersOnMap;
+
     public GameMap(GameLauncher launcher, File directory) throws MapLoadException {
         this.settingsFolder = directory;
         this.launcher = launcher;
 
         this.setupMap(new File(directory, "map.data"));
         this.setupTexture(settingsFolder);
+
+        this.playersOnMap = new CopyOnWriteArrayList<>();
     }
 
     private void setupMap(File config) throws MapLoadException {
@@ -152,5 +158,9 @@ public class GameMap implements Drawable {
                 g.drawRect(xDist + i * tileWidth, yDist + j * tileWidth, tileWidth, tileWidth);
             }
         }
+    }
+
+    public List<Player> getPlayersOnMap() {
+        return playersOnMap;
     }
 }

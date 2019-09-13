@@ -4,6 +4,7 @@ import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.items.Weapon;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.players.Player;
+import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
 import java.util.List;
@@ -34,6 +35,7 @@ public class GameInstance {
                 Player p = new Player(player);
                 this.getAllPlayers().add(p);
                 this.getAlivePlayers().add(p);
+                this.getCurrentMap().getPlayersOnMap().add(p);
                 p.setX(new Random().nextInt(this.getCurrentMap().getMatrixMap().length));
                 p.setY(new Random().nextInt(this.getCurrentMap().getMatrixMap()[0].length));
                 p.setCurrentMap(this.getCurrentMap());
@@ -47,11 +49,7 @@ public class GameInstance {
     }
 
     public void onTick() {
-        System.out.println("ontick");
-        for (Player p : this.getAlivePlayers()) {
-            p.setX(new Random().nextInt(this.getCurrentMap().getMatrixMap().length));
-            p.setY(new Random().nextInt(this.getCurrentMap().getMatrixMap()[0].length));
-        }
+        this.getCurrentMap().getPlayersOnMap().forEach(Player::onTick);
     }
 
     public void drawComponents(Graphics2D g) {

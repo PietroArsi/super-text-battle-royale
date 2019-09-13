@@ -10,6 +10,7 @@ import org.supertextbattleroyale.items.Potion;
 import org.supertextbattleroyale.items.Weapon;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.utils.JsonUtils;
+import org.supertextbattleroyale.utils.RandomUtils;
 import org.supertextbattleroyale.utils.Setting;
 
 import javax.imageio.ImageIO;
@@ -67,6 +68,16 @@ public class Player implements Drawable {
         this(in.settingsFolder);
     }
 
+    public void onTick() {
+        //to get players in the same map getCurrentMap().getPlayersOnMap()
+
+        //test
+        this.setX(RandomUtils.randomIntRange(this.getX() - 1, this.getX() + 1));
+        this.setY(RandomUtils.randomIntRange(this.getY() - 1, this.getY() + 1));
+
+        //TODO:
+    }
+
     public int getDamageVsPlayer(Weapon weapon, Player player) {
         //TODO: finish
         return 0;
@@ -93,6 +104,20 @@ public class Player implements Drawable {
     public int hitPlayer(Player other, int damage) {
         this.setXP(this.XP + damage); //XP are increased by the total damage done by the player
         return other.receiveDamage(damage);
+    }
+
+    /**
+     * Gets if a player can walk on a given coordinate
+     *
+     * @param tx
+     * @param ty
+     * @return true if the tile is walkable and no other entity is on it
+     */
+    public boolean canWalkOnTile(int tx, int ty) {
+        if(!this.getCurrentMap().getMatrixMap()[tx][ty].isTileWalkable()) return false;
+
+        return this.getCurrentMap().getPlayersOnMap().stream()
+                .anyMatch(p -> p != this && p.getX() == tx && p.getY() == ty);
     }
 
     @Override
@@ -125,6 +150,8 @@ public class Player implements Drawable {
     }
 
     public void setX(int x) {
+        if(x < 0 || (getCurrentMap() != null && x >= getCurrentMap().getMatrixMap().length)) return;
+
         this.x = x;
     }
 
@@ -133,6 +160,8 @@ public class Player implements Drawable {
     }
 
     public void setY(int y) {
+        if(y < 0 || (getCurrentMap() != null && y >= getCurrentMap().getMatrixMap()[0].length)) return;
+
         this.y = y;
     }
 

@@ -68,8 +68,6 @@ public class GameWindow extends JFrame {
     private void onTick(Graphics2D g) {
         if (this.launcher.getGameInstance() == null) return;
 
-        System.out.println("test");
-
         if (this.currentTick % 10 == 0) {
             this.launcher.getGameInstance().onTick();
             this.currentTick = 0;
