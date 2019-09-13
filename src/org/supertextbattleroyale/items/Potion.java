@@ -7,8 +7,6 @@ import org.supertextbattleroyale.utils.Setting;
 
 import java.io.File;
 
-
-
 public class Potion extends Collectible {
     @Setting
     private int maxHeal;    //Maximum hit points that the potion could heal
@@ -22,18 +20,15 @@ public class Potion extends Collectible {
         this.remainingUses = this.maxUses;
     }
 
-    public int getMaxHeal()
-    {
+    public int getMaxHeal() {
         return this.maxHeal;
     }
 
-    public int getRemainingUses()
-    {
+    public int getRemainingUses() {
         return this.remainingUses;
     }
 
-    public int healPlayer(Player player)
-    {
+    public int healPlayer(Player player) {
         this.remainingUses--;
         int oldHitPoints = player.getHitPoints();
         int newHitPoints = Math.min(oldHitPoints + this.maxHeal, player.getMaxHitPoints());

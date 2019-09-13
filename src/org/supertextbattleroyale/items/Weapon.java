@@ -1,19 +1,24 @@
 package org.supertextbattleroyale.items;
 
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
+import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.items.base.Collectible;
+import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.Setting;
 
+import java.awt.*;
 import java.io.File;
 import java.util.AbstractMap;
 
-public class Weapon extends Collectible {
+public class Weapon extends Collectible implements Drawable {
 
     @Setting
     private int baseDamage;
 
     @Setting
     private int level;
+
+    private Player player;
 
     public enum HitType {
         CRITIC(2.0f),
@@ -23,7 +28,7 @@ public class Weapon extends Collectible {
 
         float damagePercentage;
 
-        HitType (float damagePercentage) {
+        HitType(float damagePercentage) {
             this.damagePercentage = damagePercentage;
         }
     }
@@ -34,6 +39,11 @@ public class Weapon extends Collectible {
         this.level = 1;
     }
 
+    public Weapon(Weapon in, Player player) throws JsonLoadFailException {
+        this(in.settingsFolder);
+        this.player = player;
+    }
+
     public AbstractMap.SimpleEntry<HitType, Integer> getHitStats() {
         HitType type = HitType.CRITIC;
         int damage = 100;
@@ -42,5 +52,14 @@ public class Weapon extends Collectible {
         return new AbstractMap.SimpleEntry<HitType, Integer>(type, actualDamage);
     }
 
+    @Override
+    public void draw(Graphics2D g) {
+        g.drawImage(this.getImage(),
+                player.getCurrentMap().X_DIST + player.getX() * player.getCurrentMap().CELL_WIDTH + (int) (player.getCurrentMap().CELL_WIDTH * 0.4),
+                player.getCurrentMap().Y_DIST + player.getY() * player.getCurrentMap().CELL_HEIGHT + (int) (player.getCurrentMap().CELL_HEIGHT * 0.4),
+                player.getCurrentMap().CELL_WIDTH - (int) (player.getCurrentMap().CELL_WIDTH * 0.2),
+                player.getCurrentMap().CELL_HEIGHT - (int) (player.getCurrentMap().CELL_HEIGHT * 0.2),
+                null);
+    }
 
 }

@@ -1,5 +1,6 @@
 package org.supertextbattleroyale.game;
 
+import org.supertextbattleroyale.Main;
 import org.supertextbattleroyale.maps.tiles.Ground;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 
@@ -10,9 +11,8 @@ import java.util.Timer;
 
 public class GameWindow extends JFrame {
     public JPanel mainPanel;
-    private JTextArea textArea1;
     private JPanel gamePanel;
-    private JTextArea SUPERTEXTBATTLEROYALETextArea;
+    private JTextPane textPane1;
     private GameLauncher launcher;
 
     public GameWindow(GameLauncher launcher) {
@@ -48,7 +48,8 @@ public class GameWindow extends JFrame {
             }
         };
 
-        this.gamePanel.setBounds(0, 0, 512, 512);
+//        this.gamePanel.setBounds(0, 0, Main.WIDTH, Main.HEIGHT);
+        this.setBounds(512, 512, 512, 512);
     }
 
     private void setupRepainting() {
@@ -61,14 +62,15 @@ public class GameWindow extends JFrame {
 
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, this.gamePanel.getWidth(), this.gamePanel.getHeight());
+        this.launcher.getLoadedMaps().get(0).draw(g);
 
-        Color ground = new Color(new Random().nextInt(255), new Random().nextInt(255), new Random().nextInt(255), 255);
-        Color wall = new Color(40, 10, 10);
+        Color ground = new Color(0, 200, 50, 49);
+        Color wall = new Color(33, 33, 33, 150);
 
         Tile[][] tiles = this.launcher.getLoadedMaps().get(0).getMatrixMap();
 
         int w1 = Math.floorDiv(this.gamePanel.getWidth(), tiles.length);
-        int w2 = Math.floorDiv(this.gamePanel.getWidth(), tiles[0].length);
+        int w2 = Math.floorDiv(this.gamePanel.getHeight(), tiles[0].length);
 
         int tileWidth = Math.min(w1, w2);
 
@@ -78,18 +80,18 @@ public class GameWindow extends JFrame {
         for (int i = 0; i < tiles.length; i++) {
             Tile[] row = tiles[i];
 
-            for (int j = 0; j < row.length; j++) {
-                g.setColor(tiles[i][j] instanceof Ground ? ground : wall);
-                g.fillRect(xDist + i * tileWidth, yDist + j * tileWidth, tileWidth, tileWidth);
-                g.setColor(Color.BLACK);
-                g.drawRect(xDist + i * tileWidth, yDist + j * tileWidth, tileWidth, tileWidth);
-            }
+//            for (int j = 0; j < row.length; j++) {
+//                g.setColor(tiles[i][j] instanceof Ground ? ground : wall);
+//                g.fillRect(xDist + i * tileWidth, yDist + j * tileWidth, tileWidth, tileWidth);
+//                g.setColor(Color.BLACK);
+//                g.drawRect(xDist + i * tileWidth, yDist + j * tileWidth, tileWidth, tileWidth);
+//            }
         }
 
         this.launcher.getGameInstance().drawComponents(g);
     }
 
     public JPanel getGamePanel() {
-        return this.mainPanel;
+        return this.gamePanel;
     }
 }

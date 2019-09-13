@@ -29,6 +29,9 @@ public class Player implements Drawable {
     @Setting
     private String name;
 
+    @Setting
+    private String alias;
+
     private final File settingsFolder;
 
     private BufferedImage icon;
@@ -70,6 +73,10 @@ public class Player implements Drawable {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getAlias() {
+        return this.alias;
     }
 
     public int getX() {
@@ -116,13 +123,13 @@ public class Player implements Drawable {
         this.equippedArmor = equippedArmor;
     }
 
-    public void setEquippedWeapon(Weapon equippedWeapon) {
+    public void equipWeapon(Weapon equippedWeapon) {
         this.equippedWeapon = equippedWeapon;
     }
 
     public int getMaxHitPoints() {
         return maxHitPoints;
-    };
+    }
 
     public int getHitPoints() {
         return hitPoints;
@@ -141,12 +148,10 @@ public class Player implements Drawable {
     }
 
     public int usePotion(Potion potion) {
-        if(potion.getRemainingUses() > 0) {
+        if (potion.getRemainingUses() > 0) {
             return potion.healPlayer(this);
-        }
-        else return 0;
+        } else return 0;
     }
-
 
     private void setupFromJson(File config) throws JsonLoadFailException {
         Optional<JsonElement> jsonElement = JsonUtils.getJsonElementFromFile(config);
@@ -180,6 +185,10 @@ public class Player implements Drawable {
 
     @Override
     public void draw(Graphics2D g) {
+        g.setColor(Color.BLUE);
+        g.setFont(new Font("Comic Sans", Font.BOLD, 16));
+        g.drawString(this.getAlias(), this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH, this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT);
+
         g.drawImage(this.icon,
                 this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH + (int) (this.currentMap.CELL_WIDTH * 0.1),
                 this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT + (int) (this.currentMap.CELL_HEIGHT * 0.1),
@@ -187,6 +196,7 @@ public class Player implements Drawable {
                 this.currentMap.CELL_HEIGHT - (int) (this.currentMap.CELL_HEIGHT * 0.2),
                 null);
 
-        if(this.equippedArmor != null) this.equippedArmor.draw(g);
+        if (this.equippedArmor != null) this.equippedArmor.draw(g);
+        if (this.equippedWeapon != null) this.equippedWeapon.draw(g);
     }
 }
