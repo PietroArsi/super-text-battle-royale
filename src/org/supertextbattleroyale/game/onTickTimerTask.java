@@ -2,11 +2,11 @@ package org.supertextbattleroyale.game;
 
 import java.util.TimerTask;
 
-public class PaintTimerTask extends TimerTask {
+public class onTickTimerTask extends TimerTask {
 
     private GameWindow window;
 
-    public PaintTimerTask(GameWindow window) {
+    public onTickTimerTask(GameWindow window) {
         this.window = window;
     }
 

@@ -18,7 +18,7 @@ import java.util.Objects;
 public class GameLauncher {
 
     private final File workingDirectory;
-    public GameWindow mainFrame;
+    private GameWindow mainFrame;
 
     private List<Armor> armors;
     private List<Potion> potions;
@@ -55,24 +55,7 @@ public class GameLauncher {
         this.loadMaps(new File(this.getWorkingDirectory(), "maps"));
 
         gameInstance = new GameInstance(this);
-
-        //TODO: HEAVY TESTING: DO NOT MESS
-        gameInstance.setCurrentMap(this.maps.get(0));
-
-        for (Player player : this.players) {
-            try {
-                Player p = new Player(player);
-                gameInstance.getAllPlayers().add(p);
-                gameInstance.getAlivePlayers().add(p);
-                p.setX(3);
-                p.setY(4);
-                p.setCurrentMap(gameInstance.getCurrentMap());
-                p.equipArmor(new Armor(this.armors.get(0), p));
-                p.equipWeapon(new Weapon(this.weapons.get(0), p));
-            }catch (JsonLoadFailException ex) {
-                ex.printStackTrace();
-            }
-        }
+        gameInstance.initGame();
     }
 
     private void loadArmors(File folder) throws GameLoadException {
@@ -151,7 +134,6 @@ public class GameLauncher {
     }
 
     private void setupFrame(JFrame frame) {
-//        frame.setSize(1080, 1080);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setResizable(true);
@@ -185,4 +167,7 @@ public class GameLauncher {
         return maps;
     }
 
+    public GameWindow getMainFrame() {
+        return this.mainFrame;
+    }
 }

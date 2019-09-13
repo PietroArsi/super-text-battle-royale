@@ -1,13 +1,12 @@
 package org.supertextbattleroyale.game;
 
-import org.supertextbattleroyale.Main;
 import org.supertextbattleroyale.maps.tiles.Ground;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Random;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameWindow extends JFrame {
     public JPanel mainPanel;
@@ -15,10 +14,18 @@ public class GameWindow extends JFrame {
     private JTextPane textPane1;
     private GameLauncher launcher;
 
+    private final Timer timer;
+    private TimerTask currentTask;
+
+    private int currentTick;
+
     public GameWindow(GameLauncher launcher) {
         this.add(this.mainPanel);
         this.launcher = launcher;
-        this.setupRepainting();
+        this.timer = new Timer();
+
+        this.setupTimer(500);
+        this.currentTick = 0;
     }
 
     private Graphics2D setupGraphics(Graphics g) {
@@ -44,51 +51,33 @@ public class GameWindow extends JFrame {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
 
-                drawGameScreen(setupGraphics(g));
+                onTick(setupGraphics(g));
             }
         };
 
-//        this.gamePanel.setBounds(0, 0, Main.WIDTH, Main.HEIGHT);
         this.setBounds(512, 512, 512, 512);
     }
 
-    private void setupRepainting() {
-        Timer t = new Timer();
-        t.scheduleAtFixedRate(new PaintTimerTask(this), 0, 1000);
+    private void setupTimer(int ms) {
+        if (this.currentTask != null) {
+            this.currentTask.cancel();
+        }
+        this.timer.scheduleAtFixedRate(this.currentTask = new onTickTimerTask(this), 0, 250);
     }
 
-    private void drawGameScreen(Graphics2D g) {
-        //TODO: HEAVY TESTING: DO NOT MESS
+    private void onTick(Graphics2D g) {
+        if (this.launcher.getGameInstance() == null) return;
 
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, this.gamePanel.getWidth(), this.gamePanel.getHeight());
-        this.launcher.getLoadedMaps().get(0).draw(g);
+        System.out.println("test");
 
-        Color ground = new Color(0, 200, 50, 49);
-        Color wall = new Color(33, 33, 33, 150);
-
-        Tile[][] tiles = this.launcher.getLoadedMaps().get(0).getMatrixMap();
-
-        int w1 = Math.floorDiv(this.gamePanel.getWidth(), tiles.length);
-        int w2 = Math.floorDiv(this.gamePanel.getHeight(), tiles[0].length);
-
-        int tileWidth = Math.min(w1, w2);
-
-        int xDist = (this.gamePanel.getWidth() - tileWidth * tiles.length) / 2;
-        int yDist = (this.gamePanel.getHeight() - tileWidth * tiles[0].length) / 2;
-
-        for (int i = 0; i < tiles.length; i++) {
-            Tile[] row = tiles[i];
-
-//            for (int j = 0; j < row.length; j++) {
-//                g.setColor(tiles[i][j] instanceof Ground ? ground : wall);
-//                g.fillRect(xDist + i * tileWidth, yDist + j * tileWidth, tileWidth, tileWidth);
-//                g.setColor(Color.BLACK);
-//                g.drawRect(xDist + i * tileWidth, yDist + j * tileWidth, tileWidth, tileWidth);
-//            }
+        if (this.currentTick % 10 == 0) {
+            this.launcher.getGameInstance().onTick();
+            this.currentTick = 0;
         }
 
         this.launcher.getGameInstance().drawComponents(g);
+
+        this.currentTick++;
     }
 
     public JPanel getGamePanel() {

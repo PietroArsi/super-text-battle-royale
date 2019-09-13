@@ -185,8 +185,8 @@ public class Player implements Drawable {
 
     @Override
     public void draw(Graphics2D g) {
-        g.setColor(Color.BLUE);
-        g.setFont(new Font("Comic Sans", Font.BOLD, 16));
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Comic Sans", Font.BOLD, 18));
         g.drawString(this.getAlias(), this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH, this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT);
 
         g.drawImage(this.icon,

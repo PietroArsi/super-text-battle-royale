@@ -17,7 +17,7 @@ public class Armor extends Collectible implements Drawable {
     private int maximumHitPoints;
 
     private int hitPoints;
-    private Player player;
+    private Player player; //Set only on copy
 
     public Armor(File settingsFolder) throws JsonLoadFailException {
         super(settingsFolder);

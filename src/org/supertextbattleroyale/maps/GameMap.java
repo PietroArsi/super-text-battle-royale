@@ -42,10 +42,6 @@ public class GameMap implements Drawable {
         this.setupTexture(settingsFolder);
     }
 
-    public GameMap(GameMap in) throws MapLoadException {
-        this(in.launcher, in.settingsFolder);
-    }
-
     private void setupMap(File config) throws MapLoadException {
         List<String> mapToString = FileUtils.getLinesFromFile(config);
 
@@ -82,6 +78,7 @@ public class GameMap implements Drawable {
         return new AbstractMap.SimpleEntry<>(xDist, yDist);
     }
 
+    //TODO: Find a good method to get from char the corresponding tile
     private Tile getTile(char symbol) {
         if(symbol == '0') return new Ground();
         else return new Wall();
@@ -101,7 +98,7 @@ public class GameMap implements Drawable {
     }
 
     private void setupDimensions() {
-        JPanel gamePanel = this.launcher.mainFrame.getGamePanel();
+        JPanel gamePanel = this.launcher.getMainFrame().getGamePanel();
         int width = this.getTileWidth(gamePanel.getWidth(), gamePanel.getHeight());
         this.CELL_WIDTH = width;
         this.CELL_HEIGHT = width;
@@ -120,5 +117,35 @@ public class GameMap implements Drawable {
                 this.CELL_WIDTH * this.matrixMap.length,
                 this.CELL_HEIGHT * this.matrixMap[0].length,
                 null);
+
+        this.printGrid(g);
+    }
+
+    private void printGrid(Graphics2D g) {
+        Color ground = new Color(0, 200, 50, 49);
+        Color wall = new Color(33, 33, 33, 150);
+
+        Tile[][] tiles = this.launcher.getGameInstance().getCurrentMap().getMatrixMap();
+
+        JPanel panel = this.launcher.getMainFrame().getGamePanel();
+
+        int w1 = Math.floorDiv(panel.getWidth(), tiles.length);
+        int w2 = Math.floorDiv(panel.getHeight(), tiles[0].length);
+
+        int tileWidth = Math.min(w1, w2);
+
+        int xDist = (panel.getWidth() - tileWidth * tiles.length) / 2;
+        int yDist = (panel.getHeight() - tileWidth * tiles[0].length) / 2;
+
+        for (int i = 0; i < tiles.length; i++) {
+            Tile[] row = tiles[i];
+
+            for (int j = 0; j < row.length; j++) {
+                g.setColor(tiles[i][j] instanceof Ground ? ground : wall);
+                g.fillRect(xDist + i * tileWidth, yDist + j * tileWidth, tileWidth, tileWidth);
+                g.setColor(Color.BLACK);
+                g.drawRect(xDist + i * tileWidth, yDist + j * tileWidth, tileWidth, tileWidth);
+            }
+        }
     }
 }
