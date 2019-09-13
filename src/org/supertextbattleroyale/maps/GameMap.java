@@ -1,10 +1,7 @@
 package org.supertextbattleroyale.maps;
 
-import org.supertextbattleroyale.Main;
-import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.exceptions.MapLoadException;
 import org.supertextbattleroyale.game.GameLauncher;
-import org.supertextbattleroyale.game.GameWindow;
 import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.maps.tiles.Ground;
 import org.supertextbattleroyale.maps.tiles.Wall;
@@ -20,8 +17,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.List;
-
-
 
 public class GameMap implements Drawable {
 
@@ -99,6 +94,9 @@ public class GameMap implements Drawable {
         }
     }
 
+    /**
+     * Setups the current tick Tile dimension based on the Window dimension
+     */
     private void setupDimensions() {
         JPanel gamePanel = this.launcher.getMainFrame().getGamePanel();
         int width = this.getTileWidth(gamePanel.getWidth(), gamePanel.getHeight());
@@ -120,9 +118,14 @@ public class GameMap implements Drawable {
                 this.CELL_HEIGHT * this.matrixMap[0].length,
                 null);
 
-        this.printGrid(g);
+        this.printGrid(g); //debug
     }
 
+    /**
+     * Debug the map drawing rectangles for every tile
+     *
+     * @param g Graphics
+     */
     private void printGrid(Graphics2D g) {
         Color ground = new Color(0, 200, 50, 49);
         Color wall = new Color(33, 33, 33, 150);

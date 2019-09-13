@@ -40,6 +40,9 @@ public class GameLauncher {
         //TODO: this.getWeapons().get(0).getClass().getSuperclass();
     }
 
+    /**
+     * Starts the window rendering
+     */
     public void loadWindow() {
         SwingUtilities.invokeLater(() -> {
             this.mainFrame = new GameWindow(this);

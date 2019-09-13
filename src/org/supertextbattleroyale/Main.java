@@ -5,6 +5,9 @@ import org.supertextbattleroyale.game.GameLauncher;
 
 public class Main {
 
+    /**
+     * Creates a new GameLauncher instance which loads the Window and the Game
+     */
     public static void main(String[] args) {
         try {
             GameLauncher launcher = new GameLauncher();

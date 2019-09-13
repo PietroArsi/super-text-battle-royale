@@ -32,6 +32,11 @@ public class Collectible {
         this.setupIcon(settingsFolder);
     }
 
+    /**
+     * 
+     * @param config
+     * @throws JsonLoadFailException
+     */
     private void setupFromJson(File config) throws JsonLoadFailException {
         Optional<JsonElement> jsonElement = JsonUtils.getJsonElementFromFile(config);
 

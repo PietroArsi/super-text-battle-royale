@@ -7,9 +7,14 @@ import java.util.Optional;
 
 public class FileUtils {
 
+    /**
+     * Returns a String with all lines the lines concatenated into
+     *
+     * @param file to read from
+     * @return the String or empty if file doesn't exist
+     */
     public static Optional<String> getAllLinesFromFile(File file) {
         if (!file.exists()) {
-            System.out.println(file.getAbsolutePath());
             return Optional.empty();
         }
 
@@ -30,6 +35,12 @@ public class FileUtils {
         return Optional.empty();
     }
 
+    /**
+     * Gets a List of Strings
+     *
+     * @param file to read from
+     * @return List of String where every String is a file line
+     */
     public static List<String> getLinesFromFile(File file) {
         List<String> list = new ArrayList<>();
         try {

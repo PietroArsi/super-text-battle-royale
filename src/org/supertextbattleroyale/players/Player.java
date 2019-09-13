@@ -72,6 +72,46 @@ public class Player implements Drawable {
         return 0;
     }
 
+    /**
+     *
+     * @param damage The damage done to the player and to the armor
+     * @return The amount of effective damage done to the  player
+     */
+    public int receiveDamage(int damage) {
+        int playerDamage;
+        if(this.equippedArmor != null) {
+            playerDamage = this.equippedArmor.getMitigatedDamage(damage);
+            this.equippedArmor.damageArmor(damage - playerDamage);
+        }
+        else {
+            playerDamage = damage;
+        }
+        this.hitPoints = Math.max(this.hitPoints - damage, 0);
+        return playerDamage;
+    }
+
+    public int hitPlayer(Player other, int damage) {
+        this.setXP(this.XP + damage); //XP are increased by the total damage done by the player
+        return other.receiveDamage(damage);
+    }
+
+    @Override
+    public void draw(Graphics2D g) {
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Helvetica Neue", Font.BOLD, 18));
+        g.drawString(this.getAlias(), this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH, this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT);
+
+        g.drawImage(this.icon,
+                this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH + (int) (this.currentMap.CELL_WIDTH * 0.1),
+                this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT + (int) (this.currentMap.CELL_HEIGHT * 0.1),
+                this.currentMap.CELL_WIDTH - (int) (this.currentMap.CELL_WIDTH * 0.2),
+                this.currentMap.CELL_HEIGHT - (int) (this.currentMap.CELL_HEIGHT * 0.2),
+                null);
+
+        if (this.equippedArmor != null) this.equippedArmor.draw(g);
+        if (this.equippedWeapon != null) this.equippedWeapon.draw(g);
+    }
+
     public String getName() {
         return this.name;
     }
@@ -161,29 +201,6 @@ public class Player implements Drawable {
         } else return 0;
     }
 
-    /**
-     *
-     * @param damage The damage done to the player and to the armor
-     * @return The amount of effective damage done to the  player
-     */
-    public int receiveDamage(int damage) {
-        int playerDamage;
-        if(this.equippedArmor != null) {
-            playerDamage = this.equippedArmor.getMitigatedDamage(damage);
-            this.equippedArmor.damageArmor(damage - playerDamage);
-        }
-        else {
-            playerDamage = damage;
-        }
-        this.hitPoints = Math.max(this.hitPoints - damage, 0);
-        return playerDamage;
-    }
-
-    public int hitPlayer(Player other, int damage) {
-        this.setXP(this.XP + damage); //XP are increased by the total damage done by the player
-        return other.receiveDamage(damage);
-    }
-
     private void setupFromJson(File config) throws JsonLoadFailException {
         Optional<JsonElement> jsonElement = JsonUtils.getJsonElementFromFile(config);
 
@@ -212,23 +229,5 @@ public class Player implements Drawable {
             e.printStackTrace();
             throw new JsonLoadFailException();
         }
-    }
-
-
-    @Override
-    public void draw(Graphics2D g) {
-        g.setColor(Color.BLACK);
-        g.setFont(new Font("Comic Sans", Font.BOLD, 18));
-        g.drawString(this.getAlias(), this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH, this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT);
-
-        g.drawImage(this.icon,
-                this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH + (int) (this.currentMap.CELL_WIDTH * 0.1),
-                this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT + (int) (this.currentMap.CELL_HEIGHT * 0.1),
-                this.currentMap.CELL_WIDTH - (int) (this.currentMap.CELL_WIDTH * 0.2),
-                this.currentMap.CELL_HEIGHT - (int) (this.currentMap.CELL_HEIGHT * 0.2),
-                null);
-
-        if (this.equippedArmor != null) this.equippedArmor.draw(g);
-        if (this.equippedWeapon != null) this.equippedWeapon.draw(g);
     }
 }

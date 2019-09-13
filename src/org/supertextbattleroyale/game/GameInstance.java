@@ -1,7 +1,6 @@
 package org.supertextbattleroyale.game;
 
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
-import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Weapon;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.players.Player;
@@ -17,7 +16,7 @@ public class GameInstance {
 
     private List<Player> allPlayers, alivePlayers, deadPlayers;
 
-    public final GameLauncher launcher;
+    private final GameLauncher launcher;
 
     public GameInstance(GameLauncher launcher) {
         this.launcher = launcher;
@@ -55,12 +54,8 @@ public class GameInstance {
         }
     }
 
-    public void setCurrentMap(GameMap map) {
-        this.currentMap = map;
-    }
-
     public void drawComponents(Graphics2D g) {
-        g.setColor(new Color(new Random().nextInt(10000000)));
+        g.setColor(Color.BLACK);
         g.fillRect(0, 0, this.launcher.getMainFrame().getGamePanel().getWidth(), this.launcher.getMainFrame().getGamePanel().getHeight());
 
         this.getCurrentMap().draw(g);
@@ -72,6 +67,10 @@ public class GameInstance {
 
     public GameMap getCurrentMap() {
         return currentMap;
+    }
+
+    public void setCurrentMap(GameMap map) {
+        this.currentMap = map;
     }
 
     public List<Player> getAllPlayers() {
