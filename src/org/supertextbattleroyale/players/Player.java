@@ -25,6 +25,7 @@ public class Player {
     private String name;
     private BufferedImage icon;
 
+    private int maxHitPoints;
     private int hitPoints;
     private int level;
 
@@ -36,7 +37,8 @@ public class Player {
         this.setupFromJson(new File(settingsFolder, "config.json"));
         this.setupIcon(settingsFolder);
 
-        this.hitPoints = 100;
+        this.maxHitPoints = 100;
+        this.hitPoints = this.maxHitPoints;
         this.level = 1;
         this.equippedArmor = null;
         this.equippedWeapon = null;
@@ -75,6 +77,10 @@ public class Player {
         this.equippedWeapon = equippedWeapon;
     }
 
+    public int getMaxHitPoints() {
+        return maxHitPoints;
+    };
+
     public int getHitPoints() {
         return hitPoints;
     }
@@ -90,6 +96,14 @@ public class Player {
     public List<Potion> getEquippedPotions() {
         return equippedPotions;
     }
+
+    public int usePotion(Potion potion) {
+        if(potion.getRemainingUses() > 0) {
+            return potion.healPlayer(this);
+        }
+        else return 0;
+    }
+
 
     private void setupFromJson(File config) throws JsonLoadFailException {
         Optional<JsonElement> jsonElement = JsonUtils.getJsonElementFromFile(config);

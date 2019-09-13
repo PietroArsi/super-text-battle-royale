@@ -12,6 +12,7 @@ public class Weapon extends Collectible {
     @Setting
     private int baseDamage;
 
+    @Setting
     private int level;
 
     public enum HitType {
@@ -40,4 +41,6 @@ public class Weapon extends Collectible {
 
         return new AbstractMap.SimpleEntry<HitType, Integer>(type, actualDamage);
     }
+
+
 }
