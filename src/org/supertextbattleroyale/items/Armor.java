@@ -31,6 +31,14 @@ public class Armor extends Collectible implements Drawable {
     }
 
 
+    public void setHitPoints(int hitPoints) {
+        this.hitPoints = hitPoints;
+    }
+
+    public void damageArmor(int hitPointsDamage) {
+        this.hitPoints = Math.max(this.hitPoints -hitPointsDamage, 0);
+    }
+
     public boolean isBroken() {
         return this.hitPoints <= 0;
     }

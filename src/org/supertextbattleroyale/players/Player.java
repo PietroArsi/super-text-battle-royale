@@ -39,6 +39,7 @@ public class Player implements Drawable {
     private int maxHitPoints;
     private int hitPoints;
     private int level;
+    private int XP;
 
     private Armor equippedArmor;
     private Weapon equippedWeapon;
@@ -53,10 +54,10 @@ public class Player implements Drawable {
 
         this.setupFromJson(new File(settingsFolder, "config.json"));
         this.setupIcon(settingsFolder);
-
         this.maxHitPoints = 100;
         this.hitPoints = this.maxHitPoints;
         this.level = 1;
+        this.XP = 0;
         this.equippedArmor = null;
         this.equippedWeapon = null;
         this.equippedPotions = new ArrayList<>();
@@ -107,6 +108,13 @@ public class Player implements Drawable {
         return this.level;
     }
 
+    public int getXP() {
+        return this.XP;
+    }
+
+    public void setXP(int XP) {
+    }
+
     public int getHP() {
         return this.hitPoints;
     }
@@ -153,6 +161,29 @@ public class Player implements Drawable {
         } else return 0;
     }
 
+    /**
+     *
+     * @param damage The damage done to the player and to the armor
+     * @return The amount of effective damage done to the  player
+     */
+    public int receiveDamage(int damage) {
+        int playerDamage;
+        if(this.equippedArmor != null) {
+            playerDamage = this.equippedArmor.getMitigatedDamage(damage);
+            this.equippedArmor.damageArmor(damage - playerDamage);
+        }
+        else {
+            playerDamage = damage;
+        }
+        this.hitPoints = Math.max(this.hitPoints - damage, 0);
+        return playerDamage;
+    }
+
+    public int hitPlayer(Player other, int damage) {
+        this.setXP(this.XP + damage); //XP are increased by the total damage done by the player
+        return other.receiveDamage(damage);
+    }
+
     private void setupFromJson(File config) throws JsonLoadFailException {
         Optional<JsonElement> jsonElement = JsonUtils.getJsonElementFromFile(config);
 
@@ -182,6 +213,7 @@ public class Player implements Drawable {
             throw new JsonLoadFailException();
         }
     }
+
 
     @Override
     public void draw(Graphics2D g) {
