@@ -1,7 +1,7 @@
 {
   "Chest": "c",
-  "Ground": "1",
+  "Ground": "0",
   "Door": "d",
   "LowObstacle": "l",
-  "Wall": "0"
+  "Wall": "1"
 }

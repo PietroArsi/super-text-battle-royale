@@ -64,7 +64,7 @@ public class GameLauncher {
         }
 
         this.loadMaps(new File(this.getWorkingDirectory(), "maps"));
-        
+
         gameInstance = new GameInstance(this);
         gameInstance.initGame();
     }
