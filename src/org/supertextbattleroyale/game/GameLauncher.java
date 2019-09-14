@@ -55,8 +55,16 @@ public class GameLauncher {
         this.loadPotions(new File(this.getWorkingDirectory(), "potions"));
         this.loadWeapons(new File(this.getWorkingDirectory(), "weapons"));
         this.loadPlayers(new File(this.getWorkingDirectory(), "players"));
-        this.loadMaps(new File(this.getWorkingDirectory(), "maps"));
 
+        try {
+            GameMap.loadTileTypes(new File(this.getWorkingDirectory(), "maps/tiles.json"));
+        } catch (JsonLoadFailException ex) {
+            ex.printStackTrace();
+            throw new GameLoadException();
+        }
+
+        this.loadMaps(new File(this.getWorkingDirectory(), "maps"));
+        
         gameInstance = new GameInstance(this);
         gameInstance.initGame();
     }
@@ -126,6 +134,8 @@ public class GameLauncher {
 
         for (File mapFolder : Objects.requireNonNull(folder.listFiles())) {
             try {
+                if(!mapFolder.isDirectory()) continue;
+
                 this.maps.add(new GameMap(this, mapFolder));
 
                 System.out.printf("Loaded '%s'\n", mapFolder.getName());

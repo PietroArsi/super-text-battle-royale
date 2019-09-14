@@ -1,13 +1,18 @@
 package org.supertextbattleroyale.maps.tiles;
 
+import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.items.base.Collectible;
+
+import java.io.File;
 
 public class Chest extends LowObstacle {
     private boolean empty;
     private Collectible item;
     //TODO: Set two Images, one for the opened chest, one for the closed chest
 
-    public Chest() {
+    public Chest(File config) throws JsonLoadFailException {
+        super(config);
+
         this.empty = false;
     }
 

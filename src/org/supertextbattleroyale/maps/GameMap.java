@@ -1,10 +1,10 @@
 package org.supertextbattleroyale.maps;
 
+import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.exceptions.MapLoadException;
 import org.supertextbattleroyale.game.GameLauncher;
 import org.supertextbattleroyale.interfaces.Drawable;
-import org.supertextbattleroyale.maps.tiles.Ground;
-import org.supertextbattleroyale.maps.tiles.Wall;
+import org.supertextbattleroyale.maps.tiles.*;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.FileUtils;
@@ -17,10 +17,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameMap implements Drawable {
+
+    private static List<Tile> tileTypes;
 
     private Tile[][] matrixMap;
 
@@ -48,7 +52,7 @@ public class GameMap implements Drawable {
     private void setupMap(File config) throws MapLoadException {
         List<String> mapToString = FileUtils.getLinesFromFile(config);
 
-        if(mapToString.size() == 0) throw new MapLoadException();
+        if (mapToString.size() == 0) throw new MapLoadException();
 
         int width = mapToString.get(0).length();
         int height = mapToString.size();
@@ -62,7 +66,10 @@ public class GameMap implements Drawable {
 
             for (int w = 0; w < line.length(); w++) {
                 int value = Integer.parseInt(line.charAt(w) + "");
-                this.matrixMap[w][h] = getTile(line.charAt(w));
+                Optional<Tile> t = getTile(line.charAt(w));
+                if(t.isEmpty()) throw new MapLoadException();
+
+                this.matrixMap[w][h] = t.get();
             }
         }
     }
@@ -82,9 +89,8 @@ public class GameMap implements Drawable {
     }
 
     //TODO: Find a good method to get from char the corresponding tile
-    private Tile getTile(char symbol) {
-        if(symbol == '0') return new Ground();
-        else return new Wall();
+    private Optional<Tile> getTile(char symbol) {
+        return this.tileTypes.stream().filter(t -> t.getSymbol() == symbol).findAny();
     }
 
     public Tile[][] getMatrixMap() {
@@ -162,5 +168,20 @@ public class GameMap implements Drawable {
 
     public List<Player> getPlayersOnMap() {
         return playersOnMap;
+    }
+
+    /**
+     * Where all types of tiles are created
+     *
+     * @param config tiles.json
+     * @throws JsonLoadFailException if a tile has her symbol stored in the config file
+     */
+    public static void loadTileTypes(File config) throws JsonLoadFailException {
+        tileTypes = new ArrayList<>();
+        tileTypes.add(new Chest(config));
+        tileTypes.add(new Door(config));
+        tileTypes.add(new Ground(config));
+        tileTypes.add(new LowObstacle(config));
+        tileTypes.add(new Wall(config));
     }
 }
