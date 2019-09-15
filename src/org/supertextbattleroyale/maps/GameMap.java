@@ -1,5 +1,7 @@
 package org.supertextbattleroyale.maps;
 
+import org.javatuples.Pair;
+import org.javatuples.Unit;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.exceptions.MapLoadException;
 import org.supertextbattleroyale.game.GameLauncher;
@@ -16,10 +18,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameMap implements Drawable {
@@ -38,6 +38,8 @@ public class GameMap implements Drawable {
     private GameLauncher launcher;
 
     private final List<Player> playersOnMap;
+
+    private final int PATHFIND_DISTANCE_INCREMENT = 10;
 
     public GameMap(GameLauncher launcher, File directory) throws MapLoadException {
         this.settingsFolder = directory;
@@ -95,6 +97,55 @@ public class GameMap implements Drawable {
 
     public Tile[][] getMatrixMap() {
         return this.matrixMap;
+    }
+
+    /**
+     *
+     * @param type the class of a Tile child class
+     * @return a list of all tiles that are of the selected type
+     */
+    public List<Pair<Integer,Integer>> getAllTilesFromType(Class<Tile> type) {
+        List<Pair<Integer,Integer>> list = new ArrayList<>();
+        for(int i = 0; i < this.CELL_WIDTH; i++)
+            for(int j = 0; j < this.CELL_HEIGHT; j++) {
+                if(this.matrixMap[i][j].getClass() == type) list.add(new Pair<>(i,j));
+            }
+        return list;
+    }
+
+    /**
+     * A BFS alghorithm on a matrix
+     * @param zeroTiles a list of "destination tiles"
+     * @return a int matrix with the distance from the nearest zero
+     */
+    public int[][] calculateDistances(List<Pair<Integer,Integer>> zeroTiles) {
+
+        int[][] distances = new int[this.CELL_WIDTH][this.CELL_HEIGHT];
+        for(int i = 0; i < this.CELL_WIDTH; i++)
+            for(int j = 0; j < this.CELL_HEIGHT; j++)
+                distances[i][j] = Integer.MAX_VALUE;
+        ArrayDeque<Pair<Integer,Integer>> visit_queue = new ArrayDeque<>();
+        for(Pair<Integer,Integer> p : zeroTiles) {
+            distances[p.getValue0()][p.getValue1()] = 0;
+             visit_queue.offer(p);
+        }
+        Pair<Integer,Integer> u;
+        while(!visit_queue.isEmpty()) {
+            u = visit_queue.poll();
+            assert(u != null);
+            int i = u.getValue0();
+            int j = u.getValue1();
+            for(int x = Math.max(0,i-1); x <= Math.min(i+1,CELL_WIDTH); x++)
+                for(int y = Math.max(0,j-1); j <= Math.min(j+1,CELL_HEIGHT); j++)
+                    if(x != i || j != y) {
+                        if(distances[x][y] == Integer.MAX_VALUE) {
+                            distances[x][y] = distances[i][j] + 1;
+                            visit_queue.offer(new Pair<>(x,y));
+                        }
+
+                    }
+        }
+        return distances;
     }
 
     private void setupTexture(File settingsFolder) throws MapLoadException {
