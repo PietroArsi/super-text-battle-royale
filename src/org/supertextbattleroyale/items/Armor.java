@@ -6,8 +6,12 @@ import org.supertextbattleroyale.items.base.Collectible;
 import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.Setting;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class Armor extends Collectible implements Drawable {
 
@@ -19,6 +23,8 @@ public class Armor extends Collectible implements Drawable {
     private int hitPoints;
     private Player player; //Set only on copy
 
+    private BufferedImage back;
+
     public Armor(File settingsFolder) throws JsonLoadFailException {
         super(settingsFolder);
         //settings initialize maximumHitPoints, so on armor creation hitPoints need to be equal to maximum
@@ -26,7 +32,7 @@ public class Armor extends Collectible implements Drawable {
     }
 
     public Armor(Armor in, Player player) throws JsonLoadFailException {
-        this(in.settingsFolder);
+        this(in.getSettingsFolder());
         this.player = player;
     }
 
@@ -48,12 +54,31 @@ public class Armor extends Collectible implements Drawable {
 
     @Override
     public void draw(Graphics2D g) {
-        g.drawImage(this.getImage(),
-                player.getCurrentMap().X_DIST + player.getX() * player.getCurrentMap().CELL_WIDTH + (int) (player.getCurrentMap().CELL_WIDTH * 0.05),
-                player.getCurrentMap().Y_DIST + player.getY() * player.getCurrentMap().CELL_HEIGHT + (int) (player.getCurrentMap().CELL_HEIGHT * 0.05),
-                player.getCurrentMap().CELL_WIDTH - (int) (player.getCurrentMap().CELL_WIDTH * 0.1),
-                player.getCurrentMap().CELL_HEIGHT - (int) (player.getCurrentMap().CELL_HEIGHT * 0.1),
-                null);
+        this.drawImage(this.getImage(), g, this.player);
     }
 
+    public void drawBack(Graphics2D g) {
+        this.drawImage(this.back, g, this.player);
+    }
+
+    private void drawImage(BufferedImage image, Graphics2D g, Player p) {
+        g.translate(-p.getCurrentMap().CELL_WIDTH / 2, -p.getCurrentMap().CELL_HEIGHT);
+        g.drawImage(image,
+                p.getCurrentMap().X_DIST + p.getX() * p.getCurrentMap().CELL_WIDTH,
+                p.getCurrentMap().Y_DIST + p.getY() * p.getCurrentMap().CELL_HEIGHT,
+                p.getCurrentMap().CELL_WIDTH * 2,
+                p.getCurrentMap().CELL_HEIGHT * 2,
+                null);
+        g.translate(p.getCurrentMap().CELL_WIDTH / 2, p.getCurrentMap().CELL_HEIGHT);
+    }
+
+    @Override
+    protected void setupIcon(File settingsFolder) throws JsonLoadFailException {
+        super.setupIcon(settingsFolder);
+
+        try {
+            this.back = ImageIO.read(new FileInputStream(new File(settingsFolder, "back.png")));
+        } catch (IOException e) {
+        }
+    }
 }

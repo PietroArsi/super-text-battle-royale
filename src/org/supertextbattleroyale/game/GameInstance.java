@@ -1,12 +1,16 @@
 package org.supertextbattleroyale.game;
 
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
+import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Weapon;
+import org.supertextbattleroyale.items.WeaponMelee;
+import org.supertextbattleroyale.items.WeaponRanged;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -40,8 +44,10 @@ public class GameInstance {
                 p.setY(new Random().nextInt(this.getCurrentMap().getMatrixMap()[0].length));
                 p.setCurrentMap(this.getCurrentMap());
 
-//                p.equipArmor(new Armor(launcher.getLoadedArmors().get(0), p));
-                p.equipWeapon(new Weapon(launcher.getLoadedWeapons().get(0), p));
+                p.equipArmor(new Armor(launcher.getLoadedArmors().get(RandomUtils.randomIntRange(0, launcher.getLoadedArmors().size() -1)), p));
+                Weapon w = launcher.getLoadedWeapons().get(0);
+
+                p.equipWeapon(w.isRanged() ? new WeaponRanged(w, p) : new WeaponMelee(w, p));
             } catch (JsonLoadFailException ex) {
                 ex.printStackTrace();
             }
@@ -60,6 +66,7 @@ public class GameInstance {
 
         this.getAlivePlayers().stream()
                 .filter(player -> player.getCurrentMap() != null && player.getCurrentMap().equals(currentMap))
+                .sorted(Comparator.comparingInt(Player::getY))
                 .forEach(player -> player.draw(g));
     }
 
