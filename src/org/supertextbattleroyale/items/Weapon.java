@@ -1,5 +1,6 @@
 package org.supertextbattleroyale.items;
 
+import org.javatuples.Pair;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.items.base.Collectible;
@@ -16,9 +17,10 @@ public class Weapon extends Collectible implements Drawable {
     private int baseDamage;
 
     @Setting
-    private int level;
+    private boolean isRanged;
 
-    private Player player;
+    private int level;
+    protected Player player;
 
     public enum HitType {
         CRITIC(2.0f),
@@ -40,16 +42,16 @@ public class Weapon extends Collectible implements Drawable {
     }
 
     public Weapon(Weapon in, Player player) throws JsonLoadFailException {
-        this(in.settingsFolder);
+        this(in.getSettingsFolder());
         this.player = player;
     }
 
-    public AbstractMap.SimpleEntry<HitType, Integer> getHitStats() {
+    public Pair<HitType, Integer> getHitStats() {
         HitType type = HitType.CRITIC;
         int damage = 100;
         int actualDamage = (int) Math.floor(type.damagePercentage * damage);
 
-        return new AbstractMap.SimpleEntry<HitType, Integer>(type, actualDamage);
+        return new Pair<>(type, actualDamage);
     }
 
     @Override
@@ -62,4 +64,7 @@ public class Weapon extends Collectible implements Drawable {
                 null);
     }
 
+    public boolean isRanged() {
+        return isRanged;
+    }
 }

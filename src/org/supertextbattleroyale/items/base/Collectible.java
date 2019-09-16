@@ -20,7 +20,7 @@ public class Collectible {
     private String name;
     private BufferedImage icon;
 
-    protected File settingsFolder;
+    private File settingsFolder;
 
     public Collectible(File settingsFolder) throws JsonLoadFailException {
         this.settingsFolder = settingsFolder;
@@ -56,7 +56,7 @@ public class Collectible {
         }
     }
 
-    private void setupIcon(File settingsFolder) throws JsonLoadFailException {
+    protected void setupIcon(File settingsFolder) throws JsonLoadFailException {
         try {
             this.icon = ImageIO.read(new FileInputStream(new File(settingsFolder, "icon.png")));
         } catch (IOException e) {
@@ -71,5 +71,9 @@ public class Collectible {
 
     public BufferedImage getImage() {
         return this.icon;
+    }
+
+    public File getSettingsFolder() {
+        return settingsFolder;
     }
 }

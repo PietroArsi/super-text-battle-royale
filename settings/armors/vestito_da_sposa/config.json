@@ -1,0 +1,5 @@
+{
+  "name": "Antivirus",
+  "shieldPercentage": 0.2,
+  "maximumHitPoints": 100
+}

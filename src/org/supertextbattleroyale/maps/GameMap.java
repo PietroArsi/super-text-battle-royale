@@ -1,7 +1,6 @@
 package org.supertextbattleroyale.maps;
 
 import org.javatuples.Pair;
-import org.javatuples.Unit;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.exceptions.MapLoadException;
 import org.supertextbattleroyale.game.GameLauncher;
@@ -51,6 +50,13 @@ public class GameMap implements Drawable {
         this.playersOnMap = new CopyOnWriteArrayList<>();
     }
 
+    /**
+     * Reads all characters from map.data files, gets the corresponding Tile
+     * from the read char, and fills the matrixMap with the read tiles
+     *
+     * @param config
+     * @throws MapLoadException
+     */
     private void setupMap(File config) throws MapLoadException {
         List<String> mapToString = FileUtils.getLinesFromFile(config);
 
@@ -83,11 +89,11 @@ public class GameMap implements Drawable {
         return Math.min(w1, w2);
     }
 
-    private AbstractMap.SimpleEntry<Integer, Integer> getDistanceFromBorders(int panelWidth, int panelHeight) {
+    private Pair<Integer, Integer> getDistanceFromBorders(int panelWidth, int panelHeight) {
         int xDist = (panelWidth - CELL_WIDTH * matrixMap.length) / 2;
         int yDist = (panelHeight - CELL_HEIGHT * matrixMap[0].length) / 2;
 
-        return new AbstractMap.SimpleEntry<>(xDist, yDist);
+        return new Pair<>(xDist, yDist);
     }
 
     //TODO: Find a good method to get from char the corresponding tile
@@ -167,9 +173,9 @@ public class GameMap implements Drawable {
         this.CELL_WIDTH = width;
         this.CELL_HEIGHT = width;
 
-        AbstractMap.SimpleEntry<Integer, Integer> distances = this.getDistanceFromBorders(gamePanel.getWidth(), gamePanel.getHeight());
-        this.X_DIST = distances.getKey();
-        this.Y_DIST = distances.getValue();
+        Pair<Integer, Integer> distances = this.getDistanceFromBorders(gamePanel.getWidth(), gamePanel.getHeight());
+        this.X_DIST = distances.getValue0();
+        this.Y_DIST = distances.getValue1();
     }
 
     @Override
