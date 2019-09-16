@@ -1,5 +1,6 @@
 package org.supertextbattleroyale.game;
 
+import org.javatuples.Pair;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Weapon;
@@ -10,6 +11,7 @@ import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -32,7 +34,13 @@ public class GameInstance {
 
     //TODO: Get this working good
     public void initGame() {
+        //Testing per il BFS
         this.setCurrentMap(launcher.getLoadedMaps().get(1));
+        ArrayList<Pair<Integer,Integer>> l = new ArrayList<>();
+        l.add(new Pair<>(0,4));
+        l.add(new Pair<>(4,0));
+        this.currentMap.printRoomMatrix();
+        this.currentMap.printDistancesMatrix(l);
 
         for (Player player : launcher.getLoadedPlayers()) {
             try {
