@@ -62,14 +62,12 @@ public class Armor extends Collectible implements Drawable {
     }
 
     private void drawImage(BufferedImage image, Graphics2D g, Player p) {
-        g.translate(-p.getCurrentMap().CELL_WIDTH / 2, -p.getCurrentMap().CELL_HEIGHT);
         g.drawImage(image,
                 p.getCurrentMap().X_DIST + p.getX() * p.getCurrentMap().CELL_WIDTH,
                 p.getCurrentMap().Y_DIST + p.getY() * p.getCurrentMap().CELL_HEIGHT,
-                p.getCurrentMap().CELL_WIDTH * 2,
-                p.getCurrentMap().CELL_HEIGHT * 2,
+                p.getCurrentMap().CELL_WIDTH,
+                p.getCurrentMap().CELL_HEIGHT,
                 null);
-        g.translate(p.getCurrentMap().CELL_WIDTH / 2, p.getCurrentMap().CELL_HEIGHT);
     }
 
     @Override

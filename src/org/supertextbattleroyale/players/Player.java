@@ -152,14 +152,14 @@ public class Player implements Drawable {
     }
 
     private void drawImage(BufferedImage image, Graphics2D g) {
-        g.translate(-this.currentMap.CELL_WIDTH / 2, -this.currentMap.CELL_HEIGHT);
+//        g.translate(-this.currentMap.CELL_WIDTH / 2, -this.currentMap.CELL_HEIGHT);
         g.drawImage(image,
                 this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH,
                 this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT,
-                this.currentMap.CELL_WIDTH * 2,
-                this.currentMap.CELL_HEIGHT * 2,
+                this.currentMap.CELL_WIDTH,
+                this.currentMap.CELL_HEIGHT,
                 null);
-        g.translate(this.currentMap.CELL_WIDTH / 2, this.currentMap.CELL_HEIGHT);
+//        g.translate(this.currentMap.CELL_WIDTH / 2, this.currentMap.CELL_HEIGHT);
     }
 
     public String getName() {
