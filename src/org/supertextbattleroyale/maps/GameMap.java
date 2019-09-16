@@ -130,6 +130,7 @@ public class GameMap implements Drawable {
              visit_queue.offer(p);
         }
         Pair<Integer,Integer> u;
+
         while(!visit_queue.isEmpty()) {
             u = visit_queue.poll();
             assert(u != null);
