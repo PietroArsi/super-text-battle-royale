@@ -7,6 +7,7 @@ import org.supertextbattleroyale.items.Weapon;
 import org.supertextbattleroyale.items.WeaponMelee;
 import org.supertextbattleroyale.items.WeaponRanged;
 import org.supertextbattleroyale.maps.GameMap;
+import org.supertextbattleroyale.maps.MapUtils;
 import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.RandomUtils;
 
@@ -39,8 +40,8 @@ public class GameInstance {
         ArrayList<Pair<Integer,Integer>> l = new ArrayList<>();
         l.add(new Pair<>(0,4));
         l.add(new Pair<>(4,0));
-        this.currentMap.printRoomMatrix();
-        this.currentMap.printDistancesMatrix(l);
+        MapUtils.printRoomMatrix(this.currentMap);
+        MapUtils.printDistancesMatrix(this.currentMap, l);
 
         for (Player player : launcher.getLoadedPlayers()) {
             try {

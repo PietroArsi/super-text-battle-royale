@@ -75,7 +75,7 @@ public class GameMap implements Drawable {
             for (int w = 0; w < line.length(); w++) {
                 int value = Integer.parseInt(line.charAt(w) + "");
                 Optional<Tile> t = getTile(line.charAt(w));
-                if(t.isEmpty()) throw new MapLoadException();
+                if (t.isEmpty()) throw new MapLoadException();
 
                 this.matrixMap[w][h] = t.get();
             }
@@ -98,90 +98,11 @@ public class GameMap implements Drawable {
 
     //TODO: Find a good method to get from char the corresponding tile
     private Optional<Tile> getTile(char symbol) {
-        return this.tileTypes.stream().filter(t -> t.getSymbol() == symbol).findAny();
+        return tileTypes.stream().filter(t -> t.getSymbol() == symbol).findAny();
     }
 
     public Tile[][] getMatrixMap() {
         return this.matrixMap;
-    }
-
-    /**
-     *
-     * @param type the class of a Tile child class
-     * @return a list of all tiles that are of the selected type
-     */
-    public List<Pair<Integer,Integer>> getAllTilesFromType(Class<? extends Tile> type) {
-        List<Pair<Integer,Integer>> list = new ArrayList<>();
-        for(int i = 0; i < this.getWidthCell(); i++)
-            for(int j = 0; j < this.getHeightCell(); j++) {
-                if(this.matrixMap[i][j].getClass() == type) list.add(new Pair<>(i,j));
-            }
-        return list;
-    }
-
-    /**
-     * A BFS alghorithm on a matrix
-     * @param zeroTiles a list of "source nodes"
-     * @return a int matrix with the distance from the nearest source node
-     */
-    public int[][] calculateDistances(List<Pair<Integer,Integer>> zeroTiles) {
-        //Initialize all tile with MAX_INT
-        int[][] distances = new int[this.getWidthCell()][this.getHeightCell()];
-        for(int i = 0; i < this.getWidthCell(); i++)
-            for(int j = 0; j < this.getHeightCell(); j++)
-                distances[i][j] = Integer.MAX_VALUE;
-
-        ArrayDeque<Pair<Integer,Integer>> visit_queue = new ArrayDeque<>();
-        //Add all source nodes to the visit queue and set their distance to the source nodes to 0 (gac)
-        for(Pair<Integer,Integer> p : zeroTiles) {
-            distances[p.getValue0()][p.getValue1()] = 0;
-             visit_queue.offer(p);
-        }
-        Pair<Integer,Integer> u;
-        //Do a BFS search
-        while(!visit_queue.isEmpty()) {
-            u = visit_queue.poll();
-            assert(u != null);
-            int i = u.getValue0();
-            int j = u.getValue1();
-            //Visit all neighbours (also diagonal neighbours)
-            //TODO: Add a parameter allowDiagonalMovement
-            for(int y = Math.max(0,j-1); y <= Math.min(j+1,this.getHeightCell() - 1); y++)
-                for(int x = Math.max(0,i-1); x <= Math.min(i+1,this.getWidthCell() - 1); x++)
-                    if(x != i || j != y) {
-                        if(distances[x][y] == Integer.MAX_VALUE && this.matrixMap[x][y].isTileWalkable()) {
-                            distances[x][y] = distances[i][j] + 1;
-                            visit_queue.offer(new Pair<>(x,y));
-                        }
-
-                    }
-        }
-        return distances;
-    }
-
-    public void printRoomMatrix() {
-        System.out.println();
-        System.out.printf("MAP: W %d x H %d\n",this.getWidthCell(),this.getHeightCell());
-        for(int h = 0; h < this.getHeightCell(); h++) {
-            System.out.println();
-            for(int w = 0; w < this.getWidthCell(); w++) {
-                System.out.print(this.matrixMap[w][h].getSymbol());
-            }
-        }
-    }
-
-    public void printDistancesMatrix(List<Pair<Integer,Integer>> zeroTiles) {
-        int[][] distances = calculateDistances(zeroTiles);
-        System.out.println();
-        for(int j = 0; j < this.getHeightCell(); j++) {
-            System.out.println();
-            for(int i = 0; i < this.getWidthCell(); i++)  {
-                if(distances[i][j] == Integer.MAX_VALUE)
-                    System.out.print("X\t");
-                else System.out.printf("%d\t",distances[i][j]);
-            }
-        }
-
     }
 
     private void setupTexture(File settingsFolder) throws MapLoadException {
@@ -207,11 +128,11 @@ public class GameMap implements Drawable {
         this.Y_DIST = distances.getValue1();
     }
 
-    private int getWidthCell() {
+    public int getMatrixWidth() {
         return this.matrixMap.length;
     }
 
-    private int getHeightCell() {
+    public int getMatrixHeight() {
         return this.matrixMap[0].length;
     }
 
