@@ -87,6 +87,7 @@ public class MapUtils {
                 else System.out.printf("%d\t", distances[i][j]);
             }
         }
+        System.out.println();
     }
 
 }

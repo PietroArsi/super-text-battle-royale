@@ -13,5 +13,6 @@ public class onTickTimerTask extends TimerTask {
     @Override
     public void run() {
         this.window.getGamePanel().repaint();
+        this.window.getScoreboardPanel().repaint();
     }
 }

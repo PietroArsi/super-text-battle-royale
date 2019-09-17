@@ -37,9 +37,9 @@ public class GameInstance {
     public void initGame() {
         //Testing per il BFS
         this.setCurrentMap(launcher.getLoadedMaps().get(1));
-        ArrayList<Pair<Integer,Integer>> l = new ArrayList<>();
-        l.add(new Pair<>(0,4));
-        l.add(new Pair<>(4,0));
+        ArrayList<Pair<Integer, Integer>> l = new ArrayList<>();
+        l.add(new Pair<>(0, 4));
+        l.add(new Pair<>(4, 0));
         MapUtils.printRoomMatrix(this.currentMap);
         MapUtils.printDistancesMatrix(this.currentMap, l);
 
@@ -53,7 +53,7 @@ public class GameInstance {
                 p.setY(new Random().nextInt(this.getCurrentMap().getMatrixMap()[0].length));
                 p.setCurrentMap(this.getCurrentMap());
 
-                p.equipArmor(new Armor(launcher.getLoadedArmors().get(RandomUtils.randomIntRange(0, launcher.getLoadedArmors().size() -1)), p));
+                p.equipArmor(new Armor(launcher.getLoadedArmors().get(RandomUtils.randomIntRange(0, launcher.getLoadedArmors().size() - 1)), p));
                 Weapon w = launcher.getLoadedWeapons().get(0);
 
                 p.equipWeapon(w.isRanged() ? new WeaponRanged(w, p) : new WeaponMelee(w, p));
@@ -64,6 +64,9 @@ public class GameInstance {
     }
 
     public void onTick() {
+//        GameWindow w = this.launcher.getMainFrame();
+//        w.setupZoom(w.getWidth()/RandomUtils.randomIntRange(1, 10), w.getHeight()/RandomUtils.randomIntRange(1, 10), RandomUtils.randomIntRange(1, 4));
+
         this.getCurrentMap().getPlayersOnMap().forEach(Player::onTick);
     }
 
