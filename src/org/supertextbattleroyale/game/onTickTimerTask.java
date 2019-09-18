@@ -1,5 +1,7 @@
 package org.supertextbattleroyale.game;
 
+import org.javatuples.Quintet;
+
 import java.util.TimerTask;
 
 public class onTickTimerTask extends TimerTask {
@@ -13,5 +15,6 @@ public class onTickTimerTask extends TimerTask {
     @Override
     public void run() {
         this.window.getGamePanel().repaint();
+        this.window.getScoreboardPanel().repaint();
     }
 }

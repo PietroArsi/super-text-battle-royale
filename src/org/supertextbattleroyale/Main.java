@@ -10,10 +10,9 @@ public class Main {
      */
     public static void main(String[] args) {
         try {
-            GameLauncher launcher = new GameLauncher();
-            launcher.loadWindow();
-            launcher.launchGame();
-        }catch (GameLoadException ex) {
+            GameLauncher.loadWindow();
+            GameLauncher.launchGame();
+        } catch (GameLoadException ex) {
             ex.printStackTrace();
             System.out.println("Game failed to initialize, stopping.");
             System.exit(-1);

@@ -1,5 +1,6 @@
 package org.supertextbattleroyale.game;
 
+import org.javatuples.Triplet;
 import org.supertextbattleroyale.maps.tiles.Ground;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 
@@ -14,35 +15,29 @@ import java.util.TimerTask;
 public class GameWindow extends JFrame {
     public JPanel mainPanel;
     private JPanel gamePanel;
-    private GameLauncher launcher;
+    private JPanel scoreboardPanel;
 
     private final Timer timer;
     private TimerTask currentTask;
 
     private int currentTick;
-    private float wheel, wheelSpeed, wheelAcc;
 
-    private float xTranslate, yTranslate, xm, ym;
+    private float xTranslate, yTranslate;
+    private int xZoom, yZoom;
+    private float zoom;
 
     private final int FPS = 60;
+    private final int TICKS_PER_SECOND = 2;
 
-    public GameWindow(GameLauncher launcher) {
+    public GameWindow() {
         this.add(this.mainPanel);
-        this.launcher = launcher;
         this.timer = new Timer();
 
         this.setupTimer(500);
         this.currentTick = 0;
-        this.wheel = 1;
         this.xTranslate = 0;
         this.yTranslate = 0;
-        this.wheelSpeed = 1;
-
-        this.addMouseWheelListener(mouseWheelEvent -> {
-            wheelSpeed += -0.1f * mouseWheelEvent.getWheelRotation();
-            xm = mouseWheelEvent.getX();
-            ym = mouseWheelEvent.getY();
-        });
+        this.setupZoom(0, 0, 1);
     }
 
     private Graphics2D setupGraphics(Graphics g) {
@@ -58,7 +53,7 @@ public class GameWindow extends JFrame {
                 RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        graphics2D.transform(new AffineTransform(wheel, 0, 0, wheel, xTranslate, yTranslate));
+        graphics2D.transform(new AffineTransform(1, 0, 0, 1, xTranslate, yTranslate));
         return graphics2D;
     }
 
@@ -86,24 +81,37 @@ public class GameWindow extends JFrame {
     }
 
     private void onTick(Graphics2D g) {
-        if (this.launcher.getGameInstance() == null) return;
+        if (GameLauncher.getGameInstance() == null) return;
 
-        g.translate(getWidth()/2, getHeight()/2);
-        g.scale(this.wheelSpeed, this.wheelSpeed);
-        g.translate(-getWidth()/2, -getHeight()/2);
+        g.translate(this.xZoom, this.yZoom);
+        g.scale(this.zoom, this.zoom);
+        g.translate(-this.xZoom, -this.yZoom);
 
-        if (this.currentTick % 60 == 0) {
-            this.launcher.getGameInstance().onTick();
+        if (this.currentTick % (FPS/TICKS_PER_SECOND) == 0) {
+            GameLauncher.getGameInstance().onTick();
             this.currentTick = 0;
         }
 
-        this.launcher.getGameInstance().drawComponents(g);
-
+        GameLauncher.getGameInstance().drawComponents(g);
 
         this.currentTick++;
     }
 
+    public Triplet<Integer, Integer, Float> getZoomStatus() {
+        return new Triplet<>(this.xZoom, this.yZoom, this.zoom);
+    }
+
+    public void setupZoom(int xZ, int yZ, float zoom) {
+        this.zoom = zoom;
+        this.xZoom = xZ;
+        this.yZoom = yZ;
+    }
+
     public JPanel getGamePanel() {
         return this.gamePanel;
+    }
+
+    public JPanel getScoreboardPanel() {
+        return this.scoreboardPanel;
     }
 }
