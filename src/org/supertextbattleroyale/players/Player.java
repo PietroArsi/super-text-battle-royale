@@ -131,6 +131,8 @@ public class Player implements Drawable {
                 .anyMatch(p -> p != this && p.getX() == tx && p.getY() == ty);
     }
 
+
+
     @Override
     public void draw(Graphics2D g) {
         g.setColor(Color.BLACK);

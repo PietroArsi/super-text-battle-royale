@@ -29,7 +29,7 @@ public class MapUtils {
      * @param zeroTiles a list of "source nodes"
      * @return a int matrix with the distance from the nearest source node
      */
-    public static int[][] calculateDistances(GameMap map, List<Pair<Integer, Integer>> zeroTiles) {
+    public static int[][] calculateDistances(GameMap map, List<Pair<Integer, Integer>> zeroTiles, boolean allowDiagonalMovement) {
         //Initialize all tile with MAX_INT
         int[][] distances = new int[map.getMatrixWidth()][map.getMatrixHeight()];
         for (int i = 0; i < map.getMatrixWidth(); i++)
@@ -50,13 +50,13 @@ public class MapUtils {
             int i = u.getValue0();
             int j = u.getValue1();
             //Visit all neighbours (also diagonal neighbours)
-            //TODO: Add a parameter allowDiagonalMovement
             for (int y = Math.max(0, j - 1); y <= Math.min(j + 1, map.getMatrixHeight() - 1); y++) {
                 for (int x = Math.max(0, i - 1); x <= Math.min(i + 1, map.getMatrixWidth() - 1); x++) {
                     if (x != i || j != y) {
-                        if (distances[x][y] == Integer.MAX_VALUE && map.getMatrixMap()[x][y].isTileWalkable()) {
-                            distances[x][y] = distances[i][j] + 1;
-                            visit_queue.offer(new Pair<>(x, y));
+                        if(allowDiagonalMovement || x == i || y == j)
+                            if (distances[x][y] == Integer.MAX_VALUE && map.getMatrixMap()[x][y].isTileWalkable()) {
+                                distances[x][y] = distances[i][j] + 1;
+                                visit_queue.offer(new Pair<>(x, y));
                         }
                     }
                 }
@@ -77,7 +77,7 @@ public class MapUtils {
     }
 
     public static void printDistancesMatrix(GameMap map, List<Pair<Integer, Integer>> zeroTiles) {
-        int[][] distances = calculateDistances(map, zeroTiles);
+        int[][] distances = calculateDistances(map, zeroTiles, false);
         System.out.println();
         for (int j = 0; j < map.getMatrixHeight(); j++) {
             System.out.println();
@@ -88,5 +88,4 @@ public class MapUtils {
             }
         }
     }
-
 }
