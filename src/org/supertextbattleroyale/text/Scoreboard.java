@@ -31,6 +31,6 @@ public class Scoreboard implements Drawable {
 
     @Override
     public void draw(Graphics2D g) {
-        
+
     }
 }

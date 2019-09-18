@@ -17,6 +17,8 @@ import java.util.Objects;
 
 public class GameLauncher {
 
+    private static GameLauncher instance = new GameLauncher();
+
     private final File workingDirectory;
     private GameWindow mainFrame;
 
@@ -26,7 +28,7 @@ public class GameLauncher {
     private List<Player> players;
     private List<GameMap> maps;
 
-    private GameInstance gameInstance;
+    private static GameInstance gameInstance;
 
     public GameLauncher() {
         this.workingDirectory = new File(System.getProperty("user.dir"), "settings");
@@ -43,56 +45,56 @@ public class GameLauncher {
     /**
      * Starts the window rendering
      */
-    public void loadWindow() {
+    public static void loadWindow() {
         SwingUtilities.invokeLater(() -> {
-            this.mainFrame = new GameWindow(this);
-            this.setupFrame(this.mainFrame);
+            getInstance().mainFrame = new GameWindow();
+            getInstance().setupFrame(getMainFrame());
         });
     }
 
-    public void launchGame() throws GameLoadException {
-        this.loadArmors(new File(this.getWorkingDirectory(), "armors"));
-        this.loadPotions(new File(this.getWorkingDirectory(), "potions"));
-        this.loadWeapons(new File(this.getWorkingDirectory(), "weapons"));
-        this.loadPlayers(new File(this.getWorkingDirectory(), "players"));
+    public static void launchGame() throws GameLoadException {
+        getInstance().loadArmors(new File(getWorkingDirectory(), "armors"));
+        getInstance().loadPotions(new File(getWorkingDirectory(), "potions"));
+        getInstance().loadWeapons(new File(getWorkingDirectory(), "weapons"));
+        getInstance().loadPlayers(new File(getWorkingDirectory(), "players"));
 
         try {
-            GameMap.loadTileTypes(new File(this.getWorkingDirectory(), "maps/tiles.json"));
+            GameMap.loadTileTypes(new File(getWorkingDirectory(), "maps/tiles.json"));
         } catch (JsonLoadFailException ex) {
             ex.printStackTrace();
             throw new GameLoadException();
         }
 
-        this.loadMaps(new File(this.getWorkingDirectory(), "maps"));
+        getInstance().loadMaps(new File(getWorkingDirectory(), "maps"));
 
-        gameInstance = new GameInstance(this);
+        gameInstance = new GameInstance();
         gameInstance.initGame();
     }
 
     private void loadArmors(File folder) throws GameLoadException {
-        if(!folder.exists()) throw new GameLoadException();
+        if (!folder.exists()) throw new GameLoadException();
 
         for (File armorFolder : Objects.requireNonNull(folder.listFiles())) {
             try {
                 this.armors.add(new Armor(armorFolder));
 
                 System.out.printf("Loaded '%s'\n", armorFolder.getName());
-            }catch (JsonLoadFailException ex) {
+            } catch (JsonLoadFailException ex) {
                 ex.printStackTrace();
                 System.out.printf("Failed to load '%s'\n", armorFolder.getName());
             }
         }
     }
 
-    private void loadPotions(File folder) throws GameLoadException  {
-        if(!folder.exists()) throw new GameLoadException();
+    private void loadPotions(File folder) throws GameLoadException {
+        if (!folder.exists()) throw new GameLoadException();
 
         for (File potionFolder : Objects.requireNonNull(folder.listFiles())) {
             try {
                 this.potions.add(new Potion(potionFolder));
 
                 System.out.printf("Loaded '%s'\n", potionFolder.getName());
-            }catch (JsonLoadFailException ex) {
+            } catch (JsonLoadFailException ex) {
                 ex.printStackTrace();
                 System.out.printf("Failed to load '%s'\n", potionFolder.getName());
             }
@@ -100,14 +102,14 @@ public class GameLauncher {
     }
 
     private void loadWeapons(File folder) throws GameLoadException {
-        if(!folder.exists()) throw new GameLoadException();
+        if (!folder.exists()) throw new GameLoadException();
 
         for (File weaponFolder : Objects.requireNonNull(folder.listFiles())) {
             try {
                 this.weapons.add(new Weapon(weaponFolder));
 
                 System.out.printf("Loaded '%s'\n", weaponFolder.getName());
-            }catch (JsonLoadFailException ex) {
+            } catch (JsonLoadFailException ex) {
                 ex.printStackTrace();
                 System.out.printf("Failed to load '%s'\n", weaponFolder.getName());
             }
@@ -115,14 +117,14 @@ public class GameLauncher {
     }
 
     private void loadPlayers(File folder) throws GameLoadException {
-        if(!folder.exists()) throw new GameLoadException();
+        if (!folder.exists()) throw new GameLoadException();
 
         for (File playerFolder : Objects.requireNonNull(folder.listFiles())) {
             try {
                 this.players.add(new Player(playerFolder));
 
                 System.out.printf("Loaded '%s'\n", playerFolder.getName());
-            }catch (JsonLoadFailException ex) {
+            } catch (JsonLoadFailException ex) {
                 ex.printStackTrace();
                 System.out.printf("Failed to load '%s'\n", playerFolder.getName());
             }
@@ -130,16 +132,16 @@ public class GameLauncher {
     }
 
     private void loadMaps(File folder) throws GameLoadException {
-        if(!folder.exists()) throw new GameLoadException();
+        if (!folder.exists()) throw new GameLoadException();
 
         for (File mapFolder : Objects.requireNonNull(folder.listFiles())) {
             try {
-                if(!mapFolder.isDirectory()) continue;
+                if (!mapFolder.isDirectory()) continue;
 
-                this.maps.add(new GameMap(this, mapFolder));
+                this.maps.add(new GameMap(mapFolder));
 
                 System.out.printf("Loaded '%s'\n", mapFolder.getName());
-            }catch (MapLoadException ex) {
+            } catch (MapLoadException ex) {
                 ex.printStackTrace();
                 System.out.printf("Failed to load '%s'\n", mapFolder.getName());
             }
@@ -152,35 +154,39 @@ public class GameLauncher {
         frame.setResizable(true);
     }
 
-    public GameInstance getGameInstance() {
-        return this.gameInstance;
+    public static GameInstance getGameInstance() {
+        return getInstance().gameInstance;
     }
 
-    public File getWorkingDirectory() {
-        return this.workingDirectory;
+    public static File getWorkingDirectory() {
+        return getInstance().workingDirectory;
     }
 
-    public List<Armor> getLoadedArmors() {
-        return armors;
+    public static List<Armor> getLoadedArmors() {
+        return getInstance().armors;
     }
 
-    public List<Potion> getLoadedPotions() {
-        return potions;
+    public static List<Potion> getLoadedPotions() {
+        return getInstance().potions;
     }
 
-    public List<Weapon> getLoadedWeapons() {
-        return weapons;
+    public static List<Weapon> getLoadedWeapons() {
+        return getInstance().weapons;
     }
 
-    public List<Player> getLoadedPlayers() {
-        return players;
+    public static List<Player> getLoadedPlayers() {
+        return getInstance().players;
     }
 
-    public List<GameMap> getLoadedMaps() {
-        return maps;
+    public static List<GameMap> getLoadedMaps() {
+        return getInstance().maps;
     }
 
-    public GameWindow getMainFrame() {
-        return this.mainFrame;
+    public static GameWindow getMainFrame() {
+        return getInstance().mainFrame;
+    }
+
+    public static GameLauncher getInstance() {
+        return instance;
     }
 }

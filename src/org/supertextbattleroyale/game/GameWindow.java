@@ -16,7 +16,6 @@ public class GameWindow extends JFrame {
     public JPanel mainPanel;
     private JPanel gamePanel;
     private JPanel scoreboardPanel;
-    private GameLauncher launcher;
 
     private final Timer timer;
     private TimerTask currentTask;
@@ -28,10 +27,10 @@ public class GameWindow extends JFrame {
     private float zoom;
 
     private final int FPS = 60;
+    private final int TICKS_PER_SECOND = 2;
 
-    public GameWindow(GameLauncher launcher) {
+    public GameWindow() {
         this.add(this.mainPanel);
-        this.launcher = launcher;
         this.timer = new Timer();
 
         this.setupTimer(500);
@@ -82,19 +81,18 @@ public class GameWindow extends JFrame {
     }
 
     private void onTick(Graphics2D g) {
-        if (this.launcher.getGameInstance() == null) return;
+        if (GameLauncher.getGameInstance() == null) return;
 
         g.translate(this.xZoom, this.yZoom);
         g.scale(this.zoom, this.zoom);
         g.translate(-this.xZoom, -this.yZoom);
 
-        if (this.currentTick % 60 == 0) {
-            this.launcher.getGameInstance().onTick();
+        if (this.currentTick % (FPS/TICKS_PER_SECOND) == 0) {
+            GameLauncher.getGameInstance().onTick();
             this.currentTick = 0;
         }
 
-        this.launcher.getGameInstance().drawComponents(g);
-
+        GameLauncher.getGameInstance().drawComponents(g);
 
         this.currentTick++;
     }

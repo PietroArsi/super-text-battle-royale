@@ -24,10 +24,9 @@ public class GameInstance {
 
     private List<Player> allPlayers, alivePlayers, deadPlayers;
 
-    private final GameLauncher launcher;
+    private Turn currentTurn;
 
-    public GameInstance(GameLauncher launcher) {
-        this.launcher = launcher;
+    public GameInstance() {
         this.allPlayers = new CopyOnWriteArrayList<>();
         this.alivePlayers = new CopyOnWriteArrayList<>();
         this.deadPlayers = new CopyOnWriteArrayList<>();
@@ -36,25 +35,25 @@ public class GameInstance {
     //TODO: Get this working good
     public void initGame() {
         //Testing per il BFS
-        this.setCurrentMap(launcher.getLoadedMaps().get(1));
+        this.setCurrentMap(GameLauncher.getLoadedMaps().get(1));
         ArrayList<Pair<Integer, Integer>> l = new ArrayList<>();
         l.add(new Pair<>(0, 4));
         l.add(new Pair<>(4, 0));
         MapUtils.printRoomMatrix(this.currentMap);
         MapUtils.printDistancesMatrix(this.currentMap, l);
 
-        for (Player player : launcher.getLoadedPlayers()) {
+        for (Player player : GameLauncher.getLoadedPlayers()) {
             try {
                 Player p = new Player(player);
                 this.getAllPlayers().add(p);
                 this.getAlivePlayers().add(p);
                 this.getCurrentMap().getPlayersOnMap().add(p);
-                p.setX(new Random().nextInt(this.getCurrentMap().getMatrixMap().length));
-                p.setY(new Random().nextInt(this.getCurrentMap().getMatrixMap()[0].length));
+                p.setX(RandomUtils.randomIntRange(0, this.getCurrentMap().getMatrixMap().length -1));
+                p.setY(RandomUtils.randomIntRange(0, this.getCurrentMap().getMatrixMap()[0].length -1));
                 p.setCurrentMap(this.getCurrentMap());
 
-                p.equipArmor(new Armor(launcher.getLoadedArmors().get(RandomUtils.randomIntRange(0, launcher.getLoadedArmors().size() - 1)), p));
-                Weapon w = launcher.getLoadedWeapons().get(0);
+                p.equipArmor(new Armor(GameLauncher.getLoadedArmors().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedArmors().size() - 1)), p));
+                Weapon w = GameLauncher.getLoadedWeapons().get(0);
 
                 p.equipWeapon(w.isRanged() ? new WeaponRanged(w, p) : new WeaponMelee(w, p));
             } catch (JsonLoadFailException ex) {
@@ -66,13 +65,13 @@ public class GameInstance {
     public void onTick() {
 //        GameWindow w = this.launcher.getMainFrame();
 //        w.setupZoom(w.getWidth()/RandomUtils.randomIntRange(1, 10), w.getHeight()/RandomUtils.randomIntRange(1, 10), RandomUtils.randomIntRange(1, 4));
-
-        this.getCurrentMap().getPlayersOnMap().forEach(Player::onTick);
+        this.currentTurn = new Turn(this);
+        this.currentTurn.onTurn();
     }
 
     public void drawComponents(Graphics2D g) {
         g.setColor(Color.BLACK);
-        g.fillRect(0, 0, this.launcher.getMainFrame().getGamePanel().getWidth(), this.launcher.getMainFrame().getGamePanel().getHeight());
+        g.fillRect(0, 0, GameLauncher.getMainFrame().getGamePanel().getWidth(), GameLauncher.getMainFrame().getGamePanel().getHeight());
 
         this.getCurrentMap().draw(g);
 

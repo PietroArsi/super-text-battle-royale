@@ -34,15 +34,12 @@ public class GameMap implements Drawable {
 
     private BufferedImage texture;
 
-    private GameLauncher launcher;
-
     private final List<Player> playersOnMap;
 
     private final int PATHFIND_DISTANCE_INCREMENT = 10;
 
-    public GameMap(GameLauncher launcher, File directory) throws MapLoadException {
+    public GameMap(File directory) throws MapLoadException {
         this.settingsFolder = directory;
-        this.launcher = launcher;
 
         this.setupMap(new File(directory, "map.data"));
         this.setupTexture(settingsFolder);
@@ -118,7 +115,7 @@ public class GameMap implements Drawable {
      * Setups the current tick Tile dimension based on the Window dimension
      */
     private void setupDimensions() {
-        JPanel gamePanel = this.launcher.getMainFrame().getGamePanel();
+        JPanel gamePanel = GameLauncher.getMainFrame().getGamePanel();
         int width = this.getTileWidth(gamePanel.getWidth(), gamePanel.getHeight());
         this.CELL_WIDTH = width;
         this.CELL_HEIGHT = width;
@@ -158,9 +155,9 @@ public class GameMap implements Drawable {
         Color ground = new Color(0, 200, 50, 49);
         Color wall = new Color(33, 33, 33, 150);
 
-        Tile[][] tiles = this.launcher.getGameInstance().getCurrentMap().getMatrixMap();
+        Tile[][] tiles = GameLauncher.getGameInstance().getCurrentMap().getMatrixMap();
 
-        JPanel panel = this.launcher.getMainFrame().getGamePanel();
+        JPanel panel = GameLauncher.getMainFrame().getGamePanel();
 
         int w1 = Math.floorDiv(panel.getWidth(), tiles.length);
         int w2 = Math.floorDiv(panel.getHeight(), tiles[0].length);
