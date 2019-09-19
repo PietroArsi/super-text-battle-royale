@@ -150,7 +150,7 @@ public class Player implements Drawable {
         if (this.overFace != null) this.drawImage(this.overFace, g);
 
         if (this.equippedArmor != null) this.equippedArmor.draw(g);
-//        if (this.equippedWeapon != null) this.equippedWeapon.draw(g);
+        if (this.equippedWeapon != null) this.equippedWeapon.draw(g);
     }
 
     private void drawImage(BufferedImage image, Graphics2D g) {

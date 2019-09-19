@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 public class GameInstance {
 
@@ -42,7 +43,7 @@ public class GameInstance {
         MapUtils.printRoomMatrix(this.currentMap);
         MapUtils.printDistancesMatrix(this.currentMap, l);
 
-        for (Player player : GameLauncher.getLoadedPlayers()) {
+        for (Player player : GameLauncher.getLoadedPlayers().stream().limit(2).collect(Collectors.toList())) {
             try {
                 Player p = new Player(player);
                 this.getAllPlayers().add(p);
@@ -53,7 +54,7 @@ public class GameInstance {
                 p.setCurrentMap(this.getCurrentMap());
 
                 p.equipArmor(new Armor(GameLauncher.getLoadedArmors().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedArmors().size() - 1)), p));
-                Weapon w = GameLauncher.getLoadedWeapons().get(0);
+                Weapon w = GameLauncher.getLoadedWeapons().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedWeapons().size() -1));
 
                 p.equipWeapon(w.isRanged() ? new WeaponRanged(w, p) : new WeaponMelee(w, p));
             } catch (JsonLoadFailException ex) {

@@ -8,6 +8,7 @@ import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.Setting;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.AbstractMap;
 
@@ -56,11 +57,15 @@ public class Weapon extends Collectible implements Drawable {
 
     @Override
     public void draw(Graphics2D g) {
-        g.drawImage(this.getImage(),
-                player.getCurrentMap().X_DIST + player.getX() * player.getCurrentMap().CELL_WIDTH + (int) (player.getCurrentMap().CELL_WIDTH * 0.4),
-                player.getCurrentMap().Y_DIST + player.getY() * player.getCurrentMap().CELL_HEIGHT + (int) (player.getCurrentMap().CELL_HEIGHT * 0.4),
-                player.getCurrentMap().CELL_WIDTH - (int) (player.getCurrentMap().CELL_WIDTH * 0.2),
-                player.getCurrentMap().CELL_HEIGHT - (int) (player.getCurrentMap().CELL_HEIGHT * 0.2),
+        this.drawImage(getImage(), g, player);
+    }
+
+    private void drawImage(BufferedImage image, Graphics2D g, Player p) {
+        g.drawImage(image,
+                p.getCurrentMap().X_DIST + p.getX() * p.getCurrentMap().CELL_WIDTH,
+                p.getCurrentMap().Y_DIST + p.getY() * p.getCurrentMap().CELL_HEIGHT,
+                p.getCurrentMap().CELL_WIDTH,
+                p.getCurrentMap().CELL_HEIGHT,
                 null);
     }
 
