@@ -3,8 +3,8 @@ package org.supertextbattleroyale.players;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.javatuples.Pair;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
+import org.supertextbattleroyale.game.GameLauncher;
 import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Potion;
@@ -69,7 +69,7 @@ public class Player implements Drawable {
         this.equippedWeapon = null;
         this.equippedPotions = new ArrayList<>();
 
-        if(this.body != null) {
+        if (this.body != null) {
             Color bodyColor = ColorUtils.makeColorGradient(
                     0.3f, 0.3f, 0.3f,
                     0, 2, 4,
@@ -86,9 +86,16 @@ public class Player implements Drawable {
     public void onTick() {
         //to get players in the same map getCurrentMap().getPlayersOnMap()
 
+        GameLauncher.getGameInstance().getAlivePlayers().stream()
+                .filter(p -> !p.getName().equals(this.getName()))
+                .forEach(p -> {
+                    MapUtils.printRayMatrix(this.currentMap, this.getLocation(), p.getLocation());
+                    System.out.printf("%s %s vedere %s\n", this.getName(), this.canSeeTile(p.getLocation()) ? "puo'" : "non puo'", p.getName());
+                });
+
         //test
-        this.setX(RandomUtils.randomIntRange(this.getX() - 1, this.getX() + 1));
-        this.setY(RandomUtils.randomIntRange(this.getY() - 1, this.getY() + 1));
+//        this.setX(RandomUtils.randomIntRange(this.getX() - 1, this.getX() + 1));
+//        this.setY(RandomUtils.randomIntRange(this.getY() - 1, this.getY() + 1));
 
         //TODO:
     }
@@ -119,10 +126,10 @@ public class Player implements Drawable {
         return other.receiveDamage(damage);
     }
 
-    public boolean canSeeTile(Pair<Integer,Integer> tileCoords) {
-        ArrayList<Pair<Integer,Integer>> rayList = MapUtils.discretizeRay(this.getCurrentMap(), new Pair<Integer, Integer>(this.x, this.y), tileCoords);
-        for(Pair<Integer,Integer> p : rayList) {
-            if(!this.getCurrentMap().getMatrixMap()[p.getValue0()][p.getValue1()].isTileTransparent())
+    public boolean canSeeTile(Point tileCoords) {
+        ArrayList<Point> rayList = MapUtils.discretizeRay(this.getCurrentMap(), this.getLocation(), tileCoords);
+        for (Point p : rayList) {
+            if (!this.getCurrentMap().getMatrixMap()[p.x][p.y].isTileTransparent())
                 return false;
         }
         return true;
@@ -141,8 +148,6 @@ public class Player implements Drawable {
         return this.getCurrentMap().getPlayersOnMap().stream()
                 .anyMatch(p -> p != this && p.getX() == tx && p.getY() == ty);
     }
-
-
 
     @Override
     public void draw(Graphics2D g) {
@@ -304,5 +309,9 @@ public class Player implements Drawable {
             e.printStackTrace();
             throw new JsonLoadFailException();
         }
+    }
+
+    public Point getLocation() {
+        return new Point(this.x, this.y);
     }
 }

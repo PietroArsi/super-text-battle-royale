@@ -37,30 +37,35 @@ public class GameInstance {
     public void initGame() {
         //Testing per il BFS
         this.setCurrentMap(GameLauncher.getLoadedMaps().get(1));
-        ArrayList<Pair<Integer, Integer>> l = new ArrayList<>();
-        l.add(new Pair<>(0, 7));
-        l.add(new Pair<>(4, 0));
+        ArrayList<Point> l = new ArrayList<>();
+        l.add(new Point(0, 7));
+        l.add(new Point(4, 0));
         MapUtils.printRoomMatrix(this.currentMap);
         MapUtils.printDistancesMatrix(this.currentMap, l);
-        MapUtils.printRayMatrix(this.currentMap,new Pair<Integer, Integer>(0,4), new Pair<Integer, Integer>(7,0));
+        MapUtils.printRayMatrix(this.currentMap, new Point(0,4), new Point(7,0));
 
-        for (Player player : GameLauncher.getLoadedPlayers().stream().limit(2).collect(Collectors.toList())) {
-            try {
-                Player p = new Player(player);
-                this.getAllPlayers().add(p);
-                this.getAlivePlayers().add(p);
-                this.getCurrentMap().getPlayersOnMap().add(p);
-                p.setX(RandomUtils.randomIntRange(0, this.getCurrentMap().getMatrixMap().length -1));
-                p.setY(RandomUtils.randomIntRange(0, this.getCurrentMap().getMatrixMap()[0].length -1));
-                p.setCurrentMap(this.getCurrentMap());
+        createRandomPlayer(0, 5, 0);
+        createRandomPlayer(4, 0, 1);
+        createRandomPlayer(5, 5, 2);
+    }
 
-                p.equipArmor(new Armor(GameLauncher.getLoadedArmors().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedArmors().size() - 1)), p));
-                Weapon w = GameLauncher.getLoadedWeapons().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedWeapons().size() -1));
+    private void createRandomPlayer(int x, int y, int i) {
+        try {
+            Player player = GameLauncher.getLoadedPlayers().get(i);
+            Player p = new Player(player);
+            this.getAllPlayers().add(p);
+            this.getAlivePlayers().add(p);
+            this.getCurrentMap().getPlayersOnMap().add(p);
+            p.setX(x);
+            p.setY(y);
+            p.setCurrentMap(this.getCurrentMap());
 
-                p.equipWeapon(w.isRanged() ? new WeaponRanged(w, p) : new WeaponMelee(w, p));
-            } catch (JsonLoadFailException ex) {
-                ex.printStackTrace();
-            }
+            p.equipArmor(new Armor(GameLauncher.getLoadedArmors().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedArmors().size() - 1)), p));
+            Weapon w = GameLauncher.getLoadedWeapons().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedWeapons().size() -1));
+
+            p.equipWeapon(w.isRanged() ? new WeaponRanged(w, p) : new WeaponMelee(w, p));
+        } catch (JsonLoadFailException ex) {
+            ex.printStackTrace();
         }
     }
 

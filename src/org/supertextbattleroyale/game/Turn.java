@@ -1,5 +1,7 @@
 package org.supertextbattleroyale.game;
 
+import org.supertextbattleroyale.players.Player;
+
 public class Turn {
 
     private final GameInstance gameInstance;
@@ -9,7 +11,7 @@ public class Turn {
     }
 
     public void onTurn() {
-
+        gameInstance.getAlivePlayers().forEach(Player::onTick);
     }
 
 }

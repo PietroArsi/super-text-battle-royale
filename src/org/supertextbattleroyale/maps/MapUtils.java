@@ -3,24 +3,25 @@ package org.supertextbattleroyale.maps;
 import org.javatuples.Pair;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 
+import java.awt.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MapUtils {
 
-    static int NO_RAY = 0;
-    static int RAY = 1;
+    private static int NO_RAY = 0;
+    private static int RAY = 1;
 
     /**
      * @param type the class of a Tile child class
      * @return a list of all tiles that are of the selected type
      */
-    public static List<Pair<Integer, Integer>> getAllTilesFromType(GameMap map, Class<? extends Tile> type) {
-        List<Pair<Integer, Integer>> list = new ArrayList<>();
+    public static List<Point> getAllTilesFromType(GameMap map, Class<? extends Tile> type) {
+        List<Point> list = new ArrayList<>();
         for (int i = 0; i < map.getMatrixWidth(); i++) {
             for (int j = 0; j < map.getMatrixHeight(); j++) {
-                if (map.getMatrixMap()[i][j].getClass().equals(type)) list.add(new Pair<>(i, j));
+                if (map.getMatrixMap()[i][j].getClass().equals(type)) list.add(new Point(i, j));
             }
         }
         return list;
@@ -32,34 +33,35 @@ public class MapUtils {
      * @param zeroTiles a list of "source nodes"
      * @return a int matrix with the distance from the nearest source node
      */
-    public static int[][] calculateDistances(GameMap map, List<Pair<Integer, Integer>> zeroTiles, boolean allowDiagonalMovement) {
+    public static int[][] calculateDistances(GameMap map, List<Point> zeroTiles, boolean allowDiagonalMovement) {
         //Initialize all tile with MAX_INT
         int[][] distances = new int[map.getMatrixWidth()][map.getMatrixHeight()];
         for (int i = 0; i < map.getMatrixWidth(); i++)
             for (int j = 0; j < map.getMatrixHeight(); j++)
                 distances[i][j] = Integer.MAX_VALUE;
 
-        ArrayDeque<Pair<Integer, Integer>> visit_queue = new ArrayDeque<>();
+        ArrayDeque<Point> visit_queue = new ArrayDeque<>();
         //Add all source nodes to the visit queue and set their distance to the source nodes to 0 (gac)
-        for (Pair<Integer, Integer> p : zeroTiles) {
-            distances[p.getValue0()][p.getValue1()] = 0;
+        for (Point p : zeroTiles) {
+            distances[p.x][p.y] = 0;
             visit_queue.offer(p);
         }
-        Pair<Integer, Integer> u;
+        Point u;
         //Do a BFS search
         while (!visit_queue.isEmpty()) {
             u = visit_queue.poll();
             assert (u != null);
-            int i = u.getValue0();
-            int j = u.getValue1();
+            int i = u.x;
+            int j = u.y;
             //Visit all neighbours (also diagonal neighbours)
             for (int y = Math.max(0, j - 1); y <= Math.min(j + 1, map.getMatrixHeight() - 1); y++) {
                 for (int x = Math.max(0, i - 1); x <= Math.min(i + 1, map.getMatrixWidth() - 1); x++) {
                     if (x != i || j != y) {
-                        if(allowDiagonalMovement || x == i || y == j)
+                        if (allowDiagonalMovement || x == i || y == j) {
                             if (distances[x][y] == Integer.MAX_VALUE && map.getMatrixMap()[x][y].isTileWalkable()) {
                                 distances[x][y] = distances[i][j] + 1;
-                                visit_queue.offer(new Pair<>(x, y));
+                                visit_queue.offer(new Point(x, y));
+                            }
                         }
                     }
                 }
@@ -68,52 +70,56 @@ public class MapUtils {
         return distances;
     }
 
-    public static Pair<Integer,Integer> pairFloatToInt(Pair<Float,Float> p) {
-        return new Pair<>(Math.round(p.getValue0()), Math.round(p.getValue1()));
+    public static Point pairFloatToInt(Pair<Float, Float> p) {
+        return new Point(Math.round(p.getValue0()), Math.round(p.getValue1()));
     }
 
-
-    public static ArrayList<Pair<Integer,Integer>> discretizeRay(GameMap map, Pair<Integer,Integer> p1, Pair<Integer,Integer> p2) {
-        ArrayList<Pair<Integer,Integer>> rayList = new ArrayList<>();
-        int x1 = p1.getValue0();
-        int y1 = p1.getValue1();
-        int x2 = p2.getValue0();
-        int y2 = p2.getValue1();
+    public static ArrayList<Point> discretizeRay(GameMap map, Point p1, Point p2) {
+        ArrayList<Point> rayList = new ArrayList<>();
+        int x1 = p1.x;
+        int y1 = p1.y;
+        int x2 = p2.x;
+        int y2 = p2.y;
         int mx = x2 - x1;
         int my = y2 - y1;
         int dirX = mx > 0 ? 1 : -1;
         int dirY = my > 0 ? 1 : -1;
         int currentX = x1;
         int currentY = y1;
-        float nextX = x1 + 0.5f*dirX;
-        float nextY = y1 + 0.5f*dirY;
+        float nextX = x1 + 0.5f * dirX;
+        float nextY = y1 + 0.5f * dirY;
         //Initialize the Matrix
-        rayList.add(new Pair<>(currentX,currentY));
-        while(currentX != x2 && currentY != y2) {
-            float tx = (nextX - x1)/mx;
-            float ty = (nextY - y1)/my;
-            rayList.add(new Pair<>(currentX,currentY));
-            if(tx < ty) {
+        rayList.add(new Point(currentX, currentY));
+        while (currentX != x2 && currentY != y2) {
+            float tx = (nextX - x1) / mx;
+            float ty = (nextY - y1) / my;
+            rayList.add(new Point(currentX, currentY));
+            if (tx < ty) {
                 currentX += dirX;
-                nextX = currentX + 0.5f*dirX;
+                nextX = currentX + 0.5f * dirX;
             } else {
                 currentY += dirY;
-                nextY = currentY +0.5f*dirY;
+                nextY = currentY + 0.5f * dirY;
             }
         }
-        if(currentX == x2) for(int i = currentY; i < y2; i++) rayList.add(new Pair<>(currentX,i));
-        else for(int i = currentX; i < x2; i++) rayList.add(new Pair<>(i,currentY));
+        if (currentX == x2)
+            for (int i = currentY; i < y2; i++)
+                rayList.add(new Point(currentX, i));
+        else
+            for (int i = currentX; i < x2; i++)
+                rayList.add(new Point(i, currentY));
+
         return rayList;
     }
 
-    public static void printRayMatrix(GameMap map, Pair<Integer,Integer> x1, Pair<Integer, Integer> x2) {
+    public static void printRayMatrix(GameMap map, Point x1, Point x2) {
         System.out.println();
         System.out.printf("MAP: W %d x H %d\n", map.getMatrixWidth(), map.getMatrixHeight());
-        ArrayList<Pair<Integer,Integer>> l = discretizeRay(map,x1,x2);
+        ArrayList<Point> l = discretizeRay(map, x1, x2);
         for (int h = 0; h < map.getMatrixHeight(); h++) {
             System.out.println();
             for (int w = 0; w < map.getMatrixWidth(); w++) {
-                System.out.print(l.contains(new Pair<Integer,Integer>(w,h)) ? 'O' : 'X');
+                System.out.print(l.contains(new Point(w, h)) ? 'O' : 'X');
             }
         }
     }
@@ -129,7 +135,7 @@ public class MapUtils {
         }
     }
 
-    public static void printDistancesMatrix(GameMap map, List<Pair<Integer, Integer>> zeroTiles) {
+    public static void printDistancesMatrix(GameMap map, List<Point> zeroTiles) {
         int[][] distances = calculateDistances(map, zeroTiles, false);
         System.out.println();
         for (int j = 0; j < map.getMatrixHeight(); j++) {
