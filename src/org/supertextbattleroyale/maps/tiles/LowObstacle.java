@@ -20,4 +20,9 @@ public class LowObstacle extends Tile
     public boolean isTileBulletproof() {
         return false;
     }
+
+    @Override
+    public boolean isTileTransparent() {
+        return true;
+    }
 }

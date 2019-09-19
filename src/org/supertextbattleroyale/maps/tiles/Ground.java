@@ -21,4 +21,9 @@ public class Ground extends Tile {
         return false;
     }
 
+    @Override
+    public boolean isTileTransparent() {
+        return true;
+    }
+
 }

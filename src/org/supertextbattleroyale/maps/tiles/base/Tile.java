@@ -15,6 +15,7 @@ public abstract class Tile {
 
     public abstract boolean isTileWalkable();
     public abstract boolean isTileBulletproof();
+    public abstract boolean isTileTransparent();
 
     private char symbol;
 

@@ -3,12 +3,14 @@ package org.supertextbattleroyale.players;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.javatuples.Pair;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Potion;
 import org.supertextbattleroyale.items.Weapon;
 import org.supertextbattleroyale.maps.GameMap;
+import org.supertextbattleroyale.maps.MapUtils;
 import org.supertextbattleroyale.utils.ColorUtils;
 import org.supertextbattleroyale.utils.JsonUtils;
 import org.supertextbattleroyale.utils.RandomUtils;
@@ -115,6 +117,15 @@ public class Player implements Drawable {
     public int hitPlayer(Player other, int damage) {
         this.setXP(this.XP + damage); //XP are increased by the total damage done by the player
         return other.receiveDamage(damage);
+    }
+
+    public boolean canSeeTile(Pair<Integer,Integer> tileCoords) {
+        ArrayList<Pair<Integer,Integer>> rayList = MapUtils.discretizeRay(this.getCurrentMap(), new Pair<Integer, Integer>(this.x, this.y), tileCoords);
+        for(Pair<Integer,Integer> p : rayList) {
+            if(!this.getCurrentMap().getMatrixMap()[p.getValue0()][p.getValue1()].isTileTransparent())
+                return false;
+        }
+        return true;
     }
 
     /**

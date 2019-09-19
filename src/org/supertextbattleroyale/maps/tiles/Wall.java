@@ -21,4 +21,9 @@ public class Wall extends Tile {
         return true;
     }
 
+    @Override
+    public boolean isTileTransparent() {
+        return false;
+    }
+
 }
