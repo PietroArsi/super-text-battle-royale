@@ -37,10 +37,11 @@ public class GameInstance {
         //Testing per il BFS
         this.setCurrentMap(GameLauncher.getLoadedMaps().get(1));
         ArrayList<Pair<Integer, Integer>> l = new ArrayList<>();
-        l.add(new Pair<>(0, 4));
+        l.add(new Pair<>(0, 7));
         l.add(new Pair<>(4, 0));
         MapUtils.printRoomMatrix(this.currentMap);
         MapUtils.printDistancesMatrix(this.currentMap, l);
+        MapUtils.printRayMatrix(this.currentMap,new Pair<Integer, Integer>(0,4), new Pair<Integer, Integer>(7,0));
 
         for (Player player : GameLauncher.getLoadedPlayers()) {
             try {

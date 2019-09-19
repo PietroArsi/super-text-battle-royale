@@ -20,4 +20,11 @@ public class Door extends Tile {
     public boolean isTileBulletproof() {
         return true;
     }
+
+    @Override
+    public boolean isTileTransparent() {
+        return false;
+    }
+
+
 }
