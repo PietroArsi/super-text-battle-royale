@@ -11,7 +11,7 @@ public class Turn {
     }
 
     public void onTurn() {
-        gameInstance.getAlivePlayers().forEach(Player::onTick);
+//        gameInstance.getAlivePlayers().forEach(Player::onTick);
     }
 
 }

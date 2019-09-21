@@ -9,6 +9,7 @@ import org.supertextbattleroyale.items.WeaponRanged;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
 import org.supertextbattleroyale.players.Player;
+import org.supertextbattleroyale.text.Scoreboard;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
@@ -27,10 +28,14 @@ public class GameInstance {
 
     private Turn currentTurn;
 
+    private Scoreboard s;
+
     public GameInstance() {
         this.allPlayers = new CopyOnWriteArrayList<>();
         this.alivePlayers = new CopyOnWriteArrayList<>();
         this.deadPlayers = new CopyOnWriteArrayList<>();
+
+        this.s = new Scoreboard(500, 500);
     }
 
     //TODO: Get this working good
@@ -86,6 +91,8 @@ public class GameInstance {
                 .filter(player -> player.getCurrentMap() != null && player.getCurrentMap().equals(currentMap))
                 .sorted(Comparator.comparingInt(Player::getY))
                 .forEach(player -> player.draw(g));
+
+        this.s.draw(g);
     }
 
     public GameMap getCurrentMap() {
@@ -106,5 +113,9 @@ public class GameInstance {
 
     public List<Player> getDeadPlayers() {
         return deadPlayers;
+    }
+
+    public Scoreboard getScoreboard() {
+        return s;
     }
 }
