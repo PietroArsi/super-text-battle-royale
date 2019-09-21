@@ -1,6 +1,5 @@
 package org.supertextbattleroyale.game;
 
-import org.javatuples.Pair;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Weapon;
@@ -16,9 +15,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 public class GameInstance {
 
@@ -47,7 +44,6 @@ public class GameInstance {
         l.add(new Point(4, 0));
         MapUtils.printRoomMatrix(this.currentMap);
         MapUtils.printDistancesMatrix(this.currentMap, l);
-        MapUtils.printRayMatrix(this.currentMap, new Point(0, 4), new Point(7, 0));
 
         createRandomPlayer(0, 0, "Pit");
         createRandomPlayer(1, 0, "Ari");

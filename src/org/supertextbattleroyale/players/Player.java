@@ -11,6 +11,7 @@ import org.supertextbattleroyale.items.Potion;
 import org.supertextbattleroyale.items.Weapon;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
+import org.supertextbattleroyale.players.statuses.Status;
 import org.supertextbattleroyale.utils.ColorUtils;
 import org.supertextbattleroyale.utils.JsonUtils;
 import org.supertextbattleroyale.utils.RandomUtils;
@@ -48,6 +49,8 @@ public class Player implements Drawable {
     private Armor equippedArmor;
     private Weapon equippedWeapon;
     private List<Potion> equippedPotions;
+
+    private Status memologia;
 
     private GameMap currentMap;
 
@@ -89,7 +92,7 @@ public class Player implements Drawable {
         GameLauncher.getGameInstance().getAlivePlayers().stream()
                 .filter(p -> !p.getName().equals(this.getName()))
                 .forEach(p -> {
-                    MapUtils.printRayMatrix(this.currentMap, this.getLocation(), p.getLocation());
+                    MapUtils.printRayMatrix(this.currentMap, (map, pn) -> map.getMatrixMap()[pn.x][pn.y].isTileTransparent(), this.getLocation(), p.getLocation());
                     System.out.printf("\n%s %s vedere %s", this.getName(), this.canSeeTile(p.getLocation()) ? "puo'" : "non puo'", p.getName());
                 });
 
