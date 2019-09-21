@@ -146,6 +146,11 @@ public class GameMap implements Drawable {
         this.printGrid(g); //debug
     }
 
+    public Point getMapCenter() {
+        //TODO: Creare un metodo spiraloso che cerca il centro
+        return null;
+    }
+
     /**
      * Debug the map drawing rectangles for every tile
      *

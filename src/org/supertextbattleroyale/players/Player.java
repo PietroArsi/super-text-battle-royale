@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.javatuples.Pair;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
+import org.supertextbattleroyale.game.GameLauncher;
 import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Potion;
@@ -91,9 +92,9 @@ public class Player implements Drawable {
     }
 
     public void onTick() {
-        //to get players in the same map getCurrentMap().getPlayersOnMap()
-
+        //to get players in the same map getCurrentMap().getPlayersOnMap(
         this.actionsLeft = 2;
+
 
         while(this.actionsLeft > 0) {
             this.currentStatus = this.currentStatus.doStatusAction();

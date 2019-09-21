@@ -14,8 +14,11 @@ import java.util.stream.Collectors;
 
 public class Movement extends Status {
 
-    public Movement(Player player) {
+    private Point destination;
+
+    public Movement(Player player, Point destination) {
         super(player);
+        this.destination = destination;
     }
 
     @Override
