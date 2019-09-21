@@ -1,21 +1,19 @@
 package org.supertextbattleroyale.game;
 
 import org.javatuples.Triplet;
-import org.supertextbattleroyale.maps.tiles.Ground;
-import org.supertextbattleroyale.maps.tiles.base.Tile;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class GameWindow extends JFrame {
+    private final int FPS = 60;
+    private final int TICKS_PER_SECOND = 2;
+
     public JPanel mainPanel;
     private JPanel gamePanel;
-    private JPanel scoreboardPanel;
 
     private final Timer timer;
     private TimerTask currentTask;
@@ -25,9 +23,6 @@ public class GameWindow extends JFrame {
     private float xTranslate, yTranslate;
     private int xZoom, yZoom;
     private float zoom;
-
-    private final int FPS = 60;
-    private final int TICKS_PER_SECOND = 2;
 
     public GameWindow() {
         this.add(this.mainPanel);
@@ -87,7 +82,7 @@ public class GameWindow extends JFrame {
         g.scale(this.zoom, this.zoom);
         g.translate(-this.xZoom, -this.yZoom);
 
-        if (this.currentTick % (FPS/TICKS_PER_SECOND) == 0) {
+        if (this.currentTick % (FPS / TICKS_PER_SECOND) == 0) {
             GameLauncher.getGameInstance().onTick();
             this.currentTick = 0;
         }
@@ -109,9 +104,5 @@ public class GameWindow extends JFrame {
 
     public JPanel getGamePanel() {
         return this.gamePanel;
-    }
-
-    public JPanel getScoreboardPanel() {
-        return this.scoreboardPanel;
     }
 }

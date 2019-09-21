@@ -79,7 +79,7 @@ public class GameMap implements Drawable {
         }
     }
 
-    private int getTileWidth(int panelWidth, int panelHeight) {
+    private int getTileEdge(int panelWidth, int panelHeight) {
         int w1 = Math.floorDiv(panelWidth, this.matrixMap.length);
         int w2 = Math.floorDiv(panelHeight, this.matrixMap[0].length);
 
@@ -116,11 +116,11 @@ public class GameMap implements Drawable {
      */
     private void setupDimensions() {
         JPanel gamePanel = GameLauncher.getMainFrame().getGamePanel();
-        int width = this.getTileWidth(gamePanel.getWidth(), gamePanel.getHeight());
-        this.CELL_WIDTH = width;
-        this.CELL_HEIGHT = width;
+        int edgeLength = this.getTileEdge(gamePanel.getWidth()*2/3, gamePanel.getHeight());
+        this.CELL_WIDTH = edgeLength;
+        this.CELL_HEIGHT = edgeLength;
 
-        Pair<Integer, Integer> distances = this.getDistanceFromBorders(gamePanel.getWidth(), gamePanel.getHeight());
+        Pair<Integer, Integer> distances = this.getDistanceFromBorders(gamePanel.getWidth()*2/3, gamePanel.getHeight());
         this.X_DIST = distances.getValue0();
         this.Y_DIST = distances.getValue1();
     }
@@ -159,22 +159,14 @@ public class GameMap implements Drawable {
 
         JPanel panel = GameLauncher.getMainFrame().getGamePanel();
 
-        int w1 = Math.floorDiv(panel.getWidth(), tiles.length);
-        int w2 = Math.floorDiv(panel.getHeight(), tiles[0].length);
-
-        int tileWidth = Math.min(w1, w2);
-
-        int xDist = (panel.getWidth() - tileWidth * tiles.length) / 2;
-        int yDist = (panel.getHeight() - tileWidth * tiles[0].length) / 2;
-
         for (int i = 0; i < tiles.length; i++) {
             Tile[] row = tiles[i];
 
             for (int j = 0; j < row.length; j++) {
                 g.setColor(tiles[i][j] instanceof Ground ? ground : wall);
-                g.fillRect(xDist + i * tileWidth, yDist + j * tileWidth, tileWidth, tileWidth);
+                g.fillRect(X_DIST + i * CELL_WIDTH, Y_DIST + j * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
                 g.setColor(Color.BLACK);
-                g.drawRect(xDist + i * tileWidth, yDist + j * tileWidth, tileWidth, tileWidth);
+                g.drawRect(X_DIST + i * CELL_WIDTH, Y_DIST + j * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
             }
         }
     }

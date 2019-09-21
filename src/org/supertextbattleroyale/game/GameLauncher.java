@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class GameLauncher {
 
@@ -176,6 +177,19 @@ public class GameLauncher {
 
     public static List<Player> getLoadedPlayers() {
         return getInstance().players;
+    }
+
+    public static Optional<Player> getPlayerFromName(String name) {
+        return getLoadedPlayers().stream()
+                .filter(p -> p.getName().toLowerCase().equals(name.toLowerCase()) ||
+                        p.getAlias().toLowerCase().equals(name.toLowerCase()))
+                .findFirst();
+    }
+
+    public static Optional<Armor> getArmorFromName(String name) {
+        return getLoadedArmors().stream()
+                .filter(a -> a.getName().toLowerCase().equals(name.toLowerCase()))
+                .findFirst();
     }
 
     public static List<GameMap> getLoadedMaps() {

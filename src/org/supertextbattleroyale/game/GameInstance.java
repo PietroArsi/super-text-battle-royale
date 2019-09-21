@@ -9,6 +9,7 @@ import org.supertextbattleroyale.items.WeaponRanged;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
 import org.supertextbattleroyale.players.Player;
+import org.supertextbattleroyale.text.Scoreboard;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
@@ -27,10 +28,14 @@ public class GameInstance {
 
     private Turn currentTurn;
 
+    private Scoreboard s;
+
     public GameInstance() {
         this.allPlayers = new CopyOnWriteArrayList<>();
         this.alivePlayers = new CopyOnWriteArrayList<>();
         this.deadPlayers = new CopyOnWriteArrayList<>();
+
+        this.s = new Scoreboard(500, 500);
     }
 
     //TODO: Get this working good
@@ -42,16 +47,16 @@ public class GameInstance {
         l.add(new Point(4, 0));
         MapUtils.printRoomMatrix(this.currentMap);
         MapUtils.printDistancesMatrix(this.currentMap, l);
-        MapUtils.printRayMatrix(this.currentMap, new Point(0,4), new Point(7,0));
+        MapUtils.printRayMatrix(this.currentMap, new Point(0, 4), new Point(7, 0));
 
-        createRandomPlayer(0, 5, 0);
-        createRandomPlayer(4, 0, 1);
-        createRandomPlayer(5, 5, 2);
+        createRandomPlayer(0, 0, "Pit");
+        createRandomPlayer(1, 0, "Ari");
+        //        createRandomPlayer(5, 5, 2);
     }
 
-    private void createRandomPlayer(int x, int y, int i) {
+    private void createRandomPlayer(int x, int y, String name) {
         try {
-            Player player = GameLauncher.getLoadedPlayers().get(i);
+            Player player = GameLauncher.getPlayerFromName(name).get();
             Player p = new Player(player);
             this.getAllPlayers().add(p);
             this.getAlivePlayers().add(p);
@@ -61,8 +66,7 @@ public class GameInstance {
             p.setCurrentMap(this.getCurrentMap());
 
             p.equipArmor(new Armor(GameLauncher.getLoadedArmors().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedArmors().size() - 1)), p));
-            Weapon w = GameLauncher.getLoadedWeapons().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedWeapons().size() -1));
-
+            Weapon w = GameLauncher.getLoadedWeapons().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedWeapons().size() - 1));
             p.equipWeapon(w.isRanged() ? new WeaponRanged(w, p) : new WeaponMelee(w, p));
         } catch (JsonLoadFailException ex) {
             ex.printStackTrace();
@@ -86,6 +90,8 @@ public class GameInstance {
                 .filter(player -> player.getCurrentMap() != null && player.getCurrentMap().equals(currentMap))
                 .sorted(Comparator.comparingInt(Player::getY))
                 .forEach(player -> player.draw(g));
+
+        this.s.draw(g);
     }
 
     public GameMap getCurrentMap() {
@@ -106,5 +112,9 @@ public class GameInstance {
 
     public List<Player> getDeadPlayers() {
         return deadPlayers;
+    }
+
+    public Scoreboard getScoreboard() {
+        return s;
     }
 }

@@ -16,6 +16,9 @@ import java.io.IOException;
 public class Armor extends Collectible implements Drawable {
 
     @Setting
+    private String name;
+
+    @Setting
     private float shieldPercentage;
     @Setting
     private int maximumHitPoints;
