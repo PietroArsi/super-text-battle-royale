@@ -36,9 +36,12 @@ public class Combat extends Status {
                     .stream()
                     .noneMatch(p -> p.equals(aPoint)) && aMap.getMatrixMap()[aPoint.x][aPoint.y].isTileWalkable(),
                     doors, false);
-
+            Optional<Point> optNext;
             for(int i = 0; i < FLEE_DISTANCE; i++) {
-                MapUtils.getNextPathStep(player.getCurrentMap(),distances,player.getPoint(),false);
+                optNext  = MapUtils.getNextPathStep(player.getCurrentMap(),distances,player.getPoint(),false);
+                if(optNext.isPresent()) {
+                    //if(player.getCurrentMap().getMatrixMap()[player.getX()][player.getY()])
+                }
                 //TODO: Controllare l'optional
             }
 
