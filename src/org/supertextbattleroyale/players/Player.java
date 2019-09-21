@@ -25,10 +25,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Player implements Drawable {
 
@@ -104,6 +103,17 @@ public class Player implements Drawable {
     public int getDamageVsPlayer(Weapon weapon, Player player) {
         //TODO: finish
         return 0;
+    }
+
+    public boolean wantsFight(Player p) {
+        return RandomUtils.flipACoin() == 1;
+    }
+
+    public List<Player> getPlayersSeen() {
+        return this.getCurrentMap().getPlayersOnMap().stream()
+                .filter(p -> p != this)
+                .filter(p -> p.canSeeTile(p.getLocation()))
+                .collect(Collectors.toList());
     }
 
     /**
