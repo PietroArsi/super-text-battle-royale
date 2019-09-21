@@ -34,4 +34,10 @@ public class ColorUtils {
         g.dispose();
         return dyed;
     }
+
+    public static Color getColor(int hex) {
+        int red = hex;
+
+        return null;
+    }
 }

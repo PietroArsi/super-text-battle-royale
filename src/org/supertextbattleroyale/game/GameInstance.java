@@ -45,8 +45,8 @@ public class GameInstance {
         MapUtils.printRoomMatrix(this.currentMap);
         MapUtils.printDistancesMatrix(this.currentMap, l);
 
-        createRandomPlayer(0, 0, "Pit");
-        createRandomPlayer(1, 0, "Ari");
+        createRandomPlayer(3, 4, "Pit");
+        createRandomPlayer(4, 1, "Dario");
         //        createRandomPlayer(5, 5, 2);
     }
 

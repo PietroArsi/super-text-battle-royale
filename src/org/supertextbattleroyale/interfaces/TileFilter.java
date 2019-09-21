@@ -11,7 +11,7 @@ public interface TileFilter {
      *
      * @param m
      * @param t
-     * @return 
+     * @return
      */
     public boolean canCross(GameMap m, Point t);
 }
