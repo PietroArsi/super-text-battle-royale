@@ -1,25 +1,13 @@
 package org.supertextbattleroyale.players.statuses;
 
+import org.supertextbattleroyale.players.Player;
+
 public abstract class Status {
 
-    private final Type type;
+    protected Player player;
 
-    public Status(Type type) {
-        this.type = type;
-    }
-
-    public enum Type {
-        MOVING("in movimento"),
-        COMBAT("in combattimento"),
-        FLEEING("in fuga"),
-        DEAD("morto"),
-        ON_DOOR("alla porta");
-
-        String label;
-
-        Type(String label) {
-            label = label;
-        }
+    public Status(Player player) {
+        this.player = player;
     }
 
     /**
