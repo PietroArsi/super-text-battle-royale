@@ -1,13 +1,17 @@
 package org.supertextbattleroyale.players.statuses;
 
 import org.javatuples.Pair;
+import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
+import org.supertextbattleroyale.maps.tiles.Chest;
 import org.supertextbattleroyale.maps.tiles.Door;
+import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,12 +29,12 @@ public class Movement extends Status {
     public Status doStatusAction() {
         List<Player> players = player.getPlayersSeen();
 
-        if (!players.isEmpty()) {
+        if (!players.isEmpty()) { //a player has been seen
             boolean wantsFight = players.stream().anyMatch(p -> player.wantsFight(p));
 
             if (wantsFight) { //TODO: implementare una scelta piu' intelligente per la scelta del giocatore da combattere
                 return new Combat(players.get(RandomUtils.randomIntRange(0, players.size() - 1)));
-            } else {
+            } else { //wants to flee
                 List<Point> doors = player.getKnownPlaces().stream()
                         .filter(pair -> pair.getValue0() instanceof Door)
                         .map(Pair::getValue1).collect(Collectors.toList());
@@ -43,11 +47,33 @@ public class Movement extends Status {
 
                 return new Flee(player, null); //TODO: get the door from calculate distances
             }
-        } else {
-            
-        }
+        } else { //no player seen
+            Point next = getNextPoint(Collections.singletonList(destination));
 
-        return null;
+            if (next.equals(destination)) {
+                Tile tile = player.getCurrentMap().getTileAt(next);
+                if (tile instanceof Door) {
+                    GameMap newMap = ((Door) tile).getNextMap();
+                    player.setCurrentMap(newMap);
+
+                    return new Recon(player);
+                } else if (tile instanceof Chest) {
+                    ((Chest) tile).collectItems(player);
+                }
+            } else {
+                player.move(next);
+            }
+
+            List<Point> objectives = MapUtils.getAllTilesFromType(player.getCurrentMap(), Chest.class);
+            objectives.addAll(MapUtils.getAllTilesFromType(player.getCurrentMap(), Door.class));
+
+            if(objectives.size() == 0) {
+                return new Movement(player, player.getCurrentMap().getMapCenter());
+            } else {
+                return null;
+                //TODO: return movement al posto piu' vicino
+            }
+        }
     }
 
     private Point getNextPoint(List<Point> destinations) {
@@ -70,6 +96,5 @@ public class Movement extends Status {
         return toCheck.stream()
                 .min(Comparator.comparingInt(Pair::getValue1))
                 .get().getValue0();
-
     }
 }

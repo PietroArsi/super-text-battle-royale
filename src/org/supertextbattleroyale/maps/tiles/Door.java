@@ -1,6 +1,8 @@
 package org.supertextbattleroyale.maps.tiles;
 
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
+import org.supertextbattleroyale.game.GameLauncher;
+import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 
 import java.io.File;
@@ -27,4 +29,8 @@ public class Door extends Tile {
     }
 
 
+    //TODO: change
+    public GameMap getNextMap() {
+        return GameLauncher.getLoadedMaps().get(0);
+    }
 }

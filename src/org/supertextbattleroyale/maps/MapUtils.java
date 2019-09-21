@@ -3,11 +3,13 @@ package org.supertextbattleroyale.maps;
 import org.javatuples.Pair;
 import org.supertextbattleroyale.interfaces.TileFilter;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
+import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class MapUtils {
 
@@ -70,6 +72,23 @@ public class MapUtils {
             }
         }
         return distances;
+    }
+
+
+    public static Optional<Point> getNextPathStep(GameMap map, int[][] distances, Point starting, boolean allowDiagonalMovement) {
+        int i = starting.x;
+        int j = starting.y;
+        ArrayList<Point> bestNeighbours = new ArrayList<>();
+        int targetDistance = Math.max(distances[i][j] - 1,0);
+        for (int y = Math.max(0, j - 1); y <= Math.min(j + 1, map.getMatrixHeight() - 1); y++) {
+            for (int x = Math.max(0, i - 1); x <= Math.min(i + 1, map.getMatrixWidth() - 1); x++) {
+                if (allowDiagonalMovement || x == i || y == j) {
+                    if(distances[x][y] == targetDistance) bestNeighbours.add(new Point(x,y));
+                }
+            }
+        }
+        if(bestNeighbours.isEmpty()) return Optional.empty();
+        else return Optional.of(bestNeighbours.get(RandomUtils.randomIntRange(0,bestNeighbours.size()-1))); //Scelgo a caso
     }
 
     public static Point pairFloatToInt(Pair<Float, Float> p) {

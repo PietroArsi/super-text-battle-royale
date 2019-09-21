@@ -12,6 +12,7 @@ import org.supertextbattleroyale.items.Potion;
 import org.supertextbattleroyale.items.Weapon;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
+import org.supertextbattleroyale.maps.tiles.Door;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.statuses.Status;
 import org.supertextbattleroyale.utils.ColorUtils;
@@ -117,6 +118,8 @@ public class Player implements Drawable {
                 .collect(Collectors.toList());
     }
 
+
+
     /**
      * @param damage The damage done to the player and to the armor
      * @return The amount of effective damage done to the  player
@@ -205,6 +208,10 @@ public class Player implements Drawable {
         if (y < 0 || (getCurrentMap() != null && y >= getCurrentMap().getMatrixMap()[0].length)) return;
 
         this.y = y;
+    }
+
+    public Point getPoint() {
+        return new Point(this.x, this.y);
     }
 
     public Point getLocation() {
