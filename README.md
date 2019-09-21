@@ -21,3 +21,7 @@ Lato grafico:
 
 Lato gestione:
 - Creare un sistema di Log decente
+
+GESTIONE TURNO:
+ogni mappa esegue onTick di ogni giocatore vivo presente su di essa
+se l'azione e' da visualizzare viene inquadrata la mappa e viene visualizzato il turno
