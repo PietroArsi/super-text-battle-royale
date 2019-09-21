@@ -3,14 +3,15 @@ package org.supertextbattleroyale.players;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.javatuples.Pair;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
-import org.supertextbattleroyale.game.GameLauncher;
 import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Potion;
 import org.supertextbattleroyale.items.Weapon;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
+import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.statuses.Status;
 import org.supertextbattleroyale.utils.ColorUtils;
 import org.supertextbattleroyale.utils.JsonUtils;
@@ -50,11 +51,14 @@ public class Player implements Drawable {
     private Weapon equippedWeapon;
     private List<Potion> equippedPotions;
 
-    private Status memologia;
+    private Status currentStatus;
+    private int actionsLeft;
 
     private GameMap currentMap;
 
     private int x, y;
+
+    private List<Pair<Tile, Point>> knownPlaces;
 
     public Player(File settingsFolder) throws JsonLoadFailException {
         this.settingsFolder = settingsFolder;
@@ -71,6 +75,7 @@ public class Player implements Drawable {
         this.equippedArmor = null;
         this.equippedWeapon = null;
         this.equippedPotions = new ArrayList<>();
+        this.knownPlaces = new ArrayList<>();
 
         if (this.body != null) {
             Color bodyColor = ColorUtils.makeColorGradient(
@@ -89,18 +94,11 @@ public class Player implements Drawable {
     public void onTick() {
         //to get players in the same map getCurrentMap().getPlayersOnMap()
 
-        GameLauncher.getGameInstance().getAlivePlayers().stream()
-                .filter(p -> !p.getName().equals(this.getName()))
-                .forEach(p -> {
-                    MapUtils.printRayMatrix(this.currentMap, (map, pn) -> map.getMatrixMap()[pn.x][pn.y].isTileTransparent(), this.getLocation(), p.getLocation());
-                    System.out.printf("\n%s %s vedere %s", this.getName(), this.canSeeTile(p.getLocation()) ? "puo'" : "non puo'", p.getName());
-                });
+        this.actionsLeft = 2;
 
-        //test
-//        this.setX(RandomUtils.randomIntRange(this.getX() - 1, this.getX() + 1));
-//        this.setY(RandomUtils.randomIntRange(this.getY() - 1, this.getY() + 1));
-
-        //TODO:
+        while(this.actionsLeft > 0) {
+            this.currentStatus = this.currentStatus.doStatusAction();
+        }
     }
 
     public int getDamageVsPlayer(Weapon weapon, Player player) {
@@ -152,43 +150,20 @@ public class Player implements Drawable {
                 .anyMatch(p -> p != this && p.getX() == tx && p.getY() == ty);
     }
 
-    @Override
-    public void draw(Graphics2D g) {
-        g.setColor(Color.BLACK);
-        g.setFont(new Font("Helvetica Neue", Font.BOLD, 18));
-        g.drawString(this.getAlias(), this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH, this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT);
-
-        if (this.equippedArmor != null) this.equippedArmor.drawBack(g);
-
-        if (this.underFace != null) this.drawImage(this.underFace, g);
-
-        if (this.body != null) this.drawImage(this.body, g);
-
-        this.drawImage(this.face, g);
-
-        if (this.overFace != null) this.drawImage(this.overFace, g);
-
-        if (this.equippedArmor != null) this.equippedArmor.draw(g);
-        if (this.equippedWeapon != null) this.equippedWeapon.draw(g);
-    }
-
-    private void drawImage(BufferedImage image, Graphics2D g) {
-//        g.translate(-this.currentMap.CELL_WIDTH / 2, -this.currentMap.CELL_HEIGHT);
-        g.drawImage(image,
-                this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH,
-                this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT,
-                this.currentMap.CELL_WIDTH,
-                this.currentMap.CELL_HEIGHT,
-                null);
-//        g.translate(this.currentMap.CELL_WIDTH / 2, this.currentMap.CELL_HEIGHT);
-    }
-
     public String getName() {
         return this.name;
     }
 
     public String getAlias() {
         return this.alias;
+    }
+
+    public int getActionsLeft() {
+        return this.actionsLeft;
+    }
+
+    public void decrementActionsLeft(int amount) {
+        this.actionsLeft -= amount;
     }
 
     public int getX() {
@@ -209,6 +184,10 @@ public class Player implements Drawable {
         if (y < 0 || (getCurrentMap() != null && y >= getCurrentMap().getMatrixMap()[0].length)) return;
 
         this.y = y;
+    }
+
+    public Point getLocation() {
+        return new Point(this.x, this.y);
     }
 
     public GameMap getCurrentMap() {
@@ -276,6 +255,10 @@ public class Player implements Drawable {
         } else return 0;
     }
 
+    public List<Pair<Tile, Point>> getKnownPlaces() {
+        return knownPlaces;
+    }
+
     private void setupFromJson(File config) throws JsonLoadFailException {
         Optional<JsonElement> jsonElement = JsonUtils.getJsonElementFromFile(config);
 
@@ -314,8 +297,35 @@ public class Player implements Drawable {
         }
     }
 
-    public Point getLocation() {
-        return new Point(this.x, this.y);
+    @Override
+    public void draw(Graphics2D g) {
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Helvetica Neue", Font.BOLD, 18));
+        g.drawString(this.getAlias(), this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH, this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT);
+
+        if (this.equippedArmor != null) this.equippedArmor.drawBack(g);
+
+        if (this.underFace != null) this.drawImage(this.underFace, g);
+
+        if (this.body != null) this.drawImage(this.body, g);
+
+        this.drawImage(this.face, g);
+
+        if (this.overFace != null) this.drawImage(this.overFace, g);
+
+        if (this.equippedArmor != null) this.equippedArmor.draw(g);
+        if (this.equippedWeapon != null) this.equippedWeapon.draw(g);
+    }
+
+    private void drawImage(BufferedImage image, Graphics2D g) {
+//        g.translate(-this.currentMap.CELL_WIDTH / 2, -this.currentMap.CELL_HEIGHT);
+        g.drawImage(image,
+                this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH,
+                this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT,
+                this.currentMap.CELL_WIDTH,
+                this.currentMap.CELL_HEIGHT,
+                null);
+//        g.translate(this.currentMap.CELL_WIDTH / 2, this.currentMap.CELL_HEIGHT);
     }
 
     public void vaiASeguireSistemiInformativi() {
