@@ -33,6 +33,7 @@ public class Movement extends Status {
             boolean wantsFight = players.stream().anyMatch(p -> player.wantsFight(p));
 
             if (wantsFight) { //TODO: implementare una scelta piu' intelligente per la scelta del giocatore da combattere
+                player.decrementActionsLeft(1);
                 return new Combat(players.get(RandomUtils.randomIntRange(0, players.size() - 1)));
             } else { //wants to flee
                 List<Point> doors = player.getKnownPlaces().stream()
@@ -45,6 +46,7 @@ public class Movement extends Status {
 
                 player.move(getNextPoint(doors));
 
+                player.decrementActionsLeft(1);
                 return new Flee(player, null); //TODO: get the door from calculate distances
             }
         } else { //no player seen
@@ -56,6 +58,7 @@ public class Movement extends Status {
                     GameMap newMap = ((Door) tile).getNextMap();
                     player.setCurrentMap(newMap);
 
+                    player.decrementActionsLeft(1);
                     return new Recon(player);
                 } else if (tile instanceof Chest) {
                     ((Chest) tile).collectItems(player);
@@ -68,14 +71,17 @@ public class Movement extends Status {
             objectives.addAll(MapUtils.getAllTilesFromType(player.getCurrentMap(), Door.class));
 
             if(objectives.size() == 0) {
+                player.decrementActionsLeft(1);
                 return new Movement(player, player.getCurrentMap().getMapCenter());
             } else {
+                player.decrementActionsLeft(1);
                 return null;
                 //TODO: return movement al posto piu' vicino
             }
         }
     }
 
+    @Deprecated
     private Point getNextPoint(List<Point> destinations) {
         int[][] matrix = MapUtils.calculateDistances(
                 player.getCurrentMap(),

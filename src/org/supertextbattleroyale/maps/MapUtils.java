@@ -33,7 +33,7 @@ public class MapUtils {
     /**
      * A BFS alghorithm on a matrix
      *
-     * @param filter a function of the map and the coordinates that is true when the player can cross the tile in that coordinate
+     * @param filter    a function of the map and the coordinates that is true when the player can cross the tile in that coordinate
      * @param zeroTiles a list of "source nodes"
      * @return a int matrix with the distance from the nearest source node
      */
@@ -79,16 +79,17 @@ public class MapUtils {
         int i = starting.x;
         int j = starting.y;
         ArrayList<Point> bestNeighbours = new ArrayList<>();
-        int targetDistance = Math.max(distances[i][j] - 1,0);
+        int targetDistance = Math.max(distances[i][j] - 1, 0);
         for (int y = Math.max(0, j - 1); y <= Math.min(j + 1, map.getMatrixHeight() - 1); y++) {
             for (int x = Math.max(0, i - 1); x <= Math.min(i + 1, map.getMatrixWidth() - 1); x++) {
                 if (allowDiagonalMovement || x == i || y == j) {
-                    if(distances[x][y] == targetDistance) bestNeighbours.add(new Point(x,y));
+                    if (distances[x][y] == targetDistance) bestNeighbours.add(new Point(x, y));
                 }
             }
         }
-        if(bestNeighbours.isEmpty()) return Optional.empty();
-        else return Optional.of(bestNeighbours.get(RandomUtils.randomIntRange(0,bestNeighbours.size()-1))); //Scelgo a caso
+        if (bestNeighbours.isEmpty()) return Optional.empty();
+        else
+            return Optional.of(bestNeighbours.get(RandomUtils.randomIntRange(0, bestNeighbours.size() - 1))); //Scelgo a caso
     }
 
     public static Point pairFloatToInt(Pair<Float, Float> p) {
@@ -97,9 +98,10 @@ public class MapUtils {
 
     /**
      * A function that traces continue rays in a tile map
+     *
      * @param map The actual gamemap
-     * @param p1 the starting point of the line
-     * @param p2 the ending point of the line
+     * @param p1  the starting point of the line
+     * @param p2  the ending point of the line
      * @return A list of coordinates of the tiled crossed by the line between p1 and p2
      */
     public static ArrayList<Point> discretizeRay(GameMap map, Point p1, Point p2) {
@@ -147,11 +149,10 @@ public class MapUtils {
     }
 
     /**
-     *
-     * @param map The current game map
+     * @param map  The current game map
      * @param func A function that returns true if the tile could be crossed by the ray (e.g. is not solid)
-     * @param p1 The starting point of the ray
-     * @param p2 The ending point of the ray
+     * @param p1   The starting point of the ray
+     * @param p2   The ending point of the ray
      * @return true if there aren't tiles that couldn't be crossed by the ray (based on func), false otherwise
      */
     public static boolean canRayReachTile(GameMap map, TileFilter func, Point p1, Point p2) {

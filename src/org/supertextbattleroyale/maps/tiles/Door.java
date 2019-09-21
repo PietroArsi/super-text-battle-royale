@@ -28,7 +28,6 @@ public class Door extends Tile {
         return false;
     }
 
-
     //TODO: change
     public GameMap getNextMap() {
         return GameLauncher.getLoadedMaps().get(0);
