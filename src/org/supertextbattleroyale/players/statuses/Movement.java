@@ -3,14 +3,18 @@ package org.supertextbattleroyale.players.statuses;
 import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.RandomUtils;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Movement extends Status {
 
-    public Movement(Player player) {
+    private Point destination;
+
+    public Movement(Player player, Point destination) {
         super(player);
+        this.destination = destination;
     }
 
     @Override
