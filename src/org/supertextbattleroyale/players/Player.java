@@ -96,6 +96,7 @@ public class Player implements Drawable {
                     System.out.printf("\n%s %s vedere %s", this.getName(), this.canSeeTile(p.getLocation()) ? "puo'" : "non puo'", p.getName());
                 });
 
+
         //test
 //        this.setX(RandomUtils.randomIntRange(this.getX() - 1, this.getX() + 1));
 //        this.setY(RandomUtils.randomIntRange(this.getY() - 1, this.getY() + 1));
@@ -313,6 +314,9 @@ public class Player implements Drawable {
             throw new JsonLoadFailException();
         }
     }
+
+    
+
 
     public Point getLocation() {
         return new Point(this.x, this.y);
