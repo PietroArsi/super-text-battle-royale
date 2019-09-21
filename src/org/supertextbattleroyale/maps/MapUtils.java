@@ -1,6 +1,7 @@
 package org.supertextbattleroyale.maps;
 
 import org.javatuples.Pair;
+import org.supertextbattleroyale.interfaces.TileFilter;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 
 import java.awt.*;
@@ -30,10 +31,11 @@ public class MapUtils {
     /**
      * A BFS alghorithm on a matrix
      *
+     * @param filter
      * @param zeroTiles a list of "source nodes"
      * @return a int matrix with the distance from the nearest source node
      */
-    public static int[][] calculateDistances(GameMap map, List<Point> zeroTiles, boolean allowDiagonalMovement) {
+    public static int[][] calculateDistances(GameMap map, TileFilter filter, List<Point> zeroTiles, boolean allowDiagonalMovement) {
         //Initialize all tile with MAX_INT
         int[][] distances = new int[map.getMatrixWidth()][map.getMatrixHeight()];
         for (int i = 0; i < map.getMatrixWidth(); i++)
@@ -58,7 +60,7 @@ public class MapUtils {
                 for (int x = Math.max(0, i - 1); x <= Math.min(i + 1, map.getMatrixWidth() - 1); x++) {
                     if (x != i || j != y) {
                         if (allowDiagonalMovement || x == i || y == j) {
-                            if (distances[x][y] == Integer.MAX_VALUE && map.getMatrixMap()[x][y].isTileWalkable()) {
+                            if (distances[x][y] == Integer.MAX_VALUE && filter.canCross(map,new Point(x,y))) {
                                 distances[x][y] = distances[i][j] + 1;
                                 visit_queue.offer(new Point(x, y));
                             }
@@ -118,14 +120,19 @@ public class MapUtils {
         return rayList;
     }
 
-    public static void printRayMatrix(GameMap map, Point x1, Point x2) {
+    public static boolean canRayReachTile(GameMap map, TileFilter func, Point p1, Point p2) {
+        return discretizeRay(map, p1, p2).stream().anyMatch( i -> !func.canCross(map,i));
+    }
+
+
+    public static void printRayMatrix(GameMap map, TileFilter func, Point x1, Point x2) {
         System.out.println();
         System.out.printf("MAP: W %d x H %d\n", map.getMatrixWidth(), map.getMatrixHeight());
         ArrayList<Point> l = discretizeRay(map, x1, x2);
         for (int h = 0; h < map.getMatrixHeight(); h++) {
             System.out.println();
             for (int w = 0; w < map.getMatrixWidth(); w++) {
-                System.out.print(l.contains(new Point(w, h)) ? map.getMatrixMap()[w][h].isTileTransparent() ? 'O' : 'X' : '-');
+                System.out.print(l.contains(new Point(w, h)) ? func.canCross(map, new Point(w,h)) ? 'O' : 'X' : '-');
             }
         }
     }
@@ -141,12 +148,12 @@ public class MapUtils {
         }
     }
 
-    public static void printDistancesMatrix(GameMap map, List<Point> zeroTiles) {
-        int[][] distances = calculateDistances(map, zeroTiles, false);
+    public static void printDistancesMatrix(GameMap gameMap, List<Point> zeroTiles) {
+        int[][] distances = calculateDistances(gameMap, (map, p) -> map.getMatrixMap()[p.x][p.y].isTileWalkable(), zeroTiles, false);
         System.out.println();
-        for (int j = 0; j < map.getMatrixHeight(); j++) {
+        for (int j = 0; j < gameMap.getMatrixHeight(); j++) {
             System.out.println();
-            for (int i = 0; i < map.getMatrixWidth(); i++) {
+            for (int i = 0; i < gameMap.getMatrixWidth(); i++) {
                 if (distances[i][j] == Integer.MAX_VALUE)
                     System.out.print("X\t");
                 else System.out.printf("%d\t", distances[i][j]);
