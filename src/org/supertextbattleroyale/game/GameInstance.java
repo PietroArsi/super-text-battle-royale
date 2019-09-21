@@ -47,16 +47,16 @@ public class GameInstance {
         l.add(new Point(4, 0));
         MapUtils.printRoomMatrix(this.currentMap);
         MapUtils.printDistancesMatrix(this.currentMap, l);
-        MapUtils.printRayMatrix(this.currentMap, new Point(0,4), new Point(7,0));
+        MapUtils.printRayMatrix(this.currentMap, new Point(0, 4), new Point(7, 0));
 
-        createRandomPlayer(0, 5, 0);
-        createRandomPlayer(4, 0, 1);
-        createRandomPlayer(5, 5, 2);
+        createRandomPlayer(0, 0, "Pit");
+        createRandomPlayer(1, 0, "Ari");
+        //        createRandomPlayer(5, 5, 2);
     }
 
-    private void createRandomPlayer(int x, int y, int i) {
+    private void createRandomPlayer(int x, int y, String name) {
         try {
-            Player player = GameLauncher.getLoadedPlayers().get(i);
+            Player player = GameLauncher.getPlayerFromName(name).get();
             Player p = new Player(player);
             this.getAllPlayers().add(p);
             this.getAlivePlayers().add(p);
@@ -66,8 +66,7 @@ public class GameInstance {
             p.setCurrentMap(this.getCurrentMap());
 
             p.equipArmor(new Armor(GameLauncher.getLoadedArmors().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedArmors().size() - 1)), p));
-            Weapon w = GameLauncher.getLoadedWeapons().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedWeapons().size() -1));
-
+            Weapon w = GameLauncher.getLoadedWeapons().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedWeapons().size() - 1));
             p.equipWeapon(w.isRanged() ? new WeaponRanged(w, p) : new WeaponMelee(w, p));
         } catch (JsonLoadFailException ex) {
             ex.printStackTrace();

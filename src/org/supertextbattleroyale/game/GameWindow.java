@@ -1,13 +1,9 @@
 package org.supertextbattleroyale.game;
 
 import org.javatuples.Triplet;
-import org.supertextbattleroyale.maps.tiles.Ground;
-import org.supertextbattleroyale.maps.tiles.base.Tile;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.util.Timer;
 import java.util.TimerTask;

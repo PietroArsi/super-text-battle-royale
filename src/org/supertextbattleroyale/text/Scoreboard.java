@@ -87,19 +87,18 @@ public class Scoreboard implements Drawable {
 
     @Override
     public void draw(Graphics2D g) {
-        JPanel scoreboardPanel = GameLauncher.getMainFrame().getGamePanel();
+        JPanel gamePanel = GameLauncher.getMainFrame().getGamePanel();
+        this.setupDimensions(gamePanel.getWidth(), gamePanel.getHeight());
 
-        this.setupDimensions(scoreboardPanel.getWidth(), scoreboardPanel.getHeight());
+        int xDist = gamePanel.getWidth() / 3 * 2 + 5;
+        int yDist = 100;
 
-//        g.setColor(Color.white);
-//        g.setFont(new Font("Roboto", Font.BOLD, 18));
-//        //testing
-////        System.out.print("test: ");
-//        List<String> l = getLinesFromWidth(g, "abcdefghijklmnopqrstuvwxyz test1 test2 test3 test4 test55", 300);
-//        for (int i = 0; i < l.size(); i++) {
-//            g.drawString(l.get(i), scoreboardPanel.getX() + 10, scoreboardPanel.getY() + 10 + 10 * i);
-//        }
-        //        System.out.println(l.size());
-//        l.forEach(System.out::println);
+        g.setColor(Color.white);
+        g.setFont(new Font("Roboto", Font.BOLD, gamePanel.getWidth() / 33));
+
+        List<String> l = getLinesFromWidth(g, "Dario assorda Giammi con la Trap quella bella", gamePanel.getWidth() / 3);
+        for (int i = 0; i < l.size(); i++) {
+            g.drawString(l.get(i), xDist + gamePanel.getX(), yDist + gamePanel.getY() + i * (g.getFont().getSize() + 2));
+        }
     }
 }
