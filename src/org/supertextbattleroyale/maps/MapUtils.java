@@ -97,16 +97,22 @@ public class MapUtils {
             if (tx < ty) {
                 currentX += dirX;
                 nextX = currentX + 0.5f * dirX;
-            } else {
+            } else if(tx > ty) {
                 currentY += dirY;
+                nextY = currentY + 0.5f * dirY;
+            } else {
+                currentX += dirX;
+                currentY += dirY;
+                nextX = currentX + 0.5f * dirX;
                 nextY = currentY + 0.5f * dirY;
             }
         }
+        rayList.add(new Point(currentX, currentY));
         if (currentX == x2)
-            for (int i = currentY; i < y2; i++)
+            for (int i = currentY; (i <= y2 && dirY > 0) || (i >= y2 && dirY < 0); i += dirY)
                 rayList.add(new Point(currentX, i));
         else
-            for (int i = currentX; i < x2; i++)
+            for (int i = currentX; (i <= x2 && dirX > 0) || (i >= x2 && dirX < 0); i += dirX)
                 rayList.add(new Point(i, currentY));
 
         return rayList;
@@ -119,7 +125,7 @@ public class MapUtils {
         for (int h = 0; h < map.getMatrixHeight(); h++) {
             System.out.println();
             for (int w = 0; w < map.getMatrixWidth(); w++) {
-                System.out.print(l.contains(new Point(w, h)) ? 'O' : 'X');
+                System.out.print(l.contains(new Point(w, h)) ? map.getMatrixMap()[w][h].isTileTransparent() ? 'O' : 'X' : '-');
             }
         }
     }

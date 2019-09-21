@@ -90,7 +90,7 @@ public class Player implements Drawable {
                 .filter(p -> !p.getName().equals(this.getName()))
                 .forEach(p -> {
                     MapUtils.printRayMatrix(this.currentMap, this.getLocation(), p.getLocation());
-                    System.out.printf("%s %s vedere %s\n", this.getName(), this.canSeeTile(p.getLocation()) ? "puo'" : "non puo'", p.getName());
+                    System.out.printf("\n%s %s vedere %s", this.getName(), this.canSeeTile(p.getLocation()) ? "puo'" : "non puo'", p.getName());
                 });
 
         //test
@@ -313,5 +313,10 @@ public class Player implements Drawable {
 
     public Point getLocation() {
         return new Point(this.x, this.y);
+    }
+
+    public void vaiASeguireSistemiInformativi() {
+        System.out.println("*Urla Internamente*");
+        this.hitPoints -= 10;
     }
 }
