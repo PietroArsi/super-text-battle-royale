@@ -4,6 +4,8 @@ import org.supertextbattleroyale.players.Player;
 
 public class Flee extends Status {
 
+
+
     public Flee(Player player) {
         super(player);
     }
