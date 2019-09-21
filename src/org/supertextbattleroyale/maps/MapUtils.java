@@ -60,7 +60,7 @@ public class MapUtils {
                 for (int x = Math.max(0, i - 1); x <= Math.min(i + 1, map.getMatrixWidth() - 1); x++) {
                     if (x != i || j != y) {
                         if (allowDiagonalMovement || x == i || y == j) {
-                            if (distances[x][y] == Integer.MAX_VALUE && filter.canCross(map,new Point(x,y))) {
+                            if (distances[x][y] == Integer.MAX_VALUE && filter.canCross(map, new Point(x, y))) {
                                 distances[x][y] = distances[i][j] + 1;
                                 visit_queue.offer(new Point(x, y));
                             }
@@ -99,7 +99,7 @@ public class MapUtils {
             if (tx < ty) {
                 currentX += dirX;
                 nextX = currentX + 0.5f * dirX;
-            } else if(tx > ty) {
+            } else if (tx > ty) {
                 currentY += dirY;
                 nextY = currentY + 0.5f * dirY;
             } else {
@@ -121,7 +121,7 @@ public class MapUtils {
     }
 
     public static boolean canRayReachTile(GameMap map, TileFilter func, Point p1, Point p2) {
-        return !discretizeRay(map, p1, p2).stream().anyMatch( i -> !func.canCross(map,i));
+        return !discretizeRay(map, p1, p2).stream().anyMatch(i -> !func.canCross(map, i));
     }
 
 
@@ -132,7 +132,7 @@ public class MapUtils {
         for (int h = 0; h < map.getMatrixHeight(); h++) {
             System.out.println();
             for (int w = 0; w < map.getMatrixWidth(); w++) {
-                System.out.print(l.contains(new Point(w, h)) ? func.canCross(map, new Point(w,h)) ? 'O' : 'X' : '-');
+                System.out.print(l.contains(new Point(w, h)) ? func.canCross(map, new Point(w, h)) ? 'O' : 'X' : '-');
             }
         }
     }

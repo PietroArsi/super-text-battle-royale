@@ -7,5 +7,5 @@ import java.awt.*;
 
 @FunctionalInterface
 public interface TileFilter {
-    public boolean canCross(GameMap m, Point t);
+    boolean canCross(GameMap m, Point t);
 }
