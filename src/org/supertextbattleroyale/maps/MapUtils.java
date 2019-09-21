@@ -120,8 +120,9 @@ public class MapUtils {
         return rayList;
     }
 
+
     public static boolean canRayReachTile(GameMap map, TileFilter func, Point p1, Point p2) {
-        return discretizeRay(map, p1, p2).stream().anyMatch( i -> !func.canCross(map,i));
+        return discretizeRay(map, p1, p2).stream().allMatch(i -> func.canCross(map,i));
     }
 
 
