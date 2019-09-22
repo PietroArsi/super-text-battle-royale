@@ -47,7 +47,13 @@ public class Movement extends Status {
                 player.move(getNextPoint(doors));
 
                 player.decrementActionsLeft(1);
-                return new Flee(player, null); //TODO: get the door from calculate distances
+
+                return new Flee(player, MapUtils.getBestObjective(
+                        player.getLocation(),
+                        player.getCurrentMap(),
+                        (map, p) -> map.getMatrixMap()[p.x][p.y].isTileWalkable(),
+                        doors,
+                        false));
             }
         } else { //no player seen
             Point next = getNextPoint(Collections.singletonList(destination));

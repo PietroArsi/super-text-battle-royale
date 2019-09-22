@@ -10,6 +10,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 public class MapUtils {
 
@@ -157,6 +158,16 @@ public class MapUtils {
      */
     public static boolean canRayReachTile(GameMap map, TileFilter func, Point p1, Point p2) {
         return !discretizeRay(map, p1, p2).stream().anyMatch(i -> !func.canCross(map, i));
+    }
+
+    public static Point getBestObjective(Point from, GameMap map, TileFilter filter, List<Point> zeroTiles, boolean allowDiagonalMovement) {
+        int[][] m = calculateDistances(map, filter, zeroTiles, allowDiagonalMovement);
+
+        do {
+            from = getNextPathStep(map, m, from, allowDiagonalMovement).get();
+        } while (m[from.x][from.y] > 0);
+
+        return from;
     }
 
 
