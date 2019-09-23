@@ -180,6 +180,20 @@ public class Player implements Drawable {
         this.actionsLeft -= amount;
     }
 
+    public void move(Point p) {
+        this.x = p.x;
+        this.y = p.y;
+    }
+    @Deprecated
+    public void warp() {
+        //TODO
+    }
+
+    public void move(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
     public int getX() {
         return x;
     }
@@ -206,6 +220,10 @@ public class Player implements Drawable {
 
     public Point getLocation() {
         return new Point(this.x, this.y);
+    }
+
+    public Point getLocationOffset(int a, int b) {
+        return new Point(this.x + a, this.y + b);
     }
 
     public GameMap getCurrentMap() {

@@ -125,6 +125,10 @@ public class GameMap implements Drawable {
         this.Y_DIST = distances.getValue1();
     }
 
+    public Tile getTileAt(Point p) {
+        return this.matrixMap[p.x][p.y];
+    }
+
     public int getMatrixWidth() {
         return this.matrixMap.length;
     }

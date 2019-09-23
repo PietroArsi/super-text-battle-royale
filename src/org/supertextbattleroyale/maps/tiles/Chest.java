@@ -2,6 +2,7 @@ package org.supertextbattleroyale.maps.tiles;
 
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.items.base.Collectible;
+import org.supertextbattleroyale.players.Player;
 
 import java.io.File;
 
@@ -33,4 +34,6 @@ public class Chest extends LowObstacle {
         return this.item;
     }
 
+    public void collectItems(Player player) {
+    }
 }
