@@ -93,7 +93,6 @@ public class GameMap implements Drawable {
         return new Pair<>(xDist, yDist);
     }
 
-    //TODO: Find a good method to get from char the corresponding tile
     private Optional<Tile> getTile(char symbol) {
         return tileTypes.stream().filter(t -> t.getSymbol() == symbol).findAny();
     }
