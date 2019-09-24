@@ -146,7 +146,7 @@ public class GameMap implements Drawable {
                 this.CELL_HEIGHT * this.matrixMap[0].length,
                 null);
 
-        this.printGrid(g); //debug
+//        this.printGrid(g); //debug
     }
 
     public Point getMapCenter() {
