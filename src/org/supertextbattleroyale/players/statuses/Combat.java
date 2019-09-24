@@ -34,8 +34,8 @@ public class Combat extends Status {
                     false);
             return new Flee(player, objective);
         }
-
-        if (!player.getEquippedPotions().isEmpty() && RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1) {
+        boolean heals = RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1;
+        if (!player.getEquippedPotions().isEmpty() && heals) {
             player.usePotion(player.getEquippedPotions().get(0));
             return new Combat(player);
         }
@@ -54,13 +54,11 @@ public class Combat extends Status {
         int[][] distances = MapUtils.calculateDistances(player.getCurrentMap(), Filters.filterNonWalkableAndPlayers(), doors, false);
 
         Optional<Point> optNext;
-        for(int i = 0; i < FLEE_DISTANCE; i++) {
-            optNext  = MapUtils.getNextPathStep(player.getCurrentMap(),distances,player.getPoint(),false);
-            if(optNext.isPresent()) {
-                if(optNext.get().equals(player.getPoint())) player.warp();
-                else player.move(optNext.get());
+        optNext  = MapUtils.getNextPathStep(player.getCurrentMap(),distances,player.getPoint(),false);
+        if(optNext.isPresent()) {
+            if(optNext.get().equals(player.getPoint())) player.warp();
+            else player.move(optNext.get());
 
-            }
         }
 
     }
