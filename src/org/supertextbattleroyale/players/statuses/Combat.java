@@ -1,6 +1,7 @@
 package org.supertextbattleroyale.players.statuses;
 
 import org.javatuples.Pair;
+import org.supertextbattleroyale.maps.Filters;
 import org.supertextbattleroyale.maps.MapUtils;
 import org.supertextbattleroyale.maps.tiles.Door;
 import org.supertextbattleroyale.players.Player;
@@ -24,13 +25,21 @@ public class Combat extends Status {
         if (this.player.getPlayersSeen().isEmpty())
             return new Movement(this.player, this.player.getCurrentMap().getMapCenter());
 
-        if (RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1) {
+        if (RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1) {    //TODO: Find a better random variabile
             handleFlee();
-            return new Flee(player, new Point(0,0) /**TODO implement a metod to find the nearest door*/);
+            Point objective = MapUtils.getBestObjective(player.getLocation(),
+                    player.getCurrentMap(),
+                    Filters.filterNonWalkableAndPlayers(),
+                    MapUtils.getAllTilesFromType(player.getCurrentMap(), Door.class),
+                    false);
+            return new Flee(player, objective);
         }
 
-        int actions = 2;
-        //if( this.player.getPlayersSeen().isEmpty())
+        if (!player.getEquippedPotions().isEmpty() && RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1) {
+            player.usePotion(player.getEquippedPotions().get(0));
+            return new Combat(player);
+        }
+
 
 
         return null;
@@ -42,19 +51,15 @@ public class Combat extends Status {
                 .filter(pair -> pair.getValue0() instanceof Door)
                 .map(Pair::getValue1).collect(Collectors.toList());
 
-        int[][] distances = MapUtils.calculateDistances(player.getCurrentMap(), (aMap, aPoint) -> player.getCurrentMap()
-                        .getPlayersOnMap().stream()
-                        .map(p -> p.getPoint())
-                        .collect(Collectors.toList())
-                        .stream()
-                        .noneMatch(p -> p.equals(aPoint)) && aMap.getMatrixMap()[aPoint.x][aPoint.y].isTileWalkable(),
-                doors, false);
+        int[][] distances = MapUtils.calculateDistances(player.getCurrentMap(), Filters.filterNonWalkableAndPlayers(), doors, false);
+
         Optional<Point> optNext;
         for(int i = 0; i < FLEE_DISTANCE; i++) {
             optNext  = MapUtils.getNextPathStep(player.getCurrentMap(),distances,player.getPoint(),false);
             if(optNext.isPresent()) {
                 if(optNext.get().equals(player.getPoint())) player.warp();
                 else player.move(optNext.get());
+
             }
         }
 

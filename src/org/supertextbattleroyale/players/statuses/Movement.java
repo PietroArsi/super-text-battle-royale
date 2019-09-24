@@ -1,6 +1,7 @@
 package org.supertextbattleroyale.players.statuses;
 
 import org.javatuples.Pair;
+import org.supertextbattleroyale.maps.Filters;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
 import org.supertextbattleroyale.maps.tiles.Chest;
@@ -91,7 +92,7 @@ public class Movement extends Status {
     private Point getNextPoint(List<Point> destinations) {
         int[][] matrix = MapUtils.calculateDistances(
                 player.getCurrentMap(),
-                (map, p) -> map.getMatrixMap()[p.x][p.y].isTileWalkable(),
+                Filters.filterNonWalkable(),
                 destinations,
                 false);
 

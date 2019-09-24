@@ -3,6 +3,7 @@ package org.supertextbattleroyale.maps;
 import org.javatuples.Pair;
 import org.supertextbattleroyale.interfaces.TileFilter;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
+import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
@@ -10,6 +11,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class MapUtils {
@@ -195,7 +197,7 @@ public class MapUtils {
     }
 
     public static void printDistancesMatrix(GameMap gameMap, List<Point> zeroTiles) {
-        int[][] distances = calculateDistances(gameMap, (map, p) -> map.getMatrixMap()[p.x][p.y].isTileWalkable(), zeroTiles, false);
+        int[][] distances = calculateDistances(gameMap, Filters.filterNonWalkable(), zeroTiles, false);
         System.out.println();
         for (int j = 0; j < gameMap.getMatrixHeight(); j++) {
             System.out.println();
