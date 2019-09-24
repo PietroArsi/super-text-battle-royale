@@ -108,7 +108,7 @@ public class Player implements Drawable {
     }
 
     public boolean wantsFight(Player p) {
-        return RandomUtils.flipACoin() == 1;
+        return RandomUtils.flipACoin() == 1; //TODO
     }
 
     public List<Player> getPlayersSeen() {
@@ -183,6 +183,10 @@ public class Player implements Drawable {
     public void move(Point p) {
         this.x = p.x;
         this.y = p.y;
+    }
+    @Deprecated
+    public void warp() {
+        //TODO
     }
 
     public void move(int x, int y) {
@@ -284,7 +288,10 @@ public class Player implements Drawable {
     public int usePotion(Potion potion) {
         if (potion.getRemainingUses() > 0) {
             return potion.healPlayer(this);
-        } else return 0;
+        } else {
+            this.equippedPotions.remove(potion);
+            return 0;
+        }
     }
 
     public List<Pair<Tile, Point>> getKnownPlaces() {
