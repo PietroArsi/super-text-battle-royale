@@ -38,7 +38,7 @@ public class GameInstance {
     //TODO: Get this working good
     public void initGame() {
         //Testing per il BFS
-        this.setCurrentMap(GameLauncher.getLoadedMaps().get(1));
+        this.setCurrentMap(GameLauncher.getLoadedMaps().get(0));
         ArrayList<Point> l = new ArrayList<>();
         l.add(new Point(0, 7));
         l.add(new Point(4, 0));
