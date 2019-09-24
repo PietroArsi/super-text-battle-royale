@@ -22,6 +22,8 @@ public class Combat extends Status {
 
     @Override
     public Status doStatusAction() {
+        player.acquireInfo();
+
         if (this.player.getPlayersSeen().isEmpty())
             return new Movement(this.player, this.player.getCurrentMap().getMapCenter());
 

@@ -151,7 +151,8 @@ public class GameMap implements Drawable {
 
     public Point getMapCenter() {
         //TODO: Creare un metodo spiraloso che cerca il centro
-        return null;
+
+        return new Point(this.getMatrixWidth()/2, this.getMatrixHeight()/2);
     }
 
     /**

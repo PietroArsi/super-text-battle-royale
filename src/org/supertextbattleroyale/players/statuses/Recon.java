@@ -22,7 +22,7 @@ public class Recon extends Status {
 
     @Override
     public Status doStatusAction() {
-        this.acquireInfo();
+        player.acquireInfo();
         player.decrementActionsLeft(1);
 
         List<Player> players = player.getPlayersSeen();
@@ -38,15 +38,5 @@ public class Recon extends Status {
         } else {
             return new Movement(player, player.getBestObjectiveOrMapCenter());
         }
-    }
-
-    private void acquireInfo() {
-        MapUtils.getAllTilesFromType(player.getCurrentMap(), Door.class).stream()
-                .filter(player::canSeeTile)
-                .forEach(p -> player.getKnownPlaces().add(new Pair<>(player.getCurrentMap().getTileAt(p), p)));
-
-        MapUtils.getAllTilesFromType(player.getCurrentMap(), Chest.class).stream()
-                .filter(player::canSeeTile)
-                .forEach(p -> player.getKnownPlaces().add(new Pair<>(player.getCurrentMap().getTileAt(p), p)));
     }
 }

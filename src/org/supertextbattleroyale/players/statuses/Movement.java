@@ -6,14 +6,13 @@ import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
 import org.supertextbattleroyale.maps.tiles.Chest;
 import org.supertextbattleroyale.maps.tiles.Door;
+import org.supertextbattleroyale.maps.tiles.Ground;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +27,8 @@ public class Movement extends Status {
 
     @Override
     public Status doStatusAction() {
+        player.acquireInfo();
+
         List<Player> players = player.getPlayersSeen();
 
         if (!players.isEmpty()) { //a player has been seen
@@ -47,7 +48,7 @@ public class Movement extends Status {
 
                 player.move(getNextPoint(doors));
 
-                player.decrementActionsLeft(1);
+//                player.decrementActionsLeft(1); bonus movement given from fleeing
 
                 return new Flee(player);
             }
@@ -69,16 +70,16 @@ public class Movement extends Status {
                 player.move(next);
             }
 
-            List<Point> objectives = MapUtils.getAllTilesFromType(player.getCurrentMap(), Chest.class);
-            objectives.addAll(MapUtils.getAllTilesFromType(player.getCurrentMap(), Door.class));
+            Optional<Point> bestchest = player.getBestChest();
 
-            if(objectives.size() == 0) {
-                player.decrementActionsLeft(1);
-                return new Movement(player, player.getCurrentMap().getMapCenter());
+            if (bestchest.isEmpty()) {
+                if (next.equals(player.getCurrentMap().getMapCenter()) && player.getCurrentMap().getTileAt(next) instanceof Ground) {
+                    return new Movement(player, player.getBestDoor());
+                } else {
+                    return new Movement(player, player.getCurrentMap().getMapCenter());
+                }
             } else {
-                player.decrementActionsLeft(1);
-                return null;
-                //TODO: return movement al posto piu' vicino
+                return new Movement(player, bestchest.get());
             }
         }
     }

@@ -13,7 +13,9 @@ import org.supertextbattleroyale.maps.Filters;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
 import org.supertextbattleroyale.maps.tiles.Chest;
+import org.supertextbattleroyale.maps.tiles.Door;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
+import org.supertextbattleroyale.players.statuses.Recon;
 import org.supertextbattleroyale.players.statuses.Status;
 import org.supertextbattleroyale.utils.ColorUtils;
 import org.supertextbattleroyale.utils.JsonUtils;
@@ -63,6 +65,8 @@ public class Player implements Drawable {
 
     private List<Pair<Tile, Point>> knownPlaces;
 
+    private Status status;
+
     public Player(File settingsFolder) throws JsonLoadFailException {
         this.settingsFolder = settingsFolder;
         this.overFace = null;
@@ -88,6 +92,8 @@ public class Player implements Drawable {
 
             this.body = ColorUtils.tintImage(this.body, bodyColor);
         }
+
+        this.status = new Recon(this);
     }
 
     public Player(Player in) throws JsonLoadFailException {
@@ -165,8 +171,32 @@ public class Player implements Drawable {
                 .anyMatch(p -> p != this && p.getX() == tx && p.getY() == ty);
     }
 
+    public void acquireInfo() {
+        MapUtils.getAllTilesFromType(this.getCurrentMap(), Door.class).stream()
+                .filter(this::canSeeTile)
+                .forEach(p -> this.getKnownPlaces().add(new Pair<>(this.getCurrentMap().getTileAt(p), p)));
+
+        MapUtils.getAllTilesFromType(this.getCurrentMap(), Chest.class).stream()
+                .filter(this::canSeeTile)
+                .forEach(p -> this.getKnownPlaces().add(new Pair<>(this.getCurrentMap().getTileAt(p), p)));
+    }
+
     public Point getBestObjectiveOrMapCenter() {
         return getBestChest().orElseGet(() -> this.getCurrentMap().getMapCenter());
+    }
+
+    public Point getBestDoor() {
+        List<Point> doors = this.getKnownPlaces().stream()
+                .filter(pair -> pair.getValue0() instanceof Door)
+                .map(Pair::getValue1)
+                .collect(Collectors.toList());
+
+        return MapUtils.getBestObjective(
+                this.getLocation(),
+                this.getCurrentMap(),
+                Filters.filterOpaque(),
+                doors,
+                false);
     }
 
     public Optional<Point> getBestChest() {
