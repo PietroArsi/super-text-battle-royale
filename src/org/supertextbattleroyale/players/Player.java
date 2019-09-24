@@ -9,8 +9,10 @@ import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Potion;
 import org.supertextbattleroyale.items.Weapon;
+import org.supertextbattleroyale.maps.Filters;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
+import org.supertextbattleroyale.maps.tiles.Chest;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.statuses.Status;
 import org.supertextbattleroyale.utils.ColorUtils;
@@ -161,6 +163,26 @@ public class Player implements Drawable {
 
         return this.getCurrentMap().getPlayersOnMap().stream()
                 .anyMatch(p -> p != this && p.getX() == tx && p.getY() == ty);
+    }
+
+    public Point getBestObjectiveOrMapCenter() {
+        return getBestChest().orElseGet(() -> this.getCurrentMap().getMapCenter());
+    }
+
+    public Optional<Point> getBestChest() {
+        List<Point> chests = this.getKnownPlaces().stream()
+                .filter(pair -> pair.getValue0() instanceof Chest)
+                .map(Pair::getValue1)
+                .collect(Collectors.toList());
+
+        if (chests.isEmpty()) return Optional.empty();
+
+        return Optional.of(MapUtils.getBestObjective(
+                this.getLocation(),
+                this.getCurrentMap(),
+                Filters.filterOpaque(),
+                chests,
+                false));
     }
 
     public String getName() {
