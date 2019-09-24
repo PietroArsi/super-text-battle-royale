@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 public class GameMap implements Drawable {
 
@@ -181,6 +182,10 @@ public class GameMap implements Drawable {
 
     public List<Player> getPlayersOnMap() {
         return playersOnMap;
+    }
+
+    public List<Player> getAlivePlayersOnMap() {
+        return getPlayersOnMap().stream().filter(Player::isAlive).collect(Collectors.toList());
     }
 
     /**

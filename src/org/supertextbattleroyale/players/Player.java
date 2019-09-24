@@ -25,10 +25,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Player implements Drawable {
@@ -107,6 +105,10 @@ public class Player implements Drawable {
         return 0;
     }
 
+    public float getDistanceToPlayer(Player other) {
+        return (float) other.getLocation().distance(this.getLocation());
+    }
+
     public boolean wantsFight(Player p) {
         return RandomUtils.flipACoin() == 1; //TODO
     }
@@ -116,6 +118,16 @@ public class Player implements Drawable {
                 .filter(p -> p != this)
                 .filter(p -> p.canSeeTile(p.getLocation()))
                 .collect(Collectors.toList());
+    }
+    public List<Player> getAlivePlayersSeen() {
+        return this.getCurrentMap().getAlivePlayersOnMap().stream()
+                .filter(p -> p != this)
+                .filter(p -> p.canSeeTile(p.getLocation()))
+                .collect(Collectors.toList());
+    }
+
+    public Optional<Player> findTargetPlayer() {
+        return this.getAlivePlayersSeen().stream().min(Comparator.comparingDouble(this::getDistanceToPlayer));
     }
 
 
@@ -134,6 +146,7 @@ public class Player implements Drawable {
         this.hitPoints = Math.max(this.hitPoints - damage, 0);
         return playerDamage;
     }
+
 
     public int hitPlayer(Player other, int damage) {
         this.setXP(this.XP + damage); //XP are increased by the total damage done by the player
@@ -248,6 +261,8 @@ public class Player implements Drawable {
     public int getHP() {
         return this.hitPoints;
     }
+
+    public boolean isAlive() { return this.hitPoints > 0};
 
     public BufferedImage getImage() {
         return this.face;

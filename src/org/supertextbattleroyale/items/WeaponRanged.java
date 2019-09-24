@@ -7,9 +7,19 @@ import java.io.File;
 
 public class WeaponRanged extends Weapon {
 
+    protected float range;
+
     public WeaponRanged(Weapon in, Player player) throws JsonLoadFailException {
         super(in.getSettingsFolder());
         this.player = player;
     }
 
+    @Override
+    public float getRange() {
+        return range;
+    }
+
+    public void setRange(float range) {
+        this.range = range;
+    }
 }
