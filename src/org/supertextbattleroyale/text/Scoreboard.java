@@ -50,7 +50,7 @@ public class Scoreboard implements Drawable {
         int xDist = gamePanel.getWidth() / 3 * 2 + gamePanel.getWidth() / 6;
         int yDist = 100;
 
-        g.setFont(new Font("C059", Font.BOLD, gamePanel.getWidth() / 30));
+        g.setFont(new Font("TSCu_Comic", Font.BOLD, gamePanel.getWidth() / 30));
 
         List<StringUtils.ColoredString> l1 = StringUtils.getLinesFromWidth(g, "^[1446a0]SUPER ^[0b4f6c]TEXT ^[db3069]BATTLE ^[f5d547]ROYALE", gamePanel.getWidth() / 3);
         Point p = StringUtils.drawCenteredColoredStringList(g, l1, xDist + gamePanel.getX(), yDist + gamePanel.getY());

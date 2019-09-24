@@ -66,8 +66,6 @@ public class StringUtils {
     private static ColoredString getColoredStringFromSplit(String[] split) {
         Color currentColor = Color.black;
 
-        StringBuilder currentLineString = new StringBuilder();
-
         ColoredString cs = new ColoredString();
         StringBuilder sb = new StringBuilder();
 

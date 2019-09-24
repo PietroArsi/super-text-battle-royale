@@ -32,7 +32,7 @@ public class Combat extends Status {
                     Filters.filterNonWalkableAndPlayers(),
                     MapUtils.getAllTilesFromType(player.getCurrentMap(), Door.class),
                     false);
-            return new Flee(player, objective);
+            return new Flee(player);
         }
 
         if (!player.getEquippedPotions().isEmpty() && RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1) {

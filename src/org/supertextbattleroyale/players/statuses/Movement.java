@@ -34,7 +34,7 @@ public class Movement extends Status {
             boolean wantsFight = players.stream().anyMatch(p -> player.wantsFight(p));
 
             if (wantsFight) { //TODO: implementare una scelta piu' intelligente per la scelta del giocatore da combattere
-                player.decrementActionsLeft(1);
+//                player.decrementActionsLeft(1);
                 return new Combat(players.get(RandomUtils.randomIntRange(0, players.size() - 1)));
             } else { //wants to flee
                 List<Point> doors = player.getKnownPlaces().stream()
@@ -49,12 +49,7 @@ public class Movement extends Status {
 
                 player.decrementActionsLeft(1);
 
-                return new Flee(player, MapUtils.getBestObjective(
-                        player.getLocation(),
-                        player.getCurrentMap(),
-                        (map, p) -> map.getMatrixMap()[p.x][p.y].isTileWalkable(),
-                        doors,
-                        false));
+                return new Flee(player);
             }
         } else { //no player seen
             Point next = getNextPoint(Collections.singletonList(destination));

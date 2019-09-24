@@ -97,7 +97,7 @@ public class Player implements Drawable {
         this.actionsLeft = 2;
 
 
-        while(this.actionsLeft > 0) {
+        while (this.actionsLeft > 0) {
             this.currentStatus = this.currentStatus.doStatusAction();
         }
     }
@@ -117,7 +117,6 @@ public class Player implements Drawable {
                 .filter(p -> p.canSeeTile(p.getLocation()))
                 .collect(Collectors.toList());
     }
-
 
 
     /**
@@ -184,6 +183,7 @@ public class Player implements Drawable {
         this.x = p.x;
         this.y = p.y;
     }
+
     @Deprecated
     public void warp() {
         //TODO
