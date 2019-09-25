@@ -182,7 +182,6 @@ public class GameMap implements Drawable {
             assert(xc >= 0 && yc >= 0 && xc < getMatrixWidth() && yc < getMatrixHeight());
         }
         return new Point(xc,yc);
-
     }
 
     /**
@@ -194,9 +193,7 @@ public class GameMap implements Drawable {
         Color ground = new Color(0, 200, 50, 49);
         Color wall = new Color(33, 33, 33, 150);
 
-        Tile[][] tiles = GameLauncher.getGameInstance().getCurrentMap().getMatrixMap();
-
-        JPanel panel = GameLauncher.getMainFrame().getGamePanel();
+        Tile[][] tiles = this.getMatrixMap();
 
         for (int i = 0; i < tiles.length; i++) {
             Tile[] row = tiles[i];

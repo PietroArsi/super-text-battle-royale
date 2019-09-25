@@ -17,10 +17,7 @@ import org.supertextbattleroyale.maps.tiles.Door;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.statuses.Recon;
 import org.supertextbattleroyale.players.statuses.Status;
-import org.supertextbattleroyale.utils.ColorUtils;
-import org.supertextbattleroyale.utils.JsonUtils;
-import org.supertextbattleroyale.utils.RandomUtils;
-import org.supertextbattleroyale.utils.Setting;
+import org.supertextbattleroyale.utils.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -102,12 +99,9 @@ public class Player implements Drawable {
             this.currentStatus = new Recon(this);
         }
 
-        System.out.println(this.name + " " + this.currentStatus.getClass().getName());
-
 //        while (this.actionsLeft > 0) {
-            Status s = this.currentStatus.doStatusAction();
-            System.out.println(s.getClass().getName());
-            this.currentStatus = s;
+        Status s = this.currentStatus.doStatusAction();
+        this.currentStatus = s;
 //        }
     }
 
@@ -126,12 +120,12 @@ public class Player implements Drawable {
     }
 
     public List<Player> getPlayersSeen() {
-//        return this.getCurrentMap().getPlayersOnMap().stream()
-//                .filter(p -> p != this)
-//                .filter(p -> this.canSeeTile(p.getLocation()))
-//                .collect(Collectors.toList());
+        return this.getCurrentMap().getPlayersOnMap().stream()
+                .filter(p -> p != this)
+                .filter(p -> this.canSeeTile(p.getLocation()))
+                .collect(Collectors.toList());
 
-        return Collections.emptyList();
+//        return Collections.emptyList();
     }
 
     public List<Player> getAlivePlayersSeen() {
@@ -322,7 +316,9 @@ public class Player implements Drawable {
     }
 
 
-    public boolean isAlive() { return this.hitPoints > 0;}
+    public boolean isAlive() {
+        return this.hitPoints > 0;
+    }
 
 
     public BufferedImage getImage() {
@@ -415,9 +411,24 @@ public class Player implements Drawable {
     @Override
     public void draw(Graphics2D g) {
         g.setColor(Color.BLACK);
-        g.setFont(new Font("Helvetica Neue", Font.BOLD, 18));
-        g.drawString(this.getAlias(), this.currentMap.X_DIST + this.x * this.currentMap.CELL_WIDTH, this.currentMap.Y_DIST + this.y * this.currentMap.CELL_HEIGHT);
+        g.setFont(new Font("Roboto", Font.BOLD, this.currentMap.CELL_WIDTH / 3));
+        List<StringUtils.ColoredString> name = StringUtils.getLinesFromWidth(g, "^[dddddd]" + alias + "^[22ee33] " + hitPoints, this.currentMap.CELL_WIDTH * 4);
+        int stringWidth = g.getFontMetrics().stringWidth(name.get(0).toString());
 
+        g.fillRect(currentMap.X_DIST + x * currentMap.CELL_WIDTH + currentMap.CELL_WIDTH / 2 - stringWidth / 2 - 5,
+                currentMap.Y_DIST + y * currentMap.CELL_HEIGHT - g.getFont().getSize(),
+                stringWidth + 10,
+                (int) (g.getFont().getSize() * 1.3f));
+        StringUtils.drawCenteredColoredStringList(g, name,
+                currentMap.X_DIST + x * currentMap.CELL_WIDTH + currentMap.CELL_WIDTH / 2,
+                currentMap.Y_DIST + y * currentMap.CELL_HEIGHT);
+
+        if (this.currentStatus != null) {
+            List<StringUtils.ColoredString> status = StringUtils.getLinesFromWidth(g, "^[3344ff]" + currentStatus.getClass().getSimpleName(), this.currentMap.CELL_WIDTH * 4);
+            StringUtils.drawCenteredColoredStringList(g, status,
+                    currentMap.X_DIST + x * currentMap.CELL_WIDTH + currentMap.CELL_WIDTH / 2,
+                    (int) (currentMap.Y_DIST + (y + 1.5f) * currentMap.CELL_HEIGHT));
+        }
         if (this.equippedArmor != null) this.equippedArmor.drawBack(g);
 
         if (this.underFace != null) this.drawImage(this.underFace, g);

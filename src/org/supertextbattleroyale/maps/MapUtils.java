@@ -82,10 +82,8 @@ public class MapUtils {
         int j = starting.y;
         ArrayList<Point> bestNeighbours = new ArrayList<>();
         int targetDistance = Math.max(distances[i][j] - 1, 0);
-        System.out.println(targetDistance);
         for (int x = Math.max(0, i - 1); x <= Math.min(i + 1, map.getMatrixWidth() - 1); x++) {
             for (int y = Math.max(0, j - 1); y <= Math.min(j + 1, map.getMatrixHeight() - 1); y++) {
-                System.out.println(x + " " + y + " value: " + distances[x][y]);
                 if (allowDiagonalMovement || starting.distance(x, y) == 1) {
                     if (distances[x][y] == targetDistance) {
                         bestNeighbours.add(new Point(x, y));
