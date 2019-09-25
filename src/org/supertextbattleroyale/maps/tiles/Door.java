@@ -25,11 +25,11 @@ public class Door extends Tile {
 
     @Override
     public boolean isTileTransparent() {
-        return false;
+        return true;
     }
 
     //TODO: change
     public GameMap getNextMap() {
-        return GameLauncher.getLoadedMaps().get(0);
+        return GameLauncher.getLoadedMaps().get(1);
     }
 }

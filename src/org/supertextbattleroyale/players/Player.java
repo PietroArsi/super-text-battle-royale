@@ -98,12 +98,16 @@ public class Player implements Drawable {
         //to get players in the same map getCurrentMap().getPlayersOnMap(
         this.actionsLeft = 2;
 
-        if(this.currentStatus == null) {
+        if (this.currentStatus == null) {
             this.currentStatus = new Recon(this);
         }
 
+        System.out.println(this.name + " " + this.currentStatus.getClass().getName());
+
         while (this.actionsLeft > 0) {
-            this.currentStatus = this.currentStatus.doStatusAction();
+            Status s = this.currentStatus.doStatusAction();
+            System.out.println(s.getClass().getName());
+            this.currentStatus = s;
         }
     }
 
@@ -117,7 +121,8 @@ public class Player implements Drawable {
     }
 
     public boolean wantsFight(Player p) {
-        return RandomUtils.flipACoin() == 1; //TODO
+        return false;
+//        return RandomUtils.flipACoin() == 1; //TODO
     }
 
     public List<Player> getPlayersSeen() {
@@ -130,7 +135,7 @@ public class Player implements Drawable {
     public List<Player> getAlivePlayersSeen() {
         return this.getCurrentMap().getAlivePlayersOnMap().stream()
                 .filter(p -> p != this)
-                .filter(p -> p.canSeeTile(p.getLocation()))
+                .filter(p -> this.canSeeTile(p.getLocation()))
                 .collect(Collectors.toList());
     }
 

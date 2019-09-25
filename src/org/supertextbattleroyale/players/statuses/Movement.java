@@ -87,24 +87,16 @@ public class Movement extends Status {
 
     @Deprecated
     private Point getNextPoint(List<Point> destinations) {
-        int[][] matrix = MapUtils.calculateDistances(
+        int[][] m = MapUtils.calculateDistances(
                 player.getCurrentMap(),
-                Filters.filterNonWalkable(),
+                Filters.filterNonWalkableAndPlayers(),
                 destinations,
                 false);
 
-        List<Pair<Point, Integer>> toCheck = new ArrayList<>();
-        if (player.getX() > 0)
-            toCheck.add(new Pair<>(player.getLocationOffset(-1, 0), matrix[player.getX() - 1][player.getY()]));
-        if (player.getX() < player.getCurrentMap().getMatrixWidth() - 1)
-            toCheck.add(new Pair<>(player.getLocationOffset(+1, 0), matrix[player.getX() + 1][player.getY()]));
-        if (player.getX() > 0)
-            toCheck.add(new Pair<>(player.getLocationOffset(0, -1), matrix[player.getX()][player.getY() - 1]));
-        if (player.getY() < player.getCurrentMap().getMatrixHeight() - 1)
-            toCheck.add(new Pair<>(player.getLocationOffset(0, +1), matrix[player.getX()][player.getY() + 1]));
-
-        return toCheck.stream()
-                .min(Comparator.comparingInt(Pair::getValue1))
-                .get().getValue0();
+        return MapUtils.getNextPathStep(
+                player.getCurrentMap(),
+                m,
+                player.getLocation(),
+                false).get();
     }
 }

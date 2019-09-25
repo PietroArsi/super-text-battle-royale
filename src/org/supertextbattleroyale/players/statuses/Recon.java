@@ -26,16 +26,19 @@ public class Recon extends Status {
         player.decrementActionsLeft(1);
 
         List<Player> players = player.getAlivePlayersSeen();
+        System.out.println("aaa");
 
         if (!players.isEmpty()) {
             boolean wantsFight = players.stream().anyMatch(p -> player.wantsFight(p));
 
+            System.out.println("players");
             if (wantsFight) {
                 return new Combat(player);
             } else {
                 return new Flee(player);
             }
         } else {
+            System.out.println("move");
             return new Movement(player, player.getBestObjectiveOrMapCenter());
         }
     }
