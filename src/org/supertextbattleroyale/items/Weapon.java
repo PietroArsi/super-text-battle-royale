@@ -25,6 +25,8 @@ public class Weapon extends Collectible implements Drawable {
 
     protected Player player;
 
+    public static float MELEE_RANGE = 1.5f;
+
     public enum HitType {
         CRITIC(2.0f),
         NORMAL(1.0f),
@@ -60,6 +62,10 @@ public class Weapon extends Collectible implements Drawable {
     @Override
     public void draw(Graphics2D g) {
         this.drawImage(getImage(), g, player);
+    }
+
+    public float getRange() {
+        return Weapon.MELEE_RANGE;
     }
 
     private void drawImage(BufferedImage image, Graphics2D g, Player p) {

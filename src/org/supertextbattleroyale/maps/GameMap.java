@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 public class GameMap implements Drawable {
 
@@ -70,7 +71,6 @@ public class GameMap implements Drawable {
             if (line.length() != width) throw new MapLoadException();
 
             for (int w = 0; w < line.length(); w++) {
-                int value = Integer.parseInt(line.charAt(w) + "");
                 Optional<Tile> t = getTile(line.charAt(w));
                 if (t.isEmpty()) throw new MapLoadException();
 
@@ -182,6 +182,10 @@ public class GameMap implements Drawable {
 
     public List<Player> getPlayersOnMap() {
         return playersOnMap;
+    }
+
+    public List<Player> getAlivePlayersOnMap() {
+        return getPlayersOnMap().stream().filter(Player::isAlive).collect(Collectors.toList());
     }
 
     /**

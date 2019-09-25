@@ -25,7 +25,7 @@ public class Recon extends Status {
         player.acquireInfo();
         player.decrementActionsLeft(1);
 
-        List<Player> players = player.getPlayersSeen();
+        List<Player> players = player.getAlivePlayersSeen();
 
         if (!players.isEmpty()) {
             boolean wantsFight = players.stream().anyMatch(p -> player.wantsFight(p));

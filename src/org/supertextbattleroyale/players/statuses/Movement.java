@@ -46,13 +46,14 @@ public class Movement extends Status {
                         .filter(player::canSeeTile)
                         .forEach(doors::add);
 
-                player.move(getNextPoint(doors));
+                player.move(getNextPoint(doors)); //TODO:
 
 //                player.decrementActionsLeft(1); bonus movement given from fleeing
 
                 return new Flee(player);
             }
         } else { //no player seen
+            //TODO: fix
             Point next = getNextPoint(Collections.singletonList(destination));
 
             if (next.equals(destination)) {

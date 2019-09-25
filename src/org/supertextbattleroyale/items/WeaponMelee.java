@@ -10,4 +10,8 @@ public class WeaponMelee extends Weapon {
         this.player = player;
     }
 
+    @Override
+    public float getRange() {
+        return Weapon.MELEE_RANGE;
+    }
 }

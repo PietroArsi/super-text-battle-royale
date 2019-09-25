@@ -8,6 +8,7 @@ import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,27 +25,38 @@ public class Combat extends Status {
     public Status doStatusAction() {
         player.acquireInfo();
 
-        if (this.player.getPlayersSeen().isEmpty())
-            return new Movement(this.player, this.player.getCurrentMap().getMapCenter());
+        Status nextStatus = null;
 
-        if (RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1) {    //TODO: Find a better random variabile
+        if (this.player.getAlivePlayersSeen().isEmpty())
+            //No player found, go to the best objective
+            nextStatus = new Movement(this.player, this.player.getCurrentMap().getMapCenter());
+        else if (RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1) {    //TODO: Find a better random variabile
+            //If the random number is 1 then flee
             handleFlee();
-            Point objective = MapUtils.getBestObjective(player.getLocation(),
-                    player.getCurrentMap(),
-                    Filters.filterNonWalkableAndPlayers(),
-                    MapUtils.getAllTilesFromType(player.getCurrentMap(), Door.class),
-                    false);
-            return new Flee(player);
+            nextStatus = new Flee(this.player);
+        } else {
+            boolean heals = RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1;
+            if (!player.getEquippedPotions().isEmpty() && heals) {
+                player.usePotion(player.getEquippedPotions().get(0));
+                return new Combat(player);
+            } else {
+                Optional<Player> maybeAPlayer = this.player.findTargetPlayer();
+                if (maybeAPlayer.isPresent() && maybeAPlayer.get().getDistanceToPlayer(this.player) <= this.player.getEquippedWeapon().getRange()) {
+                    //TODO: if(this.player.getActionsLeft() > 1)
+                    if (this.player.getActionsLeft() > 0) {
+                        //TODO: Precise attack
+
+                    } else {
+                        //TODO: Rapid attack
+                    }
+
+                } else {
+
+                }
+            }
         }
 
-        if (!player.getEquippedPotions().isEmpty() && RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1) {
-            player.usePotion(player.getEquippedPotions().get(0));
-            return new Combat(player);
-        }
-
-
-
-        return null;
+        return nextStatus;
     }
 
     private void handleFlee() {
@@ -56,13 +68,11 @@ public class Combat extends Status {
         int[][] distances = MapUtils.calculateDistances(player.getCurrentMap(), Filters.filterNonWalkableAndPlayers(), doors, false);
 
         Optional<Point> optNext;
-        for(int i = 0; i < FLEE_DISTANCE; i++) {
-            optNext  = MapUtils.getNextPathStep(player.getCurrentMap(),distances,player.getPoint(),false);
-            if(optNext.isPresent()) {
-                if(optNext.get().equals(player.getPoint())) player.warp();
-                else player.move(optNext.get());
+        optNext = MapUtils.getNextPathStep(player.getCurrentMap(), distances, player.getPoint(), false);
+        if (optNext.isPresent()) {
+            if (optNext.get().equals(player.getPoint())) player.warp();
+            else player.move(optNext.get());
 
-            }
         }
 
     }
