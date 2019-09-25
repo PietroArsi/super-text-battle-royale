@@ -72,7 +72,6 @@ public class GameMap implements Drawable {
             if (line.length() != width) throw new MapLoadException();
 
             for (int w = 0; w < line.length(); w++) {
-                int value = Integer.parseInt(line.charAt(w) + "");
                 Optional<Tile> t = getTile(line.charAt(w));
                 if (t.isEmpty()) throw new MapLoadException();
 
@@ -148,8 +147,9 @@ public class GameMap implements Drawable {
                 this.CELL_HEIGHT * this.matrixMap[0].length,
                 null);
 
-//        this.printGrid(g); //debug
+        this.printGrid(g); //debug
     }
+
     private enum Direction {RIGHT,DOWN,LEFT,UP};
     public Point getMapCenter(TileFilter filter) {
         int xc = getMatrixWidth() / 2;
@@ -182,6 +182,7 @@ public class GameMap implements Drawable {
             assert(xc >= 0 && yc >= 0 && xc < getMatrixWidth() && yc < getMatrixHeight());
         }
         return new Point(xc,yc);
+
     }
 
     /**

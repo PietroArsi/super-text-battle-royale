@@ -6,14 +6,13 @@ import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
 import org.supertextbattleroyale.maps.tiles.Chest;
 import org.supertextbattleroyale.maps.tiles.Door;
+import org.supertextbattleroyale.maps.tiles.Ground;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +27,8 @@ public class Movement extends Status {
 
     @Override
     public Status doStatusAction() {
+        player.acquireInfo();
+
         List<Player> players = player.getPlayersSeen();
 
         if (!players.isEmpty()) { //a player has been seen
@@ -45,13 +46,14 @@ public class Movement extends Status {
                         .filter(player::canSeeTile)
                         .forEach(doors::add);
 
-                player.move(getNextPoint(doors));
+                player.move(getNextPoint(doors)); //TODO:
 
-                player.decrementActionsLeft(1);
+//                player.decrementActionsLeft(1); bonus movement given from fleeing
 
                 return new Flee(player);
             }
         } else { //no player seen
+            //TODO: fix
             Point next = getNextPoint(Collections.singletonList(destination));
 
             if (next.equals(destination)) {
@@ -69,40 +71,32 @@ public class Movement extends Status {
                 player.move(next);
             }
 
-            List<Point> objectives = MapUtils.getAllTilesFromType(player.getCurrentMap(), Chest.class);
-            objectives.addAll(MapUtils.getAllTilesFromType(player.getCurrentMap(), Door.class));
+            Optional<Point> bestchest = player.getBestChest();
 
-            if(objectives.size() == 0) {
-                player.decrementActionsLeft(1);
-                return new Movement(player, player.getCurrentMap().getMapCenter());
+            if (bestchest.isEmpty()) {
+                if (next.equals(player.getCurrentMap().getMapCenter()) && player.getCurrentMap().getTileAt(next) instanceof Ground) {
+                    return new Movement(player, player.getBestDoor());
+                } else {
+                    return new Movement(player, player.getCurrentMap().getMapCenter());
+                }
             } else {
-                player.decrementActionsLeft(1);
-                return null;
-                //TODO: return movement al posto piu' vicino
+                return new Movement(player, bestchest.get());
             }
         }
     }
 
     @Deprecated
     private Point getNextPoint(List<Point> destinations) {
-        int[][] matrix = MapUtils.calculateDistances(
+        int[][] m = MapUtils.calculateDistances(
                 player.getCurrentMap(),
-                Filters.filterNonWalkable(),
+                Filters.filterNonWalkableAndPlayers(),
                 destinations,
                 false);
 
-        List<Pair<Point, Integer>> toCheck = new ArrayList<>();
-        if (player.getX() > 0)
-            toCheck.add(new Pair<>(player.getLocationOffset(-1, 0), matrix[player.getX() - 1][player.getY()]));
-        if (player.getX() < player.getCurrentMap().getMatrixWidth() - 1)
-            toCheck.add(new Pair<>(player.getLocationOffset(+1, 0), matrix[player.getX() + 1][player.getY()]));
-        if (player.getX() > 0)
-            toCheck.add(new Pair<>(player.getLocationOffset(0, -1), matrix[player.getX()][player.getY() - 1]));
-        if (player.getY() < player.getCurrentMap().getMatrixHeight() - 1)
-            toCheck.add(new Pair<>(player.getLocationOffset(0, +1), matrix[player.getX()][player.getY() + 1]));
-
-        return toCheck.stream()
-                .min(Comparator.comparingInt(Pair::getValue1))
-                .get().getValue0();
+        return MapUtils.getNextPathStep(
+                player.getCurrentMap(),
+                m,
+                player.getLocation(),
+                false).get();
     }
 }

@@ -13,7 +13,9 @@ import org.supertextbattleroyale.maps.Filters;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
 import org.supertextbattleroyale.maps.tiles.Chest;
+import org.supertextbattleroyale.maps.tiles.Door;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
+import org.supertextbattleroyale.players.statuses.Recon;
 import org.supertextbattleroyale.players.statuses.Status;
 import org.supertextbattleroyale.utils.ColorUtils;
 import org.supertextbattleroyale.utils.JsonUtils;
@@ -96,9 +98,16 @@ public class Player implements Drawable {
         //to get players in the same map getCurrentMap().getPlayersOnMap(
         this.actionsLeft = 2;
 
+        if (this.currentStatus == null) {
+            this.currentStatus = new Recon(this);
+        }
+
+        System.out.println(this.name + " " + this.currentStatus.getClass().getName());
 
         while (this.actionsLeft > 0) {
-            this.currentStatus = this.currentStatus.doStatusAction();
+            Status s = this.currentStatus.doStatusAction();
+            System.out.println(s.getClass().getName());
+            this.currentStatus = s;
         }
     }
 
@@ -112,7 +121,8 @@ public class Player implements Drawable {
     }
 
     public boolean wantsFight(Player p) {
-        return RandomUtils.flipACoin() == 1; //TODO
+        return false;
+//        return RandomUtils.flipACoin() == 1; //TODO
     }
 
     public List<Player> getPlayersSeen() {
@@ -121,10 +131,11 @@ public class Player implements Drawable {
                 .filter(p -> p.canSeeTile(p.getLocation()))
                 .collect(Collectors.toList());
     }
+
     public List<Player> getAlivePlayersSeen() {
         return this.getCurrentMap().getAlivePlayersOnMap().stream()
                 .filter(p -> p != this)
-                .filter(p -> p.canSeeTile(p.getLocation()))
+                .filter(p -> this.canSeeTile(p.getLocation()))
                 .collect(Collectors.toList());
     }
 
@@ -178,8 +189,32 @@ public class Player implements Drawable {
                 .anyMatch(p -> p != this && p.getX() == tx && p.getY() == ty);
     }
 
+    public void acquireInfo() {
+        MapUtils.getAllTilesFromType(this.getCurrentMap(), Door.class).stream()
+                .filter(this::canSeeTile)
+                .forEach(p -> this.getKnownPlaces().add(new Pair<>(this.getCurrentMap().getTileAt(p), p)));
+
+        MapUtils.getAllTilesFromType(this.getCurrentMap(), Chest.class).stream()
+                .filter(this::canSeeTile)
+                .forEach(p -> this.getKnownPlaces().add(new Pair<>(this.getCurrentMap().getTileAt(p), p)));
+    }
+
     public Point getBestObjectiveOrMapCenter() {
-        return getBestChest().orElseGet(() -> this.getCurrentMap().getMapCenter());
+        return getBestChest().orElseGet(() -> this.getCurrentMap().getMapCenter(Filters.filterNonWalkableAndPlayers()));
+    }
+
+    public Point getBestDoor() {
+        List<Point> doors = this.getKnownPlaces().stream()
+                .filter(pair -> pair.getValue0() instanceof Door)
+                .map(Pair::getValue1)
+                .collect(Collectors.toList());
+
+        return MapUtils.getBestObjective(
+                this.getLocation(),
+                this.getCurrentMap(),
+                Filters.filterNonWalkableAndPlayers(),
+                doors,
+                false);
     }
 
     public Optional<Point> getBestChest() {
@@ -284,7 +319,9 @@ public class Player implements Drawable {
         return this.hitPoints;
     }
 
+
     public boolean isAlive() { return this.hitPoints > 0;}
+
 
     public BufferedImage getImage() {
         return this.face;

@@ -11,6 +11,8 @@ public class Turn {
     }
 
     public void onTurn() {
+        gameInstance.getCurrentMap().getAlivePlayersOnMap().forEach(Player::onTick);
+
 //        gameInstance.getCurrentMap().getPlayersOnMap().get(0).setX(7);
 //        gameInstance.getCurrentMap().getPlayersOnMap().get(0).setY(2);
 //

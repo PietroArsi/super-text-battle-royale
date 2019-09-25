@@ -22,31 +22,24 @@ public class Recon extends Status {
 
     @Override
     public Status doStatusAction() {
-        this.acquireInfo();
+        player.acquireInfo();
         player.decrementActionsLeft(1);
 
         List<Player> players = player.getAlivePlayersSeen();
+        System.out.println("aaa");
 
         if (!players.isEmpty()) {
             boolean wantsFight = players.stream().anyMatch(p -> player.wantsFight(p));
 
+            System.out.println("players");
             if (wantsFight) {
                 return new Combat(player);
             } else {
                 return new Flee(player);
             }
         } else {
+            System.out.println("move");
             return new Movement(player, player.getBestObjectiveOrMapCenter());
         }
-    }
-
-    private void acquireInfo() {
-        MapUtils.getAllTilesFromType(player.getCurrentMap(), Door.class).stream()
-                .filter(player::canSeeTile)
-                .forEach(p -> player.getKnownPlaces().add(new Pair<>(player.getCurrentMap().getTileAt(p), p)));
-
-        MapUtils.getAllTilesFromType(player.getCurrentMap(), Chest.class).stream()
-                .filter(player::canSeeTile)
-                .forEach(p -> player.getKnownPlaces().add(new Pair<>(player.getCurrentMap().getTileAt(p), p)));
     }
 }

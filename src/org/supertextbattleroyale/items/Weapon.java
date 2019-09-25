@@ -19,6 +19,7 @@ public class Weapon extends Collectible implements Drawable {
 
     @Setting
     private boolean isRanged;
+
     @Setting
     private int level;
 

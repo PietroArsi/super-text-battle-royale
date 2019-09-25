@@ -77,7 +77,6 @@ public class MapUtils {
         return distances;
     }
 
-
     public static Optional<Point> getNextPathStep(GameMap map, int[][] distances, Point starting, boolean allowDiagonalMovement) {
         int i = starting.x;
         int j = starting.y;

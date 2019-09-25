@@ -9,7 +9,6 @@ import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,11 +23,13 @@ public class Combat extends Status {
 
     @Override
     public Status doStatusAction() {
-        Status nextStatus;
+        player.acquireInfo();
+
+        Status nextStatus = null;
 
         if (this.player.getAlivePlayersSeen().isEmpty())
             //No player found, go to the best objective
-            nextStatus = new Movement(this.player, this.player.getCurrentMap().getMapCenter());
+            nextStatus = new Movement(this.player, this.player.getCurrentMap().getMapCenter(Filters.filterNonWalkableAndPlayers()));
         else
             if (RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1) {    //TODO: Find a better random variabile
                 //If the random number is 1 then flee
@@ -72,7 +73,7 @@ public class Combat extends Status {
                         //Move to nearest interesting objective or else move to map center
                         player.move(MapUtils.getNextPathStep(this.player.getCurrentMap(),
                                 MapUtils.calculateDistances(this.player.getCurrentMap(), Filters.filterNonWalkableAndPlayers(),objl, false),
-                                player.getLocation(), false).orElseGet(() -> this.player.getCurrentMap().getMapCenter()));
+                                player.getLocation(), false).orElseGet(() -> this.player.getCurrentMap().getMapCenter(Filters.filterNonWalkableAndPlayers())));
                         this.player.decrementActionsLeft(1);
                         nextStatus = new Movement(player, obj);
                     }
@@ -90,9 +91,9 @@ public class Combat extends Status {
         int[][] distances = MapUtils.calculateDistances(player.getCurrentMap(), Filters.filterNonWalkableAndPlayers(), doors, false);
 
         Optional<Point> optNext;
-        optNext  = MapUtils.getNextPathStep(player.getCurrentMap(),distances,player.getPoint(),false);
-        if(optNext.isPresent()) {
-            if(optNext.get().equals(player.getPoint())) player.warp();
+        optNext = MapUtils.getNextPathStep(player.getCurrentMap(), distances, player.getPoint(), false);
+        if (optNext.isPresent()) {
+            if (optNext.get().equals(player.getPoint())) player.warp();
             else player.move(optNext.get());
 
         }

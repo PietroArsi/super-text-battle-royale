@@ -7,6 +7,7 @@ import org.supertextbattleroyale.items.WeaponMelee;
 import org.supertextbattleroyale.items.WeaponRanged;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
+import org.supertextbattleroyale.maps.tiles.Door;
 import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.text.Scoreboard;
 import org.supertextbattleroyale.utils.RandomUtils;
@@ -38,7 +39,7 @@ public class GameInstance {
     //TODO: Get this working good
     public void initGame() {
         //Testing per il BFS
-        this.setCurrentMap(GameLauncher.getLoadedMaps().get(0));
+        this.setCurrentMap(GameLauncher.getLoadedMaps().get(1));
         ArrayList<Point> l = new ArrayList<>();
         l.add(new Point(0, 7));
         l.add(new Point(4, 0));
@@ -57,8 +58,10 @@ public class GameInstance {
             this.getAllPlayers().add(p);
             this.getAlivePlayers().add(p);
             this.getCurrentMap().getPlayersOnMap().add(p);
-            p.setX(x);
-            p.setY(y);
+
+            List<Point> doors = MapUtils.getAllTilesFromType(getCurrentMap(), Door.class);
+            p.move(doors.get(RandomUtils.randomIntRange(0, doors.size() - 1)));
+
             p.setCurrentMap(this.getCurrentMap());
 
             p.equipArmor(new Armor(GameLauncher.getLoadedArmors().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedArmors().size() - 1)), p));
