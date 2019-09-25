@@ -6,9 +6,10 @@ import org.supertextbattleroyale.players.Player;
 import java.util.stream.Collectors;
 
 public class Filters {
-    public static TileFilter filterNonWalkableAndPlayers() {
+    public static TileFilter filterNonWalkableAndPlayers(Player skip) {
         return (aMap, aPoint) -> aMap
                 .getPlayersOnMap().stream()
+                .filter(p -> p != skip)
                 .map(Player::getPoint)
                 .collect(Collectors.toList())
                 .stream()

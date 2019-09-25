@@ -46,15 +46,17 @@ public class Movement extends Status {
                         .filter(player::canSeeTile)
                         .forEach(doors::add);
 
-                player.move(getNextPoint(doors)); //TODO:
+                player.move(getNextLocation(doors)); //TODO:
 
 //                player.decrementActionsLeft(1); bonus movement given from fleeing
-
+                System.out.println("HERE");
                 return new Flee(player);
             }
         } else { //no player seen
             //TODO: fix
-            Point next = getNextPoint(Collections.singletonList(destination));
+            Point next = getNextLocation(Collections.singletonList(destination));
+
+//            System.out.println(player.getName() + " " + player.getLocation() + " next: " + next + " destination: " + destination);
 
             if (next.equals(destination)) {
                 Tile tile = player.getCurrentMap().getTileAt(next);
@@ -74,10 +76,10 @@ public class Movement extends Status {
             Optional<Point> bestchest = player.getBestChest();
 
             if (bestchest.isEmpty()) {
-                if (next.equals(player.getCurrentMap().getMapCenter()) && player.getCurrentMap().getTileAt(next) instanceof Ground) {
+                if (next.equals(getMapCenter()) && player.getCurrentMap().getTileAt(next) instanceof Ground) {
                     return new Movement(player, player.getBestDoor());
                 } else {
-                    return new Movement(player, player.getCurrentMap().getMapCenter());
+                    return new Movement(player, getMapCenter());
                 }
             } else {
                 return new Movement(player, bestchest.get());
@@ -85,18 +87,28 @@ public class Movement extends Status {
         }
     }
 
-    @Deprecated
-    private Point getNextPoint(List<Point> destinations) {
+    private Point getNextLocation(List<Point> destinations) {
         int[][] m = MapUtils.calculateDistances(
                 player.getCurrentMap(),
-                Filters.filterNonWalkableAndPlayers(),
+                Filters.filterNonWalkableAndPlayers(player),
                 destinations,
                 false);
 
-        return MapUtils.getNextPathStep(
+//        MapUtils.printDistancesMatrix(player.getCurrentMap(), destinations);
+
+        Optional<Point> p =  MapUtils.getNextPathStep(
                 player.getCurrentMap(),
                 m,
                 player.getLocation(),
-                false).get();
+                false);
+
+//        System.out.println(p.isEmpty());
+
+        return p.orElse(player.getLocation());
+    }
+    
+    private Point getMapCenter() {
+        Point center = new Point(player.getCurrentMap().getMatrixWidth()/2, player.getCurrentMap().getMatrixHeight()/2);
+        return center;
     }
 }

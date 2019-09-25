@@ -10,7 +10,7 @@ import java.util.TimerTask;
 
 public class GameWindow extends JFrame {
     private final int FPS = 60;
-    private final float TICKS_PER_SECOND = 0.5f;
+    private final float TICKS_PER_SECOND = 1f;
 
     public JPanel mainPanel;
     private JPanel gamePanel;

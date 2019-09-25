@@ -51,6 +51,7 @@ public class GameInstance {
         //        createRandomPlayer(5, 5, 2);
     }
 
+    int count = 0;
     private void createRandomPlayer(int x, int y, String name) {
         try {
             Player player = GameLauncher.getPlayerFromName(name).get();
@@ -60,7 +61,7 @@ public class GameInstance {
             this.getCurrentMap().getPlayersOnMap().add(p);
 
             List<Point> doors = MapUtils.getAllTilesFromType(getCurrentMap(), Door.class);
-            p.move(doors.get(RandomUtils.randomIntRange(0, doors.size() - 1)));
+            p.move(doors.get(count));
 
             p.setCurrentMap(this.getCurrentMap());
 
@@ -70,6 +71,7 @@ public class GameInstance {
         } catch (JsonLoadFailException ex) {
             ex.printStackTrace();
         }
+        count++;
     }
 
     public void onTick() {

@@ -104,11 +104,11 @@ public class Player implements Drawable {
 
         System.out.println(this.name + " " + this.currentStatus.getClass().getName());
 
-        while (this.actionsLeft > 0) {
+//        while (this.actionsLeft > 0) {
             Status s = this.currentStatus.doStatusAction();
             System.out.println(s.getClass().getName());
             this.currentStatus = s;
-        }
+//        }
     }
 
     public int getDamageVsPlayer(Weapon weapon, Player player) {
@@ -121,15 +121,17 @@ public class Player implements Drawable {
     }
 
     public boolean wantsFight(Player p) {
-        return false;
-//        return RandomUtils.flipACoin() == 1; //TODO
+//        return false;
+        return RandomUtils.flipACoin() == 1; //TODO
     }
 
     public List<Player> getPlayersSeen() {
-        return this.getCurrentMap().getPlayersOnMap().stream()
-                .filter(p -> p != this)
-                .filter(p -> p.canSeeTile(p.getLocation()))
-                .collect(Collectors.toList());
+//        return this.getCurrentMap().getPlayersOnMap().stream()
+//                .filter(p -> p != this)
+//                .filter(p -> this.canSeeTile(p.getLocation()))
+//                .collect(Collectors.toList());
+
+        return Collections.emptyList();
     }
 
     public List<Player> getAlivePlayersSeen() {
@@ -200,7 +202,7 @@ public class Player implements Drawable {
     }
 
     public Point getBestObjectiveOrMapCenter() {
-        return getBestChest().orElseGet(() -> this.getCurrentMap().getMapCenter(Filters.filterNonWalkableAndPlayers()));
+        return getBestChest().orElseGet(() -> this.getCurrentMap().getMapCenter(Filters.filterNonWalkableAndPlayers(this)));
     }
 
     public Point getBestDoor() {
@@ -212,7 +214,7 @@ public class Player implements Drawable {
         return MapUtils.getBestObjective(
                 this.getLocation(),
                 this.getCurrentMap(),
-                Filters.filterNonWalkableAndPlayers(),
+                Filters.filterNonWalkableAndPlayers(this),
                 doors,
                 false);
     }

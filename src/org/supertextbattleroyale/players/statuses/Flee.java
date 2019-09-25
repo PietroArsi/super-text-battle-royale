@@ -26,7 +26,7 @@ public class Flee extends Status {
 
         int[][] distances = MapUtils.calculateDistances(
                 player.getCurrentMap(),
-                Filters.filterNonWalkableAndPlayers(),
+                Filters.filterNonWalkableAndPlayers(player),
                 Collections.singletonList(door),
                 false);
 
@@ -34,7 +34,7 @@ public class Flee extends Status {
                 player.getCurrentMap(),
                 distances,
                 player.getLocation(),
-                false).get();
+                false).orElse(player.getLocation());
 
         player.move(next);
         Tile current = player.getCurrentMap().getTileAt(next);
@@ -60,7 +60,7 @@ public class Flee extends Status {
         return MapUtils.getBestObjective(
                 player.getLocation(),
                 player.getCurrentMap(),
-                Filters.filterNonWalkableAndPlayers(),
+                Filters.filterNonWalkableAndPlayers(player),
                 doors,
                 false);
     }
