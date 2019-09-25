@@ -63,6 +63,14 @@ public class Weapon extends Collectible implements Drawable {
         this.drawImage(getImage(), g, player);
     }
 
+    public int getBaseDamage() {
+        return baseDamage;
+    }
+
+    public void setBaseDamage(int baseDamage) {
+        this.baseDamage = baseDamage;
+    }
+
     public float getRange() {
         return Weapon.MELEE_RANGE;
     }

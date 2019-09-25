@@ -284,7 +284,7 @@ public class Player implements Drawable {
         return this.hitPoints;
     }
 
-    public boolean isAlive() { return this.hitPoints > 0};
+    public boolean isAlive() { return this.hitPoints > 0;}
 
     public BufferedImage getImage() {
         return this.face;

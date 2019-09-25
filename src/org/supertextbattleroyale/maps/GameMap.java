@@ -5,6 +5,7 @@ import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.exceptions.MapLoadException;
 import org.supertextbattleroyale.game.GameLauncher;
 import org.supertextbattleroyale.interfaces.Drawable;
+import org.supertextbattleroyale.interfaces.TileFilter;
 import org.supertextbattleroyale.maps.tiles.*;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.Player;
@@ -149,10 +150,38 @@ public class GameMap implements Drawable {
 
 //        this.printGrid(g); //debug
     }
+    private enum Direction {RIGHT,DOWN,LEFT,UP};
+    public Point getMapCenter(TileFilter filter) {
+        int xc = getMatrixWidth() / 2;
+        int yc = getMatrixHeight() / 2;
+        int magnitude = 1;
 
-    public Point getMapCenter() {
-        //TODO: Creare un metodo spiraloso che cerca il centro
-        return null;
+        Direction dir = Direction.RIGHT;
+
+        while(!filter.canCross(this, new Point(xc,yc)) ) {
+            switch(dir) {
+                case DOWN:
+                    yc -= magnitude;
+                    dir = Direction.LEFT;
+                    magnitude++;
+                    break;
+                case LEFT:
+                    xc -= magnitude;
+                    dir = Direction.UP;
+                    break;
+                case UP:
+                    yc += magnitude;
+                    dir = Direction.RIGHT;
+                    magnitude++;
+                    break;
+                case RIGHT:
+                    xc += magnitude;
+                    dir = Direction.DOWN;
+                    break;
+            }
+            assert(xc >= 0 && yc >= 0 && xc < getMatrixWidth() && yc < getMatrixHeight());
+        }
+        return new Point(xc,yc);
     }
 
     /**

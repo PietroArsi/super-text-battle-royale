@@ -8,6 +8,7 @@ import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -35,39 +36,49 @@ public class Combat extends Status {
                 nextStatus = new Flee(this.player);
             }
             else {
+                //The probability of using a potion grows with the damage taken by the player
                 boolean heals = RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1;
                 if (!player.getEquippedPotions().isEmpty() && heals) {
                     player.usePotion(player.getEquippedPotions().get(0));
-                    return new Combat(player);
+                    this.player.decrementActionsLeft(1);
+                    nextStatus = new Combat(player);
                 }
                 else {
+                    //Search if there is an alive player to fight
                     Optional<Player> maybeAPlayer = this.player.findTargetPlayer();
                     if(maybeAPlayer.isPresent() && maybeAPlayer.get().getDistanceToPlayer(this.player) <= this.player.getEquippedWeapon().getRange()) {
-                        //TODO: if(this.player.getActionsLeft() > 1)
-                        if(this.player.getActionsLeft() > 0) {
+                        if(this.player.getActionsLeft() > 1) {
                             //TODO: Precise attack
+                            this.player.hitPlayer(maybeAPlayer.get(), (int)( this.player.getEquippedWeapon().getBaseDamage()*1.3f));
+                            this.player.decrementActionsLeft(2);
 
                         }
                         else
                         {
                             //TODO: Rapid attack
+                            this.player.hitPlayer(maybeAPlayer.get(), (int)( this.player.getEquippedWeapon().getBaseDamage()));
+                            this.player.decrementActionsLeft(1);
                         }
-
+                        nextStatus = new Combat(this.player);
                     }
                     else
                     {
-
+                        //Find interesting tiles in the map
+                        Point obj = MapUtils.getBestObjective(this.player.getLocation(),this.player.getCurrentMap(), Filters.filterNonWalkableAndPlayers(),
+                            this.player.getAlivePlayersSeen().stream()
+                                    .map(Player::getLocation).collect(Collectors.toList()), false);
+                        ArrayList<Point> objl = new ArrayList<>();
+                        objl.add(obj);
+                        //Move to nearest interesting objective or else move to map center
+                        player.move(MapUtils.getNextPathStep(this.player.getCurrentMap(),
+                                MapUtils.calculateDistances(this.player.getCurrentMap(), Filters.filterNonWalkableAndPlayers(),objl, false),
+                                player.getLocation(), false).orElseGet(() -> this.player.getCurrentMap().getMapCenter()));
+                        this.player.decrementActionsLeft(1);
+                        nextStatus = new Movement(player, obj);
                     }
-                }
-            }
+                } }
 
-
-
-
-
-
-
-        return null;
+        return nextStatus;
     }
 
     private void handleFlee() {
