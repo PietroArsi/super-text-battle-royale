@@ -46,16 +46,18 @@ public class Movement extends Status {
                         .filter(player::canSeeTile)
                         .forEach(doors::add);
 
-                player.move(getNextLocation(doors)); //TODO:
+                player.move(player.getNextLocation(doors)); //TODO:
 
 //                player.decrementActionsLeft(1); bonus movement given from fleeing
                 return new Flee(player);
             }
         } else { //no player seen
             //TODO: fix
-            Point next = getNextLocation(Collections.singletonList(destination));
-
+            Point next = player.getNextLocation(Collections.singletonList(destination));
+            System.out.println(next);
             if (next.equals(destination)) {
+                player.move(next);
+
                 Tile tile = player.getCurrentMap().getTileAt(next);
                 if (tile instanceof Door) {
                     GameMap newMap = ((Door) tile).getNextMap();
@@ -84,23 +86,7 @@ public class Movement extends Status {
         }
     }
 
-    private Point getNextLocation(List<Point> destinations) {
-        int[][] m = MapUtils.calculateDistances(
-                player.getCurrentMap(),
-                Filters.filterNonWalkableAndPlayers(player),
-                destinations,
-                false);
-
-        Optional<Point> p =  MapUtils.getNextPathStep(
-                player.getCurrentMap(),
-                m,
-                player.getLocation(),
-                false);
-
-        return p.orElse(player.getLocation());
-    }
-    
     private Point getMapCenter() {
-        return player.getCurrentMap().getMapCenter(Filters.filterNonWalkableAndPlayers(player));
+        return player.getCurrentMap().getMapCenter(Filters.filterNonWalkable());
     }
 }

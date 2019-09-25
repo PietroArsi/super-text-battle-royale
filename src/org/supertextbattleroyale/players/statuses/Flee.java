@@ -22,22 +22,11 @@ public class Flee extends Status {
     public Status doStatusAction() {
         player.acquireInfo();
 
-        Point door = getBestDoor();
+        Point door = player.getBestDoor();
 
-        int[][] distances = MapUtils.calculateDistances(
-                player.getCurrentMap(),
-                Filters.filterNonWalkableAndPlayers(player),
-                Collections.singletonList(door),
-                false);
-
-        Point next = MapUtils.getNextPathStep(
-                player.getCurrentMap(),
-                distances,
-                player.getLocation(),
-                false).orElse(player.getLocation());
-
+        Point next = player.getNextLocation(Collections.singletonList(door));
         player.move(next);
-        Tile current = player.getCurrentMap().getTileAt(next);
+        Tile current = player.getCurrentMap().getTileAt(player.getLocation());
         player.decrementActionsLeft(1);
 
         if (current instanceof Door) {
@@ -46,22 +35,5 @@ public class Flee extends Status {
         } else {
             return new Flee(player);
         }
-    }
-
-    private Point getBestDoor() {
-        List<Point> doors = player.getKnownPlaces().stream()
-                .filter(pair -> pair.getValue0() instanceof Door)
-                .map(Pair::getValue1).collect(Collectors.toList());
-
-        MapUtils.getAllTilesFromType(player.getCurrentMap(), Door.class).stream()
-                .filter(player::canSeeTile)
-                .forEach(doors::add);
-
-        return MapUtils.getBestObjective(
-                player.getLocation(),
-                player.getCurrentMap(),
-                Filters.filterNonWalkableAndPlayers(player),
-                doors,
-                false);
     }
 }

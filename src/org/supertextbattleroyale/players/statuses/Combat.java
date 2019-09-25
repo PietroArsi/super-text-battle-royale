@@ -9,6 +9,7 @@ import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,6 +22,11 @@ public class Combat extends Status {
 
     public static int FLEE_DISTANCE = 3;
 
+    //TODO: Find a better random variabile
+    private boolean wantsFlee() {
+        return RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1;
+    }
+
     @Override
     public Status doStatusAction() {
         player.acquireInfo();
@@ -29,14 +35,15 @@ public class Combat extends Status {
 
         if (this.player.getAlivePlayersSeen().isEmpty())
             //No player found, go to the best objective
-            nextStatus = new Movement(this.player, this.player.getCurrentMap().getMapCenter(Filters.filterNonWalkableAndPlayers(player)));
-        else if (RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1) {    //TODO: Find a better random variabile
+            nextStatus = new Movement(this.player, this.player.getCurrentMap().getMapCenter(Filters.filterNonWalkable()));
+        else if (wantsFlee()) {
             //If the random number is 1 then flee
             handleFlee();
             nextStatus = new Flee(this.player);
         } else {
             //The probability of using a potion grows with the damage taken by the player
             boolean heals = RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1;
+
             if (!player.getEquippedPotions().isEmpty() && heals) {
                 player.usePotion(player.getEquippedPotions().get(0));
                 this.player.decrementActionsLeft(1);
@@ -49,7 +56,6 @@ public class Combat extends Status {
                         //TODO: Precise attack
                         this.player.hitPlayer(maybeAPlayer.get(), (int) (this.player.getEquippedWeapon().getBaseDamage() * 1.3f));
                         this.player.decrementActionsLeft(2);
-
                     } else {
                         //TODO: Rapid attack
                         this.player.hitPlayer(maybeAPlayer.get(), (int) (this.player.getEquippedWeapon().getBaseDamage()));
@@ -57,16 +63,11 @@ public class Combat extends Status {
                     }
                     nextStatus = new Combat(this.player);
                 } else {
-                    //Find interesting tiles in the map
-                    Point obj = MapUtils.getBestObjective(this.player.getLocation(), this.player.getCurrentMap(), Filters.filterNonWalkableAndPlayers(player),
-                            this.player.getAlivePlayersSeen().stream()
-                                    .map(Player::getLocation).collect(Collectors.toList()), false);
-                    ArrayList<Point> objl = new ArrayList<>();
-                    objl.add(obj);
                     //Move to nearest interesting objective or else move to map center
-                    player.move(MapUtils.getNextPathStep(this.player.getCurrentMap(),
-                            MapUtils.calculateDistances(this.player.getCurrentMap(), Filters.filterNonWalkableAndPlayers(player), objl, false),
-                            player.getLocation(), false).orElseGet(() -> this.player.getCurrentMap().getMapCenter(Filters.filterNonWalkableAndPlayers(player))));
+                    Point obj = player.getBestObjectiveOrMapCenter();
+
+                    player.move(player.getNextLocation(Collections.singletonList(obj)));
+
                     this.player.decrementActionsLeft(1);
                     nextStatus = new Movement(player, obj);
                 }
@@ -78,19 +79,9 @@ public class Combat extends Status {
 
     private void handleFlee() {
         //Get all visible doors
-        List<Point> doors = player.getKnownPlaces().stream()
-                .filter(pair -> pair.getValue0() instanceof Door)
-                .map(Pair::getValue1).collect(Collectors.toList());
+        Point door = player.getBestDoor();
 
-        int[][] distances = MapUtils.calculateDistances(player.getCurrentMap(), Filters.filterNonWalkableAndPlayers(player), doors, false);
-
-        Optional<Point> optNext;
-        optNext = MapUtils.getNextPathStep(player.getCurrentMap(), distances, player.getPoint(), false);
-        if (optNext.isPresent()) {
-            if (optNext.get().equals(player.getPoint())) player.warp();
-            else player.move(optNext.get());
-
-        }
-
+        Point p = player.getNextLocation(Collections.singletonList(door));
+        player.move(p);
     }
 }

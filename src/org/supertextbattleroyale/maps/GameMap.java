@@ -116,11 +116,11 @@ public class GameMap implements Drawable {
      */
     private void setupDimensions() {
         JPanel gamePanel = GameLauncher.getMainFrame().getGamePanel();
-        int edgeLength = this.getTileEdge(gamePanel.getWidth()*2/3, gamePanel.getHeight());
+        int edgeLength = this.getTileEdge(gamePanel.getWidth() * 2 / 3, gamePanel.getHeight());
         this.CELL_WIDTH = edgeLength;
         this.CELL_HEIGHT = edgeLength;
 
-        Pair<Integer, Integer> distances = this.getDistanceFromBorders(gamePanel.getWidth()*2/3, gamePanel.getHeight());
+        Pair<Integer, Integer> distances = this.getDistanceFromBorders(gamePanel.getWidth() * 2 / 3, gamePanel.getHeight());
         this.X_DIST = distances.getValue0();
         this.Y_DIST = distances.getValue1();
     }
@@ -150,7 +150,8 @@ public class GameMap implements Drawable {
         this.printGrid(g); //debug
     }
 
-    private enum Direction {RIGHT,DOWN,LEFT,UP};
+    private enum Direction {RIGHT, DOWN, LEFT, UP}
+
     public Point getMapCenter(TileFilter filter) {
         int xc = getMatrixWidth() / 2;
         int yc = getMatrixHeight() / 2;
@@ -158,8 +159,8 @@ public class GameMap implements Drawable {
 
         Direction dir = Direction.RIGHT;
 
-        while(!filter.canCross(this, new Point(xc,yc)) ) {
-            switch(dir) {
+        while (!filter.canCross(this, new Point(xc, yc))) {
+            switch (dir) {
                 case DOWN:
                     yc -= magnitude;
                     dir = Direction.LEFT;
@@ -179,9 +180,9 @@ public class GameMap implements Drawable {
                     dir = Direction.DOWN;
                     break;
             }
-            assert(xc >= 0 && yc >= 0 && xc < getMatrixWidth() && yc < getMatrixHeight());
+            assert (xc >= 0 && yc >= 0 && xc < getMatrixWidth() && yc < getMatrixHeight());
         }
-        return new Point(xc,yc);
+        return new Point(xc, yc);
     }
 
     /**
@@ -203,6 +204,8 @@ public class GameMap implements Drawable {
                 g.fillRect(X_DIST + i * CELL_WIDTH, Y_DIST + j * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
                 g.setColor(Color.BLACK);
                 g.drawRect(X_DIST + i * CELL_WIDTH, Y_DIST + j * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
+                g.setColor(Color.red);
+                g.drawString(i + " " + j, X_DIST + i * CELL_WIDTH + 10, Y_DIST + (j + 1) * CELL_HEIGHT - 10);
             }
         }
     }

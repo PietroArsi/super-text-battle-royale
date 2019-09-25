@@ -188,15 +188,17 @@ public class Player implements Drawable {
     public void acquireInfo() {
         MapUtils.getAllTilesFromType(this.getCurrentMap(), Door.class).stream()
                 .filter(this::canSeeTile)
+                .filter(p-> !this.getKnownPlaces().contains(new Pair<>(this.getCurrentMap().getTileAt(p), p)))
                 .forEach(p -> this.getKnownPlaces().add(new Pair<>(this.getCurrentMap().getTileAt(p), p)));
 
         MapUtils.getAllTilesFromType(this.getCurrentMap(), Chest.class).stream()
                 .filter(this::canSeeTile)
+                .filter(p-> !this.getKnownPlaces().contains(new Pair<>(this.getCurrentMap().getTileAt(p), p)))
                 .forEach(p -> this.getKnownPlaces().add(new Pair<>(this.getCurrentMap().getTileAt(p), p)));
     }
 
     public Point getBestObjectiveOrMapCenter() {
-        return getBestChest().orElseGet(() -> this.getCurrentMap().getMapCenter(Filters.filterNonWalkableAndPlayers(this)));
+        return getBestChest().orElseGet(() -> this.getCurrentMap().getMapCenter(Filters.filterNonWalkable()));
     }
 
     public Point getBestDoor() {
@@ -227,6 +229,22 @@ public class Player implements Drawable {
                 Filters.filterOpaque(),
                 chests,
                 false));
+    }
+
+    public Point getNextLocation(List<Point> destinations) {
+        int[][] m = MapUtils.calculateDistances(
+                this.getCurrentMap(),
+                Filters.filterNonWalkableAndPlayers(this),
+                destinations,
+                false);
+
+        Optional<Point> p =  MapUtils.getNextPathStep(
+                this.getCurrentMap(),
+                m,
+                this.getLocation(),
+                false);
+
+        return p.orElse(this.getLocation());
     }
 
     public String getName() {
