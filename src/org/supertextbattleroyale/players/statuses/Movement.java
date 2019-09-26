@@ -67,24 +67,15 @@ public class Movement extends Status {
                 } else if (tile instanceof Chest) {
                     ((Chest) tile).collectItems(player);
                     player.decrementActionsLeft(1);
-                } else if(destination.equals(getMapCenter())) {
-                    player.getKnownPlaces().add(new Pair<>(player.getCurrentMap().getTileAt(getMapCenter()), getMapCenter()));
+                } else if(destination.equals(player.getMapCenter())) {
+                    player.getKnownPlaces().add(new Pair<>(player.getCurrentMap().getTileAt(player.getMapCenter()), player.getMapCenter()));
                 }
 
-                if(player.getKnownPlaces().stream().map(Pair::getValue1).noneMatch(p -> p.equals(getMapCenter()))) {
-
-                    return new Movement(player, player.getBestObjectiveOrMapCenter());
-                } else {
-                    return new Movement(player, player.getBestObjectiveOrDoor());
-                }
+                return new Movement(player, player.getNextDestination());
             } else {
                 player.move(next);
                 return new Movement(player, destination);
             }
         }
-    }
-
-    private Point getMapCenter() {
-        return player.getCurrentMap().getMapCenter(Filters.filterNonWalkable());
     }
 }

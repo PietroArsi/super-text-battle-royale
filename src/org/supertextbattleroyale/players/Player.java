@@ -197,6 +197,18 @@ public class Player implements Drawable {
                 .forEach(p -> this.getKnownPlaces().add(new Pair<>(this.getCurrentMap().getTileAt(p), p)));
     }
 
+    public Point getMapCenter() {
+        return getCurrentMap().getMapCenter(Filters.filterNonWalkable());
+    }
+
+    public Point getNextDestination() {
+        if(getKnownPlaces().stream().map(Pair::getValue1).noneMatch(p -> p.equals(getMapCenter()))) {
+           return getBestObjectiveOrMapCenter();
+        } else {
+            return getBestObjectiveOrDoor();
+        }
+    }
+
     public Point getBestObjectiveOrMapCenter() {
         return getBestChest().orElseGet(() -> this.getCurrentMap().getMapCenter(Filters.filterNonWalkable()));
     }

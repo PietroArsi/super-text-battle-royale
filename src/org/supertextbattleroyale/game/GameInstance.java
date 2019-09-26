@@ -44,13 +44,15 @@ public class GameInstance {
         MapUtils.printRoomMatrix(this.currentMap);
         MapUtils.printDistancesMatrix(this.currentMap, l);
 
-        createRandomPlayer(3, 4, "Pit");
-        createRandomPlayer(4, 1, "Dario");
+        createRandomPlayer("Pit");
+        createRandomPlayer("Dario");
+        createRandomPlayer("Ari");
+
         //        createRandomPlayer(5, 5, 2);
     }
 
     int count = 0;
-    private void createRandomPlayer(int x, int y, String name) {
+    private void createRandomPlayer(String name) {
         try {
             Player player = GameLauncher.getPlayerFromName(name).get();
             Player p = new Player(player);

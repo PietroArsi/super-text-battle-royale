@@ -24,6 +24,7 @@ public class Combat extends Status {
 
     //TODO: Find a better random variabile
     private boolean wantsFlee() {
+//        System.out.println(RandomUtils.exponential(1));
         return false;
 //        return RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1;
     }
@@ -32,7 +33,7 @@ public class Combat extends Status {
     public Status doStatusAction() {
         player.acquireInfo();
 
-        Status nextStatus = null;
+        Status nextStatus;
 
         if (this.player.getAlivePlayersSeen().isEmpty())
             //No player found, go to the best objective
@@ -52,25 +53,29 @@ public class Combat extends Status {
             } else {
                 //Search if there is an alive player to fight
                 Optional<Player> maybeAPlayer = this.player.findTargetPlayer();
-                if (maybeAPlayer.isPresent() && maybeAPlayer.get().getDistanceToPlayer(this.player) <= this.player.getEquippedWeapon().getRange()) {
-                    if (this.player.getActionsLeft() > 1) {
-                        //TODO: Precise attack
-                        this.player.hitPlayer(maybeAPlayer.get(), (int) (this.player.getEquippedWeapon().getBaseDamage() * 1.3f));
-                        this.player.decrementActionsLeft(2);
+                if (maybeAPlayer.isPresent()) {
+                    if(maybeAPlayer.get().getDistanceToPlayer(this.player) <= this.player.getEquippedWeapon().getRange()) {
+                        if (this.player.getActionsLeft() > 1) {
+                            //TODO: Precise attack
+                            this.player.hitPlayer(maybeAPlayer.get(), (int) (this.player.getEquippedWeapon().getBaseDamage() * 1.3f));
+                            this.player.decrementActionsLeft(2);
+                        } else {
+                            //TODO: Rapid attack
+                            this.player.hitPlayer(maybeAPlayer.get(), (int) (this.player.getEquippedWeapon().getBaseDamage()));
+                            this.player.decrementActionsLeft(1);
+                        }
                     } else {
-                        //TODO: Rapid attack
-                        this.player.hitPlayer(maybeAPlayer.get(), (int) (this.player.getEquippedWeapon().getBaseDamage()));
-                        this.player.decrementActionsLeft(1);
+                        player.move(player.getNextLocation(Collections.singletonList(maybeAPlayer.get().getLocation())));
                     }
                     nextStatus = new Combat(player);
                 } else {
                     //Move to nearest interesting objective or else move to map center
-                    Point obj = player.getBestObjectiveOrMapCenter();
+                    Point obj = player.getNextDestination();
 
                     player.move(player.getNextLocation(Collections.singletonList(obj)));
 
                     this.player.decrementActionsLeft(1);
-                    nextStatus = new Combat(player);
+                    return new Movement(player, obj);
                 }
             }
         }
