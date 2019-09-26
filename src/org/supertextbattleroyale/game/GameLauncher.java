@@ -156,7 +156,7 @@ public class GameLauncher {
     }
 
     public static GameInstance getGameInstance() {
-        return getInstance().gameInstance;
+        return gameInstance;
     }
 
     public static File getWorkingDirectory() {

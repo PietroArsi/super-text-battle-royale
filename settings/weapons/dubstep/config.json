@@ -1,4 +1,5 @@
 {
   "name": "Delusione",
-  "isRanged": false
+  "isRanged": false,
+  "baseDamage": 10
 }

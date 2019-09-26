@@ -1,4 +1,5 @@
 {
   "name": "Piastrellate",
-  "isRanged": false
+  "isRanged": false,
+  "baseDamage": 10
 }

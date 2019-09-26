@@ -2,6 +2,8 @@ package org.supertextbattleroyale.game;
 
 import org.supertextbattleroyale.players.Player;
 
+import java.util.Timer;
+
 public class Turn {
 
     private final GameInstance gameInstance;
@@ -10,17 +12,22 @@ public class Turn {
         this.gameInstance = gameInstance;
     }
 
-    public void onTurn() {
-        gameInstance.getCurrentMap().getAlivePlayersOnMap().forEach(Player::onTick);
+    int counter = 0;
 
-//        gameInstance.getCurrentMap().getPlayersOnMap().get(0).setX(7);
-//        gameInstance.getCurrentMap().getPlayersOnMap().get(0).setY(2);
+    public void onTurn() {
+//        int size = gameInstance.getCurrentMap().getAlivePlayersOnMap().size();
 //
-//        gameInstance.getCurrentMap().getPlayersOnMap().get(1).setX(11);
-//        gameInstance.getCurrentMap().getPlayersOnMap().get(1).setY(7);
+//        if(size == 0) return;
 //
-//        gameInstance.getCurrentMap().getPlayersOnMap().forEach(Player::onTick);
-//        gameInstance.getAlivePlayers().forEach(Player::onTick);
+//        System.out.println("B" + counter);
+//
+//        if(counter >= size) counter = 0;
+//
+//        System.out.println(counter);
+//
+//        gameInstance.getCurrentMap().getAlivePlayersOnMap().get(counter).onTick();
+//
+//        counter++;
     }
 
 }

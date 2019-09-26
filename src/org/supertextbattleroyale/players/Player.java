@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.javatuples.Pair;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
+import org.supertextbattleroyale.game.GameLauncher;
 import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Potion;
@@ -92,6 +93,8 @@ public class Player implements Drawable {
     }
 
     public void onTick() {
+        if(!this.isAlive()) return;
+
         //to get players in the same map getCurrentMap().getPlayersOnMap(
         this.actionsLeft = 2;
 
@@ -116,7 +119,7 @@ public class Player implements Drawable {
 
     public boolean wantsFight(Player p) {
 //        return false;
-        return RandomUtils.flipACoin() == 1; //TODO
+        return true; //TODO
     }
 
     public List<Player> getPlayersSeen() {
@@ -124,14 +127,11 @@ public class Player implements Drawable {
                 .filter(p -> p != this)
                 .filter(p -> this.canSeeTile(p.getLocation()))
                 .collect(Collectors.toList());
-
-//        return Collections.emptyList();
     }
 
     public List<Player> getAlivePlayersSeen() {
-        return this.getCurrentMap().getAlivePlayersOnMap().stream()
-                .filter(p -> p != this)
-                .filter(p -> this.canSeeTile(p.getLocation()))
+        return this.getPlayersSeen().stream()
+                .filter(Player::isAlive)
                 .collect(Collectors.toList());
     }
 
@@ -201,6 +201,10 @@ public class Player implements Drawable {
         return getBestChest().orElseGet(() -> this.getCurrentMap().getMapCenter(Filters.filterNonWalkable()));
     }
 
+    public Point getBestObjectiveOrDoor() {
+        return getBestChest().orElseGet(this::getBestDoor);
+    }
+
     public Point getBestDoor() {
         List<Point> doors = this.getKnownPlaces().stream()
                 .filter(pair -> pair.getValue0() instanceof Door)
@@ -234,7 +238,7 @@ public class Player implements Drawable {
     public Point getNextLocation(List<Point> destinations) {
         int[][] m = MapUtils.calculateDistances(
                 this.getCurrentMap(),
-                Filters.filterNonWalkableAndPlayers(this),
+                Filters.filterNonWalkableAndSeenPlayers(this),
                 destinations,
                 false);
 
@@ -327,6 +331,7 @@ public class Player implements Drawable {
     }
 
     public void setXP(int XP) {
+        this.XP = XP;
     }
 
     public int getHP() {

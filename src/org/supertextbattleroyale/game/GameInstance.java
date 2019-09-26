@@ -22,7 +22,7 @@ public class GameInstance {
 
     private GameMap currentMap;
 
-    private List<Player> allPlayers, alivePlayers, deadPlayers;
+    private List<Player> allPlayers;
 
     private Turn currentTurn;
 
@@ -30,8 +30,6 @@ public class GameInstance {
 
     public GameInstance() {
         this.allPlayers = new CopyOnWriteArrayList<>();
-        this.alivePlayers = new CopyOnWriteArrayList<>();
-        this.deadPlayers = new CopyOnWriteArrayList<>();
 
         this.s = new Scoreboard(500, 500);
     }
@@ -57,8 +55,6 @@ public class GameInstance {
             Player player = GameLauncher.getPlayerFromName(name).get();
             Player p = new Player(player);
             this.getAllPlayers().add(p);
-            this.getAlivePlayers().add(p);
-            this.getCurrentMap().getPlayersOnMap().add(p);
 
             List<Point> doors = MapUtils.getAllTilesFromType(getCurrentMap(), Door.class);
             p.move(doors.get(count));
@@ -74,11 +70,20 @@ public class GameInstance {
         count++;
     }
 
+    int counter = 0;
+
     public void onTick() {
-//        GameWindow w = this.launcher.getMainFrame();
-//        w.setupZoom(w.getWidth()/RandomUtils.randomIntRange(1, 10), w.getHeight()/RandomUtils.randomIntRange(1, 10), RandomUtils.randomIntRange(1, 4));
-        this.currentTurn = new Turn(this);
-        this.currentTurn.onTurn();
+        int size = getCurrentMap().getAlivePlayersOnMap().size();
+
+        if(size == 0) return;
+
+        if(counter >= size) counter = 0;
+
+        List<Player> p =  getCurrentMap().getAlivePlayersOnMap();
+        p.size();
+        getCurrentMap().getAlivePlayersOnMap().get(counter).onTick();
+
+        counter++;
     }
 
     public void drawComponents(Graphics2D g) {
@@ -87,8 +92,10 @@ public class GameInstance {
 
         this.getCurrentMap().draw(g);
 
-        this.getAlivePlayers().stream()
-                .filter(player -> player.getCurrentMap() != null && player.getCurrentMap().equals(currentMap))
+        this.getAllPlayers().stream()
+                .filter(player -> player.getCurrentMap() != null)
+                .filter(player -> player.getCurrentMap().equals(currentMap))
+                .filter(Player::isAlive)
                 .sorted(Comparator.comparingInt(Player::getY))
                 .forEach(player -> player.draw(g));
 
@@ -105,14 +112,6 @@ public class GameInstance {
 
     public List<Player> getAllPlayers() {
         return allPlayers;
-    }
-
-    public List<Player> getAlivePlayers() {
-        return alivePlayers;
-    }
-
-    public List<Player> getDeadPlayers() {
-        return deadPlayers;
     }
 
     public Scoreboard getScoreboard() {

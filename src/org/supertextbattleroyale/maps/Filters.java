@@ -3,6 +3,7 @@ package org.supertextbattleroyale.maps;
 import org.supertextbattleroyale.interfaces.TileFilter;
 import org.supertextbattleroyale.players.Player;
 
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class Filters {
@@ -11,8 +12,15 @@ public class Filters {
                 .getPlayersOnMap().stream()
                 .filter(p -> p != skip)
                 .map(Player::getPoint)
-                .collect(Collectors.toList())
-                .stream()
+                .noneMatch(p -> p.equals(aPoint)) && aMap.getMatrixMap()[aPoint.x][aPoint.y].isTileWalkable();
+    }
+
+    public static TileFilter filterNonWalkableAndSeenPlayers(Player player) {
+        return (aMap, aPoint) -> aMap
+                .getPlayersOnMap().stream()
+                .filter(p -> p != player)
+                .filter(p -> player.getPlayersSeen().contains(p))
+                .map(Player::getPoint)
                 .noneMatch(p -> p.equals(aPoint)) && aMap.getMatrixMap()[aPoint.x][aPoint.y].isTileWalkable();
     }
 

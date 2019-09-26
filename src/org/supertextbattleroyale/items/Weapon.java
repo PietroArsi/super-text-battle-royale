@@ -64,7 +64,7 @@ public class Weapon extends Collectible implements Drawable {
     }
 
     public int getBaseDamage() {
-        return baseDamage;
+        return 10;
     }
 
     public void setBaseDamage(int baseDamage) {

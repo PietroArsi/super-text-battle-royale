@@ -1,4 +1,5 @@
 {
   "name": "Poisonus Reverse",
-  "isRanged": false
+  "isRanged": false,
+  "baseDamage": 10
 }

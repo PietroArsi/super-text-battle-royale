@@ -1,4 +1,5 @@
 {
   "name": "La Trap quella Bella",
-  "isRanged": false
+  "isRanged": false,
+  "baseDamage": 10
 }

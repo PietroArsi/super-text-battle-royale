@@ -1,4 +1,5 @@
 {
   "name": "Induzione al Suicidio",
-  "isRanged": false
+  "isRanged": false,
+  "baseDamage": 10
 }

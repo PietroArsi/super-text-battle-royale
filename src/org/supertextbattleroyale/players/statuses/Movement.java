@@ -29,14 +29,14 @@ public class Movement extends Status {
     public Status doStatusAction() {
         player.acquireInfo();
 
-        List<Player> players = player.getPlayersSeen();
+        List<Player> players = player.getAlivePlayersSeen();
 
         if (!players.isEmpty()) { //a player has been seen
             boolean wantsFight = players.stream().anyMatch(p -> player.wantsFight(p));
 
             if (wantsFight) { //TODO: implementare una scelta piu' intelligente per la scelta del giocatore da combattere
 //                player.decrementActionsLeft(1);
-                return new Combat(players.get(RandomUtils.randomIntRange(0, players.size() - 1)));
+                return new Combat(player);
             } else { //wants to flee
                 List<Point> doors = player.getKnownPlaces().stream()
                         .filter(pair -> pair.getValue0() instanceof Door)
@@ -52,36 +52,34 @@ public class Movement extends Status {
                 return new Flee(player);
             }
         } else { //no player seen
-            //TODO: fix
             Point next = player.getNextLocation(Collections.singletonList(destination));
-            System.out.println(next);
-            if (next.equals(destination)) {
-                player.move(next);
 
+            if (next.equals(destination)) {
                 Tile tile = player.getCurrentMap().getTileAt(next);
                 if (tile instanceof Door) {
                     GameMap newMap = ((Door) tile).getNextMap();
                     player.setCurrentMap(newMap);
 
                     player.decrementActionsLeft(1);
+                    player.move(next);
+
                     return new Recon(player);
                 } else if (tile instanceof Chest) {
                     ((Chest) tile).collectItems(player);
+                    player.decrementActionsLeft(1);
+                } else if(destination.equals(getMapCenter())) {
+                    player.getKnownPlaces().add(new Pair<>(player.getCurrentMap().getTileAt(getMapCenter()), getMapCenter()));
+                }
+
+                if(player.getKnownPlaces().stream().map(Pair::getValue1).noneMatch(p -> p.equals(getMapCenter()))) {
+
+                    return new Movement(player, player.getBestObjectiveOrMapCenter());
+                } else {
+                    return new Movement(player, player.getBestObjectiveOrDoor());
                 }
             } else {
                 player.move(next);
-            }
-
-            Optional<Point> bestChest = player.getBestChest();
-
-            if (bestChest.isEmpty()) {
-                if (next.equals(getMapCenter()) && player.getCurrentMap().getTileAt(next) instanceof Ground) {
-                    return new Movement(player, player.getBestDoor());
-                } else {
-                    return new Movement(player, getMapCenter());
-                }
-            } else {
-                return new Movement(player, bestChest.get());
+                return new Movement(player, destination);
             }
         }
     }

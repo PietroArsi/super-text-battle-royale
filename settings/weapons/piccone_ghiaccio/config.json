@@ -1,4 +1,5 @@
 {
   "name": "Piccone di Ghiaccio",
-  "isRanged": false
+  "isRanged": false,
+  "baseDamage": 10
 }

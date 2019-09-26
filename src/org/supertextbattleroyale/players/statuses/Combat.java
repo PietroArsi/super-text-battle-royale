@@ -24,7 +24,8 @@ public class Combat extends Status {
 
     //TODO: Find a better random variabile
     private boolean wantsFlee() {
-        return RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1;
+        return false;
+//        return RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1;
     }
 
     @Override
@@ -61,7 +62,7 @@ public class Combat extends Status {
                         this.player.hitPlayer(maybeAPlayer.get(), (int) (this.player.getEquippedWeapon().getBaseDamage()));
                         this.player.decrementActionsLeft(1);
                     }
-                    nextStatus = new Combat(this.player);
+                    nextStatus = new Combat(player);
                 } else {
                     //Move to nearest interesting objective or else move to map center
                     Point obj = player.getBestObjectiveOrMapCenter();
@@ -69,7 +70,7 @@ public class Combat extends Status {
                     player.move(player.getNextLocation(Collections.singletonList(obj)));
 
                     this.player.decrementActionsLeft(1);
-                    nextStatus = new Movement(player, obj);
+                    nextStatus = new Combat(player);
                 }
             }
         }

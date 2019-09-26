@@ -1,4 +1,5 @@
 {
   "name": "Registrazione Earrape",
-  "isRanged": false
+  "isRanged": false,
+  "baseDamage": 10
 }

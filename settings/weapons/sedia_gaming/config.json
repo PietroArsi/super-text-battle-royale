@@ -1,4 +1,5 @@
 {
   "name": "Sedia da Gaming",
-  "isRanged": false
+  "isRanged": false,
+  "baseDamage": 10
 }

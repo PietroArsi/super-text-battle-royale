@@ -1,4 +1,5 @@
 {
   "name": "Trolley Problem",
-  "isRanged": false
+  "isRanged": false,
+  "baseDamage": 10
 }

@@ -1,4 +1,5 @@
 {
   "name": "Sgabello da Gaming",
-  "isRanged": false
+  "isRanged": false,
+  "baseDamage": 10
 }

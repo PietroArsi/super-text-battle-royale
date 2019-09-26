@@ -1,4 +1,5 @@
 {
   "name": "Cappuccino Segreto",
-  "isRanged": false
+  "isRanged": false,
+  "baseDamage": 10
 }

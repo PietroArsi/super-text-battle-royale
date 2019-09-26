@@ -36,8 +36,6 @@ public class GameMap implements Drawable {
 
     private BufferedImage texture;
 
-    private final List<Player> playersOnMap;
-
     private final int PATHFIND_DISTANCE_INCREMENT = 10;
 
     public GameMap(File directory) throws MapLoadException {
@@ -45,8 +43,6 @@ public class GameMap implements Drawable {
 
         this.setupMap(new File(directory, "map.data"));
         this.setupTexture(settingsFolder);
-
-        this.playersOnMap = new CopyOnWriteArrayList<>();
     }
 
     /**
@@ -147,7 +143,7 @@ public class GameMap implements Drawable {
                 this.CELL_HEIGHT * this.matrixMap[0].length,
                 null);
 
-        this.printGrid(g); //debug
+//        this.printGrid(g); //debug
     }
 
     private enum Direction {RIGHT, DOWN, LEFT, UP}
@@ -211,11 +207,15 @@ public class GameMap implements Drawable {
     }
 
     public List<Player> getPlayersOnMap() {
-        return playersOnMap;
+        return GameLauncher.getGameInstance().getAllPlayers().stream()
+                .filter(p -> p.getCurrentMap().equals(this))
+                .collect(Collectors.toList());
     }
 
     public List<Player> getAlivePlayersOnMap() {
-        return getPlayersOnMap().stream().filter(Player::isAlive).collect(Collectors.toList());
+        return getPlayersOnMap().stream()
+                .filter(Player::isAlive)
+                .collect(Collectors.toList());
     }
 
     /**
