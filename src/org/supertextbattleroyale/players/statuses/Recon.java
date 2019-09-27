@@ -1,6 +1,7 @@
 package org.supertextbattleroyale.players.statuses;
 
 import org.supertextbattleroyale.players.Player;
+import org.supertextbattleroyale.players.StatusAction;
 
 import java.util.List;
 
@@ -11,9 +12,10 @@ public class Recon extends Status {
     }
 
     @Override
-    public Status doStatusAction() {
+    public StatusAction getStatusAction() {
         player.acquireInfo();
         player.decrementActionsLeft(1);
+        getAttention();
 
         List<Player> players = player.getAlivePlayersSeen();
 
@@ -21,12 +23,16 @@ public class Recon extends Status {
             boolean wantsFight = players.stream().anyMatch(p -> player.wantsFight(p));
 
             if (wantsFight) {
-                return new Combat(player);
+                getAttention();
+
+                return () -> new Combat(player);
             } else {
-                return new Flee(player);
+                getAttention();
+
+                return () -> new Flee(player);
             }
         } else {
-            return new Movement(player, player.getBestObjectiveOrMapCenter());
+            return () -> new Movement(player, player.getBestObjectiveOrMapCenter());
         }
     }
 }

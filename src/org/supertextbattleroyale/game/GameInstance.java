@@ -1,5 +1,6 @@
 package org.supertextbattleroyale.game;
 
+import org.javatuples.Pair;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.items.Armor;
 import org.supertextbattleroyale.items.Weapon;
@@ -13,8 +14,7 @@ import org.supertextbattleroyale.text.Scoreboard;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -47,21 +47,41 @@ public class GameInstance {
         createRandomPlayer("Pit");
         createRandomPlayer("Dario");
         createRandomPlayer("Ari");
+        createRandomPlayer("Davide");
+        createRandomPlayer("Luca");
+        createRandomPlayer("Kien");
 
+        this.setCurrentMap(allPlayers.get(0).getCurrentMap());
         //        createRandomPlayer(5, 5, 2);
     }
 
-    int count = 0;
+    private List<Pair<GameMap, Point>> usedDoors = new ArrayList<>();
+
     private void createRandomPlayer(String name) {
         try {
-            Player player = GameLauncher.getPlayerFromName(name).get();
-            Player p = new Player(player);
+            Optional<Player> player = GameLauncher.getPlayerFromName(name);
+            if(player.isEmpty()) return;
+
+            Player p = new Player(player.get());
             this.getAllPlayers().add(p);
 
-            List<Point> doors = MapUtils.getAllTilesFromType(getCurrentMap(), Door.class);
-            p.move(doors.get(count));
+            Pair<GameMap, Point> door;
 
-            p.setCurrentMap(this.getCurrentMap());
+            System.out.println("adding " + name + "...");
+
+            do {
+                GameMap currentMap = GameLauncher.getLoadedMaps().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedMaps().size() - 1));
+                List<Point> doors = MapUtils.getAllTilesFromType(currentMap, Door.class);
+                Point currentDoor = doors.get(RandomUtils.randomIntRange(0, doors.size() -1));
+                door = new Pair<>(currentMap, currentDoor);
+            } while(usedDoors.contains(door));
+
+            usedDoors.add(door);
+
+            p.setCurrentMap(door.getValue0());
+            p.move(door.getValue1());
+
+            System.out.println("added " + name + " in " + door.getValue0().getName() + " " + door.getValue1());
 
             p.equipArmor(new Armor(GameLauncher.getLoadedArmors().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedArmors().size() - 1)), p));
             Weapon w = GameLauncher.getLoadedWeapons().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedWeapons().size() - 1));
@@ -69,21 +89,28 @@ public class GameInstance {
         } catch (JsonLoadFailException ex) {
             ex.printStackTrace();
         }
-        count++;
     }
 
+    int mapCounter = 0;
     int counter = 0;
 
     public void onTick() {
-        int size = getCurrentMap().getAlivePlayersOnMap().size();
+        int mapSize = GameLauncher.getLoadedMaps().size();
 
-        if(size == 0) return;
+        if (mapSize == 0) return;
 
-        if(counter >= size) counter = 0;
+        int size = GameLauncher.getLoadedMaps().get(mapCounter).getAlivePlayersOnMap().size();
 
-        List<Player> p =  getCurrentMap().getAlivePlayersOnMap();
-        p.size();
-        getCurrentMap().getAlivePlayersOnMap().get(counter).onTick();
+        if(counter >= size) {
+            counter = 0;
+            mapCounter++;
+
+            if(mapCounter == mapSize) mapCounter = 0;
+            return;
+        }
+        GameMap currentMap = GameLauncher.getLoadedMaps().get(mapCounter);
+
+        currentMap.getAlivePlayersOnMap().get(counter).onTick();
 
         counter++;
     }

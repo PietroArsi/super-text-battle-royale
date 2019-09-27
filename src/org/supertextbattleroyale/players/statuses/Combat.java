@@ -5,6 +5,7 @@ import org.supertextbattleroyale.maps.Filters;
 import org.supertextbattleroyale.maps.MapUtils;
 import org.supertextbattleroyale.maps.tiles.Door;
 import org.supertextbattleroyale.players.Player;
+import org.supertextbattleroyale.players.StatusAction;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
@@ -24,63 +25,86 @@ public class Combat extends Status {
 
     //TODO: Find a better random variabile
     private boolean wantsFlee() {
-//        System.out.println(RandomUtils.exponential(1));
         return false;
-//        return RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1;
+//        return RandomUtils.bernoulli(1 - player.getHitPoints() / (2f * player.getMaxHitPoints())) == 1;
     }
 
     @Override
-    public Status doStatusAction() {
+    public StatusAction getStatusAction() {
         player.acquireInfo();
-
-        Status nextStatus;
-
-        if (this.player.getAlivePlayersSeen().isEmpty())
+        
+        if (player.getAlivePlayersSeen().isEmpty())
             //No player found, go to the best objective
-            nextStatus = new Movement(this.player, this.player.getCurrentMap().getMapCenter(Filters.filterNonWalkable()));
+            return () -> new Movement(player, player.getMapCenter());
         else if (wantsFlee()) {
+            getAttention();
             //If the random number is 1 then flee
-            handleFlee();
-            nextStatus = new Flee(this.player);
+            return () -> {
+                handleFlee();
+
+                return new Flee(player);
+            };
         } else {
             //The probability of using a potion grows with the damage taken by the player
-            boolean heals = RandomUtils.bernoulli(1 - this.player.getHitPoints() / (2f * this.player.getMaxHitPoints())) == 1;
+            boolean heals = RandomUtils.bernoulli(1 - player.getHitPoints() / (2f * player.getMaxHitPoints())) == 1;
 
             if (!player.getEquippedPotions().isEmpty() && heals) {
-                player.usePotion(player.getEquippedPotions().get(0));
-                this.player.decrementActionsLeft(1);
-                nextStatus = new Combat(player);
+                getAttention();
+
+                return () -> {
+                    player.usePotion(player.getEquippedPotions().get(0));
+                    player.decrementActionsLeft(1);
+
+                    return new Combat(player);
+                };
             } else {
                 //Search if there is an alive player to fight
-                Optional<Player> maybeAPlayer = this.player.findTargetPlayer();
+                Optional<Player> maybeAPlayer = player.findTargetPlayer();
+
                 if (maybeAPlayer.isPresent()) {
-                    if(maybeAPlayer.get().getDistanceToPlayer(this.player) <= this.player.getEquippedWeapon().getRange()) {
-                        if (this.player.getActionsLeft() > 1) {
+                    if(isInRangeToAttack(maybeAPlayer.get())) {
+                        if (player.getActionsLeft() > 1) {
+                            getAttention();
+
                             //TODO: Precise attack
-                            this.player.hitPlayer(maybeAPlayer.get(), (int) (this.player.getEquippedWeapon().getBaseDamage() * 1.3f));
-                            this.player.decrementActionsLeft(2);
+                            return () -> {
+                                player.hitPlayer(maybeAPlayer.get(), (int) (player.getEquippedWeapon().getBaseDamage() * 1.3f));
+                                player.decrementActionsLeft(2);
+                                return new Combat(player);
+                            };
                         } else {
+                            getAttention();
+
                             //TODO: Rapid attack
-                            this.player.hitPlayer(maybeAPlayer.get(), (int) (this.player.getEquippedWeapon().getBaseDamage()));
-                            this.player.decrementActionsLeft(1);
+                            return () -> {
+                                player.hitPlayer(maybeAPlayer.get(), (int) (player.getEquippedWeapon().getBaseDamage()));
+                                player.decrementActionsLeft(1);
+                                return new Combat(player);
+                            };
                         }
                     } else {
-                        player.move(player.getNextLocation(Collections.singletonList(maybeAPlayer.get().getLocation())));
+                        return () -> {
+                            player.move(player.getNextLocation(Collections.singletonList(maybeAPlayer.get().getLocation())));
+
+                            return new Combat(player);
+                        };
                     }
-                    nextStatus = new Combat(player);
                 } else {
                     //Move to nearest interesting objective or else move to map center
-                    Point obj = player.getNextDestination();
-
-                    player.move(player.getNextLocation(Collections.singletonList(obj)));
-
-                    this.player.decrementActionsLeft(1);
-                    return new Movement(player, obj);
+//                    Point obj = player.getNextDestination();
+//
+//                    player.move(player.getNextLocation(Collections.singletonList(obj)));
+//
+//                    player.decrementActionsLeft(1);
+//                    return new Movement(player, obj);
+                    return () -> new Movement(player, player.getNextDestination());
                 }
             }
         }
+    }
 
-        return nextStatus;
+    private boolean isInRangeToAttack(Player vs) {
+        return player.getDistanceToPlayer(vs) <= player.getEquippedWeapon().getRange();
     }
 
     private void handleFlee() {

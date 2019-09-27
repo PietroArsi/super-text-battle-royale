@@ -45,6 +45,10 @@ public class GameMap implements Drawable {
         this.setupTexture(settingsFolder);
     }
 
+    public String getName() {
+        return this.settingsFolder.getName();
+    }
+
     /**
      * Reads all characters from map.data files, gets the corresponding Tile
      * from the read char, and fills the matrixMap with the read tiles

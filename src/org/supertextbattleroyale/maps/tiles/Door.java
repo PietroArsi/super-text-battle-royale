@@ -3,7 +3,9 @@ package org.supertextbattleroyale.maps.tiles;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.game.GameLauncher;
 import org.supertextbattleroyale.maps.GameMap;
+import org.supertextbattleroyale.maps.MapUtils;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
+import org.supertextbattleroyale.players.Player;
 
 import java.io.File;
 
@@ -28,8 +30,9 @@ public class Door extends Tile {
         return true;
     }
 
-    //TODO: change
-    public GameMap getNextMap() {
-        return GameLauncher.getGameInstance().getCurrentMap();
+    public GameMap getNextMap(Player p) {
+        GameMap map = GameLauncher.getLoadedMaps().stream().filter(g -> g != p.getCurrentMap()).findAny().orElse(p.getCurrentMap());
+        p.move(MapUtils.getAllTilesFromType(map, Door.class).stream().findAny().get());
+        return map;
     }
 }

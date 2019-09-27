@@ -93,7 +93,7 @@ public class Player implements Drawable {
     }
 
     public void onTick() {
-        if(!this.isAlive()) return;
+        if (!this.isAlive()) return;
 
         //to get players in the same map getCurrentMap().getPlayersOnMap(
         this.actionsLeft = 2;
@@ -102,9 +102,13 @@ public class Player implements Drawable {
             this.currentStatus = new Recon(this);
         }
 
+        StatusAction action = currentStatus.getStatusAction();
+
 //        while (this.actionsLeft > 0) {
-        Status s = this.currentStatus.doStatusAction();
-        this.currentStatus = s;
+        if(currentStatus.wantAttention()) {
+            GameLauncher.getGameInstance().setCurrentMap(this.getCurrentMap());
+        }
+        this.currentStatus = action.apply();
 //        }
     }
 
@@ -188,12 +192,12 @@ public class Player implements Drawable {
     public void acquireInfo() {
         MapUtils.getAllTilesFromType(this.getCurrentMap(), Door.class).stream()
                 .filter(this::canSeeTile)
-                .filter(p-> !this.getKnownPlaces().contains(new Pair<>(this.getCurrentMap().getTileAt(p), p)))
+                .filter(p -> !this.getKnownPlaces().contains(new Pair<>(this.getCurrentMap().getTileAt(p), p)))
                 .forEach(p -> this.getKnownPlaces().add(new Pair<>(this.getCurrentMap().getTileAt(p), p)));
 
         MapUtils.getAllTilesFromType(this.getCurrentMap(), Chest.class).stream()
                 .filter(this::canSeeTile)
-                .filter(p-> !this.getKnownPlaces().contains(new Pair<>(this.getCurrentMap().getTileAt(p), p)))
+                .filter(p -> !this.getKnownPlaces().contains(new Pair<>(this.getCurrentMap().getTileAt(p), p)))
                 .forEach(p -> this.getKnownPlaces().add(new Pair<>(this.getCurrentMap().getTileAt(p), p)));
     }
 
@@ -202,8 +206,8 @@ public class Player implements Drawable {
     }
 
     public Point getNextDestination() {
-        if(getKnownPlaces().stream().map(Pair::getValue1).noneMatch(p -> p.equals(getMapCenter()))) {
-           return getBestObjectiveOrMapCenter();
+        if (getKnownPlaces().stream().map(Pair::getValue1).noneMatch(p -> p.equals(getMapCenter()))) {
+            return getBestObjectiveOrMapCenter();
         } else {
             return getBestObjectiveOrDoor();
         }
@@ -254,7 +258,7 @@ public class Player implements Drawable {
                 destinations,
                 false);
 
-        Optional<Point> p =  MapUtils.getNextPathStep(
+        Optional<Point> p = MapUtils.getNextPathStep(
                 this.getCurrentMap(),
                 m,
                 this.getLocation(),

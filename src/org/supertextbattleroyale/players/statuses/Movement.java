@@ -9,11 +9,13 @@ import org.supertextbattleroyale.maps.tiles.Door;
 import org.supertextbattleroyale.maps.tiles.Ground;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.Player;
+import org.supertextbattleroyale.players.StatusAction;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Movement extends Status {
@@ -25,8 +27,24 @@ public class Movement extends Status {
         this.destination = destination;
     }
 
+    private StatusAction handleFlee() {
+        return () -> {
+            List<Point> doors = player.getKnownPlaces().stream()
+                    .filter(pair -> pair.getValue0() instanceof Door)
+                    .map(Pair::getValue1).collect(Collectors.toList());
+
+            MapUtils.getAllTilesFromType(player.getCurrentMap(), Door.class).stream()
+                    .filter(player::canSeeTile)
+                    .forEach(doors::add);
+
+            player.move(player.getNextLocation(doors));
+
+            return new Flee(player);
+        };
+    }
+
     @Override
-    public Status doStatusAction() {
+    public StatusAction getStatusAction() {
         player.acquireInfo();
 
         List<Player> players = player.getAlivePlayersSeen();
@@ -34,47 +52,58 @@ public class Movement extends Status {
         if (!players.isEmpty()) { //a player has been seen
             boolean wantsFight = players.stream().anyMatch(p -> player.wantsFight(p));
 
-            if (wantsFight) { //TODO: implementare una scelta piu' intelligente per la scelta del giocatore da combattere
-//                player.decrementActionsLeft(1);
-                return new Combat(player);
+            if (wantsFight) {
+                getAttention();
+                return () -> new Combat(player);
             } else { //wants to flee
-                List<Point> doors = player.getKnownPlaces().stream()
-                        .filter(pair -> pair.getValue0() instanceof Door)
-                        .map(Pair::getValue1).collect(Collectors.toList());
-
-                MapUtils.getAllTilesFromType(player.getCurrentMap(), Door.class).stream()
-                        .filter(player::canSeeTile)
-                        .forEach(doors::add);
-
-                player.move(player.getNextLocation(doors)); //TODO:
-
-//                player.decrementActionsLeft(1); bonus movement given from fleeing
-                return new Flee(player);
+                getAttention();
+                return handleFlee();
             }
         } else { //no player seen
             Point next = player.getNextLocation(Collections.singletonList(destination));
 
+            //CASE DESTINATION REACHED
             if (next.equals(destination)) {
                 Tile tile = player.getCurrentMap().getTileAt(next);
                 if (tile instanceof Door) {
-                    GameMap newMap = ((Door) tile).getNextMap();
-                    player.setCurrentMap(newMap);
+                    return () -> {
+                        GameMap newMap = ((Door) tile).getNextMap(player);
 
-                    player.decrementActionsLeft(1);
-                    player.move(next);
+                        player.move(next);
+                        player.setCurrentMap(newMap);
 
-                    return new Recon(player);
-                } else if (tile instanceof Chest) {
-                    ((Chest) tile).collectItems(player);
-                    player.decrementActionsLeft(1);
-                } else if(destination.equals(player.getMapCenter())) {
-                    player.getKnownPlaces().add(new Pair<>(player.getCurrentMap().getTileAt(player.getMapCenter()), player.getMapCenter()));
+                        player.decrementActionsLeft(1);
+
+                        return new Recon(player);
+                    };
                 }
 
-                return new Movement(player, player.getNextDestination());
+                //CASE DESTINATION CHEST
+                if (tile instanceof Chest) {
+                    getAttention();
+
+                    return () -> {
+                        ((Chest) tile).collectItems(player);
+                        player.decrementActionsLeft(1);
+                        return new Movement(player, player.getNextDestination());
+                    };
+                }
+
+                //CASE DESTINATION MAP CENTER
+                if (destination.equals(player.getMapCenter())) {
+                    return () -> {
+                        player.getKnownPlaces().add(new Pair<>(player.getCurrentMap().getTileAt(player.getMapCenter()), player.getMapCenter()));
+                        return new Movement(player, player.getNextDestination());
+                    };
+                }
+
+                //CASE NOTHING RELEVANT HAPPENED
+                return () -> new Movement(player, player.getNextDestination());
             } else {
-                player.move(next);
-                return new Movement(player, destination);
+                return () -> {
+                    player.move(next);
+                    return new Movement(player, destination);
+                };
             }
         }
     }

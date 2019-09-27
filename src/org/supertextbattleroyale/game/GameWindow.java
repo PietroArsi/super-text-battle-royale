@@ -72,7 +72,9 @@ public class GameWindow extends JFrame {
         }
 
         int period = 1000 / FPS;
-        this.timer.scheduleAtFixedRate(this.currentTask = new onTickTimerTask(this), 0, 10);
+
+        new Thread(new onTickTimerTask(this)).start();
+//        this.timer.scheduleAtFixedRate(this.currentTask = new onTickTimerTask(this), 0, 1);
     }
 
     private void onTick(Graphics2D g) {
