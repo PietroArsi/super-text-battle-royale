@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.game.GameLauncher;
 import org.supertextbattleroyale.interfaces.Drawable;
@@ -27,8 +28,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Player implements Drawable {
@@ -59,7 +60,7 @@ public class Player implements Drawable {
 
     private int x, y;
 
-    private List<Pair<Tile, Point>> knownPlaces;
+    private List<Triplet<GameMap, Tile, Point>> knownPlaces;
 
     public Player(File settingsFolder) throws JsonLoadFailException {
         this.settingsFolder = settingsFolder;
@@ -101,6 +102,7 @@ public class Player implements Drawable {
         if (this.currentStatus == null) {
             this.currentStatus = new Recon(this);
         }
+        long t1 = System.currentTimeMillis();
 
         StatusAction action = currentStatus.getStatusAction();
 
@@ -109,6 +111,9 @@ public class Player implements Drawable {
             GameLauncher.getGameInstance().setCurrentMap(this.getCurrentMap());
         }
         this.currentStatus = action.apply();
+        long t2 = System.currentTimeMillis();
+
+        System.out.println(getAlias() + "\t " + currentStatus.getClass().getSimpleName() + "\t on map: \t\t" + getCurrentMap().getName() + " \t" + (t2 - t1));
 //        }
     }
 
@@ -192,13 +197,13 @@ public class Player implements Drawable {
     public void acquireInfo() {
         MapUtils.getAllTilesFromType(this.getCurrentMap(), Door.class).stream()
                 .filter(this::canSeeTile)
-                .filter(p -> !this.getKnownPlaces().contains(new Pair<>(this.getCurrentMap().getTileAt(p), p)))
-                .forEach(p -> this.getKnownPlaces().add(new Pair<>(this.getCurrentMap().getTileAt(p), p)));
+                .filter(p -> !this.getKnownPlaces().contains(new Triplet<>(this.getCurrentMap(), this.getCurrentMap().getTileAt(p), p)))
+                .forEach(p -> this.getKnownPlaces().add(new Triplet<>(this.getCurrentMap(), this.getCurrentMap().getTileAt(p), p)));
 
         MapUtils.getAllTilesFromType(this.getCurrentMap(), Chest.class).stream()
                 .filter(this::canSeeTile)
-                .filter(p -> !this.getKnownPlaces().contains(new Pair<>(this.getCurrentMap().getTileAt(p), p)))
-                .forEach(p -> this.getKnownPlaces().add(new Pair<>(this.getCurrentMap().getTileAt(p), p)));
+                .filter(p -> !this.getKnownPlaces().contains(new Triplet<>(this.getCurrentMap(), this.getCurrentMap().getTileAt(p), p)))
+                .forEach(p -> this.getKnownPlaces().add(new Triplet<>(this.getCurrentMap(), this.getCurrentMap().getTileAt(p), p)));
     }
 
     public Point getMapCenter() {
@@ -206,7 +211,11 @@ public class Player implements Drawable {
     }
 
     public Point getNextDestination() {
-        if (getKnownPlaces().stream().map(Pair::getValue1).noneMatch(p -> p.equals(getMapCenter()))) {
+        if (getKnownPlaces().stream()
+                .filter(tri -> tri.getValue0().equals(this.currentMap))
+                .map(Triplet::getValue2)
+                .noneMatch(p -> p.equals(getMapCenter()))) {
+
             return getBestObjectiveOrMapCenter();
         } else {
             return getBestObjectiveOrDoor();
@@ -217,14 +226,15 @@ public class Player implements Drawable {
         return getBestChest().orElseGet(() -> this.getCurrentMap().getMapCenter(Filters.filterNonWalkable()));
     }
 
-    public Point getBestObjectiveOrDoor() {
+    private Point getBestObjectiveOrDoor() {
         return getBestChest().orElseGet(this::getBestDoor);
     }
 
     public Point getBestDoor() {
         List<Point> doors = this.getKnownPlaces().stream()
-                .filter(pair -> pair.getValue0() instanceof Door)
-                .map(Pair::getValue1)
+                .filter(tri -> tri.getValue0().equals(this.currentMap))
+                .filter(tri -> tri.getValue1() instanceof Door)
+                .map(Triplet::getValue2)
                 .collect(Collectors.toList());
 
         return MapUtils.getBestObjective(
@@ -235,10 +245,11 @@ public class Player implements Drawable {
                 false);
     }
 
-    public Optional<Point> getBestChest() {
+    private Optional<Point> getBestChest() {
         List<Point> chests = this.getKnownPlaces().stream()
-                .filter(pair -> pair.getValue0() instanceof Chest)
-                .map(Pair::getValue1)
+                .filter(tri -> tri.getValue0().equals(this.currentMap))
+                .filter(tri -> tri.getValue1() instanceof Chest)
+                .map(Triplet::getValue2)
                 .collect(Collectors.toList());
 
         if (chests.isEmpty()) return Optional.empty();
@@ -257,6 +268,8 @@ public class Player implements Drawable {
                 Filters.filterNonWalkableAndSeenPlayers(this),
                 destinations,
                 false);
+
+//        MapUtils.printDistancesMatrix(this.currentMap, destinations);
 
         Optional<Point> p = MapUtils.getNextPathStep(
                 this.getCurrentMap(),
@@ -405,7 +418,7 @@ public class Player implements Drawable {
         }
     }
 
-    public List<Pair<Tile, Point>> getKnownPlaces() {
+    public List<Triplet<GameMap, Tile, Point>> getKnownPlaces() {
         return knownPlaces;
     }
 

@@ -90,13 +90,6 @@ public class Combat extends Status {
                         };
                     }
                 } else {
-                    //Move to nearest interesting objective or else move to map center
-//                    Point obj = player.getNextDestination();
-//
-//                    player.move(player.getNextLocation(Collections.singletonList(obj)));
-//
-//                    player.decrementActionsLeft(1);
-//                    return new Movement(player, obj);
                     return () -> new Movement(player, player.getNextDestination());
                 }
             }

@@ -7,10 +7,8 @@ import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -35,6 +33,45 @@ public class MapUtils {
 //        System.out.println("TIME FOR getAllTilesFromType " + (t2 - t1));
         return list;
     }
+
+    public static void aStar(GameMap map, Point start, Point goal) {
+        final int X = map.getMatrixWidth();
+        final int Y = map.getMatrixHeight();
+        Queue<Point> frontier = new PriorityQueue<>();
+        frontier.add(start);
+        int[][] came_from = new int[X][Y];
+        int[][] cost_so_far = new int[X][Y];
+
+        came_from[start.x][start.y] = -1;
+        cost_so_far[start.x][start.y] = 0;
+
+        Point current;
+
+        while (!frontier.isEmpty()) {
+            current = frontier.poll();
+
+            if (current.equals(goal)) {
+                break;
+            }
+
+//            for()
+        }
+    }
+
+    private static List<Point> getNeighbours(GameMap map, Point p, boolean allowDiagonalMovement) {
+        List<Point> list = new ArrayList<>();
+
+        for (int x = Math.max(0, p.x - 1); x <= Math.min(p.x + 1, map.getMatrixWidth() - 1); x++) {
+            for (int y = Math.max(0, p.y - 1); y <= Math.min(p.y + 1, map.getMatrixHeight() - 1); y++) {
+                if (x == p.x && y == p.y) continue;
+                if (!allowDiagonalMovement && Math.abs(p.x - x) == Math.abs(p.y - y)) continue;
+                list.add(new Point(x, y));
+            }
+        }
+
+        return list;
+    }
+
 
     /**
      * A BFS alghorithm on a matrix
@@ -66,21 +103,15 @@ public class MapUtils {
             int i = u.x;
             int j = u.y;
             //Visit all neighbours (also diagonal neighbours)
-            for (int y = Math.max(0, j - 1); y <= Math.min(j + 1, map.getMatrixHeight() - 1); y++) {
-                for (int x = Math.max(0, i - 1); x <= Math.min(i + 1, map.getMatrixWidth() - 1); x++) {
-                    if (x != i || j != y) {
-                        if (allowDiagonalMovement || x == i || y == j) {
-                            if (distances[x][y] == Integer.MAX_VALUE && filter.canCross(map, new Point(x, y))) {
-                                distances[x][y] = distances[i][j] + 1;
-                                visit_queue.offer(new Point(x, y));
-                            }
-                        }
-                    }
+            for (Point p : getNeighbours(map, new Point(i, j), allowDiagonalMovement)) {
+                int x = p.x, y = p.y;
+
+                if (distances[x][y] == Integer.MAX_VALUE && filter.canCross(map, p)) {
+                    distances[x][y] = distances[i][j] + 1;
+                    visit_queue.offer(p);
                 }
             }
         }
-
-
         long t2 = System.currentTimeMillis();
 //        System.out.println("TIME FOR distances " + (t2 - t1));
         return distances;
@@ -93,13 +124,10 @@ public class MapUtils {
         int j = starting.y;
         ArrayList<Point> bestNeighbours = new ArrayList<>();
         int targetDistance = Math.max(distances[i][j] - 1, 0);
-        for (int x = Math.max(0, i - 1); x <= Math.min(i + 1, map.getMatrixWidth() - 1); x++) {
-            for (int y = Math.max(0, j - 1); y <= Math.min(j + 1, map.getMatrixHeight() - 1); y++) {
-                if (allowDiagonalMovement || starting.distance(x, y) == 1) {
-                    if (distances[x][y] == targetDistance) {
-                        bestNeighbours.add(new Point(x, y));
-                    }
-                }
+
+        for (Point p : getNeighbours(map, starting, allowDiagonalMovement)) {
+            if (distances[p.x][p.y] == targetDistance) {
+                bestNeighbours.add(p);
             }
         }
 

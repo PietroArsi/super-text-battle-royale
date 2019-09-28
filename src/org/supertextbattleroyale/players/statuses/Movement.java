@@ -1,6 +1,7 @@
 package org.supertextbattleroyale.players.statuses;
 
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.supertextbattleroyale.maps.Filters;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
@@ -29,15 +30,7 @@ public class Movement extends Status {
 
     private StatusAction handleFlee() {
         return () -> {
-            List<Point> doors = player.getKnownPlaces().stream()
-                    .filter(pair -> pair.getValue0() instanceof Door)
-                    .map(Pair::getValue1).collect(Collectors.toList());
-
-            MapUtils.getAllTilesFromType(player.getCurrentMap(), Door.class).stream()
-                    .filter(player::canSeeTile)
-                    .forEach(doors::add);
-
-            player.move(player.getNextLocation(doors));
+            player.move(player.getNextLocation(Collections.singletonList(player.getBestDoor())));
 
             return new Flee(player);
         };
@@ -68,8 +61,6 @@ public class Movement extends Status {
                 if (tile instanceof Door) {
                     return () -> {
                         GameMap newMap = ((Door) tile).getNextMap(player);
-
-                        player.move(next);
                         player.setCurrentMap(newMap);
 
                         player.decrementActionsLeft(1);
@@ -92,7 +83,7 @@ public class Movement extends Status {
                 //CASE DESTINATION MAP CENTER
                 if (destination.equals(player.getMapCenter())) {
                     return () -> {
-                        player.getKnownPlaces().add(new Pair<>(player.getCurrentMap().getTileAt(player.getMapCenter()), player.getMapCenter()));
+                        player.getKnownPlaces().add(new Triplet<>(player.getCurrentMap(), player.getCurrentMap().getTileAt(player.getMapCenter()), player.getMapCenter()));
                         return new Movement(player, player.getNextDestination());
                     };
                 }

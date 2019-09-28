@@ -100,8 +100,9 @@ public class GameWindow extends JFrame {
 
     public void setupZoom(int xZ, int yZ, float zoom) {
         this.zoom = zoom;
-        this.xZoom = xZ;
-        this.yZoom = yZ;
+        //TODO:
+        this.xZoom = xZ + (int) xTranslate;
+        this.yZoom = yZ + (int) yTranslate;
     }
 
     public JPanel getGamePanel() {

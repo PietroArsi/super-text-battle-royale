@@ -19,17 +19,19 @@ public class Flee extends Status {
         player.acquireInfo();
 
         Point door = player.getBestDoor();
-
         Point next = player.getNextLocation(Collections.singletonList(door));
-        player.move(next);
-        Tile current = player.getCurrentMap().getTileAt(player.getLocation());
-        player.decrementActionsLeft(1);
 
-        if (current instanceof Door) {
-            player.setCurrentMap(((Door) current).getNextMap(player));
-            return () -> new Recon(player);
-        } else {
-            return () -> new Flee(player);
-        }
+        return () -> {
+            player.move(next);
+            Tile current = player.getCurrentMap().getTileAt(player.getLocation());
+            player.decrementActionsLeft(1);
+
+            if (current instanceof Door) {
+                player.setCurrentMap(((Door) current).getNextMap(player));
+                return new Recon(player);
+            } else {
+                return new Flee(player);
+            }
+        };
     }
 }

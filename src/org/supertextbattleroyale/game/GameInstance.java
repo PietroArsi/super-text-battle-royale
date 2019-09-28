@@ -48,8 +48,11 @@ public class GameInstance {
         createRandomPlayer("Dario");
         createRandomPlayer("Ari");
         createRandomPlayer("Davide");
-        createRandomPlayer("Luca");
+        createRandomPlayer("Dani");
         createRandomPlayer("Kien");
+        createRandomPlayer("Max");
+        createRandomPlayer("Paso");
+        createRandomPlayer("Giammi");
 
         this.setCurrentMap(allPlayers.get(0).getCurrentMap());
         //        createRandomPlayer(5, 5, 2);
@@ -60,7 +63,7 @@ public class GameInstance {
     private void createRandomPlayer(String name) {
         try {
             Optional<Player> player = GameLauncher.getPlayerFromName(name);
-            if(player.isEmpty()) return;
+            if (player.isEmpty()) return;
 
             Player p = new Player(player.get());
             this.getAllPlayers().add(p);
@@ -72,9 +75,9 @@ public class GameInstance {
             do {
                 GameMap currentMap = GameLauncher.getLoadedMaps().get(RandomUtils.randomIntRange(0, GameLauncher.getLoadedMaps().size() - 1));
                 List<Point> doors = MapUtils.getAllTilesFromType(currentMap, Door.class);
-                Point currentDoor = doors.get(RandomUtils.randomIntRange(0, doors.size() -1));
+                Point currentDoor = doors.get(RandomUtils.randomIntRange(0, doors.size() - 1));
                 door = new Pair<>(currentMap, currentDoor);
-            } while(usedDoors.contains(door));
+            } while (usedDoors.contains(door));
 
             usedDoors.add(door);
 
@@ -94,28 +97,15 @@ public class GameInstance {
     int mapCounter = 0;
     int counter = 0;
 
-    public void onTick() {
-        int mapSize = GameLauncher.getLoadedMaps().size();
-
-        if (mapSize == 0) return;
-
-        int size = GameLauncher.getLoadedMaps().get(mapCounter).getAlivePlayersOnMap().size();
-
-        if(counter >= size) {
-            counter = 0;
-            mapCounter++;
-
-            if(mapCounter == mapSize) mapCounter = 0;
-            return;
+    void onTick() {
+        for (GameMap m : GameLauncher.getLoadedMaps()) {
+            for (Player player : m.getAlivePlayersOnMap()) {
+                player.onTick();
+            }
         }
-        GameMap currentMap = GameLauncher.getLoadedMaps().get(mapCounter);
-
-        currentMap.getAlivePlayersOnMap().get(counter).onTick();
-
-        counter++;
     }
 
-    public void drawComponents(Graphics2D g) {
+    void drawComponents(Graphics2D g) {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, GameLauncher.getMainFrame().getGamePanel().getWidth(), GameLauncher.getMainFrame().getGamePanel().getHeight());
 

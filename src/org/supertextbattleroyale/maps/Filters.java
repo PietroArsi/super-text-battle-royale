@@ -19,8 +19,8 @@ public class Filters {
         return (aMap, aPoint) -> aMap
                 .getPlayersOnMap().stream()
                 .filter(p -> p != player)
-                .filter(p -> player.getPlayersSeen().contains(p))
-                .map(Player::getPoint)
+                .filter(p -> player.getAlivePlayersSeen().contains(p))
+                .map(Player::getLocation)
                 .noneMatch(p -> p.equals(aPoint)) && aMap.getMatrixMap()[aPoint.x][aPoint.y].isTileWalkable();
     }
 
