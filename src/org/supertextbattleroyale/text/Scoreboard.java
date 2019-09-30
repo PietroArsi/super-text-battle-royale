@@ -1,6 +1,7 @@
 package org.supertextbattleroyale.text;
 
 import org.supertextbattleroyale.game.GameLauncher;
+import org.supertextbattleroyale.game.GameWindow;
 import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.utils.StringUtils;
 

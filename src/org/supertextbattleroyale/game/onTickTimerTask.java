@@ -1,6 +1,8 @@
 package org.supertextbattleroyale.game;
 
-public class onTickTimerTask implements Runnable {
+import java.util.TimerTask;
+
+public class onTickTimerTask extends TimerTask {
 
     private GameWindow window;
 
@@ -11,6 +13,14 @@ public class onTickTimerTask implements Runnable {
     @Override
     public void run() {
         while (true) {
+
+//            if (this.currentTick % (FPS / TICKS_PER_SECOND) == 0) {
+                if(GameLauncher.getGameInstance() != null) {
+                    GameLauncher.getGameInstance().onTick();
+                }
+//                this.currentTick = 0;
+//            }
+
             this.window.getGamePanel().repaint();
         }
     }

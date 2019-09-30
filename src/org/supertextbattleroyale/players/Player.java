@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Player implements Drawable {
@@ -94,6 +95,12 @@ public class Player implements Drawable {
     }
 
     public void onTick() {
+//        try {
+//            TimeUnit.MILLISECONDS.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
         if (!this.isAlive()) return;
 
         //to get players in the same map getCurrentMap().getPlayersOnMap(

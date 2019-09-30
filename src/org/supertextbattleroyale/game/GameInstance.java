@@ -24,8 +24,6 @@ public class GameInstance {
 
     private List<Player> allPlayers;
 
-    private Turn currentTurn;
-
     private Scoreboard s;
 
     public GameInstance() {
@@ -36,6 +34,7 @@ public class GameInstance {
 
     //TODO: Get this working good
     public void initGame() {
+        GameLauncher.getMainFrame().getGamePanel().pause();
         //Testing per il BFS
         this.setCurrentMap(GameLauncher.getLoadedMaps().get(1));
         ArrayList<Point> l = new ArrayList<>();
@@ -55,7 +54,7 @@ public class GameInstance {
         createRandomPlayer("Giammi");
 
         this.setCurrentMap(allPlayers.get(0).getCurrentMap());
-        //        createRandomPlayer(5, 5, 2);
+        GameLauncher.getMainFrame().getGamePanel().resume();
     }
 
     private List<Pair<GameMap, Point>> usedDoors = new ArrayList<>();
@@ -94,10 +93,7 @@ public class GameInstance {
         }
     }
 
-    int mapCounter = 0;
-    int counter = 0;
-
-    void onTick() {
+    public void onTick() {
         for (GameMap m : GameLauncher.getLoadedMaps()) {
             for (Player player : m.getAlivePlayersOnMap()) {
                 player.onTick();
@@ -105,7 +101,7 @@ public class GameInstance {
         }
     }
 
-    void drawComponents(Graphics2D g) {
+    public void drawComponents(Graphics2D g) {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, GameLauncher.getMainFrame().getGamePanel().getWidth(), GameLauncher.getMainFrame().getGamePanel().getHeight());
 

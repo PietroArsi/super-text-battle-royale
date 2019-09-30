@@ -36,6 +36,8 @@ public abstract class Status {
     void getAttention(Player... players) {
         this.show = true;
 
+        System.out.println(player.getName() + " ATTENTION");
+
         List<Player> playerList = new ArrayList<>(Arrays.asList(players));
         playerList.add(player);
 
@@ -61,8 +63,9 @@ public abstract class Status {
 
         //TODO: fix alignment
 
-//                GameLauncher.getMainFrame().setupZoom(center.x, center.y, Math.max(1, Math.min(2, zoom)));
-
-
+        GameLauncher.getMainFrame().setupZoom(
+                center.x * GameLauncher.getGameInstance().getCurrentMap().CELL_WIDTH ,
+                center.y * GameLauncher.getGameInstance().getCurrentMap().CELL_HEIGHT,
+                Math.max(1, Math.min(2, zoom)));
     }
 }

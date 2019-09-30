@@ -1,97 +1,39 @@
 package org.supertextbattleroyale.game;
 
 import org.javatuples.Triplet;
+import org.supertextbattleroyale.game_.GamePanel;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.awt.event.*;
 
-public class GameWindow extends JFrame {
-    private final int FPS = 60;
-    private final float TICKS_PER_SECOND = 1f;
-
-    public JPanel mainPanel;
+public class GameWindow extends JFrame implements WindowListener, WindowFocusListener, WindowStateListener {
+    private JPanel mainPanel;
     private JPanel gamePanel;
 
-    private final Timer timer;
-    private TimerTask currentTask;
-
-    private int currentTick;
-
-    private float xTranslate, yTranslate;
     private int xZoom, yZoom;
     private float zoom;
 
-    public GameWindow() {
+    GameWindow() {
         this.add(this.mainPanel);
-        this.timer = new Timer();
-
-        this.setupTimer(500);
-        this.currentTick = 0;
-        this.xTranslate = 0;
-        this.yTranslate = 0;
         this.setupZoom(0, 0, 1);
-    }
 
-    private Graphics2D setupGraphics(Graphics g) {
-        Graphics2D graphics2D = (Graphics2D) g;
+        this.addWindowListener(this);
+        this.addWindowFocusListener(this);
+        this.addWindowListener(this);
 
-        graphics2D.setRenderingHint(
-                RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics2D.setRenderingHint(
-                RenderingHints.KEY_INTERPOLATION,
-                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        graphics2D.setRenderingHint(
-                RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-        graphics2D.transform(new AffineTransform(1, 0, 0, 1, xTranslate, yTranslate));
-        return graphics2D;
+        this.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent componentEvent) {
+                getGamePanel().setupDimension(getWidth(), getHeight());
+                System.out.println(getWidth() + " " + getHeight());
+            }
+        });
     }
 
     private void createUIComponents() {
         //Custom setup of the game panel so that it draws correctly and where we want it to draw
-        this.gamePanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-
-                onTick(setupGraphics(g));
-            }
-        };
+        this.gamePanel = new GamePanel();
 
         this.setBounds(512, 512, 512, 512);
-    }
-
-    private void setupTimer(int ms) {
-        if (this.currentTask != null) {
-            this.currentTask.cancel();
-        }
-
-        int period = 1000 / FPS;
-
-        new Thread(new onTickTimerTask(this)).start();
-//        this.timer.scheduleAtFixedRate(this.currentTask = new onTickTimerTask(this), 0, 1);
-    }
-
-    private void onTick(Graphics2D g) {
-        if (GameLauncher.getGameInstance() == null) return;
-
-        g.translate(this.xZoom, this.yZoom);
-        g.scale(this.zoom, this.zoom);
-        g.translate(-this.xZoom, -this.yZoom);
-
-        if (this.currentTick % (FPS / TICKS_PER_SECOND) == 0) {
-            GameLauncher.getGameInstance().onTick();
-            this.currentTick = 0;
-        }
-
-        GameLauncher.getGameInstance().drawComponents(g);
-
-        this.currentTick++;
     }
 
     public Triplet<Integer, Integer, Float> getZoomStatus() {
@@ -101,11 +43,60 @@ public class GameWindow extends JFrame {
     public void setupZoom(int xZ, int yZ, float zoom) {
         this.zoom = zoom;
         //TODO:
-        this.xZoom = xZ + (int) xTranslate;
-        this.yZoom = yZ + (int) yTranslate;
+        this.xZoom = xZ;
+        this.yZoom = yZ;
     }
 
-    public JPanel getGamePanel() {
-        return this.gamePanel;
+    public GamePanel getGamePanel() {
+        return (GamePanel) this.gamePanel;
+    }
+
+    @Override
+    public void windowGainedFocus(WindowEvent windowEvent) {
+        getGamePanel().resume();
+    }
+
+    @Override
+    public void windowLostFocus(WindowEvent windowEvent) {
+        getGamePanel().pause();
+    }
+
+    @Override
+    public void windowOpened(WindowEvent windowEvent) {
+    }
+
+    @Override
+    public void windowClosing(WindowEvent windowEvent) {
+        getGamePanel().stopGame();
+    }
+
+    @Override
+    public void windowClosed(WindowEvent windowEvent) {
+        getGamePanel().stopGame();
+    }
+
+    @Override
+    public void windowIconified(WindowEvent windowEvent) {
+        getGamePanel().pause();
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent windowEvent) {
+        getGamePanel().resume();
+    }
+
+    @Override
+    public void windowActivated(WindowEvent windowEvent) {
+        getGamePanel().resume();
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent windowEvent) {
+        getGamePanel().pause();
+    }
+
+    @Override
+    public void windowStateChanged(WindowEvent windowEvent) {
+
     }
 }
