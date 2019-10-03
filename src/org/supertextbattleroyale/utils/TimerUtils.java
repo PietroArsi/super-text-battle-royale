@@ -2,10 +2,6 @@ package org.supertextbattleroyale.utils;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Puloski_
- * @since 5/11/2014
- */
 public class TimerUtils {
     private long last;
 
