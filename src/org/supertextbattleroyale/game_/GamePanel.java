@@ -9,10 +9,11 @@ import java.util.concurrent.TimeUnit;
 
 public class GamePanel extends JPanel implements Runnable {
 
-    private int PWIDTH = 512;
-    private int PHEIGHT = 512;
+    private int P_WIDTH = 512;
+    private int P_HEIGHT = 512;
 
     private Thread animator;
+    private TimerUtils timer = new TimerUtils();
 
     private volatile boolean running;
     private volatile boolean gameOver;
@@ -23,7 +24,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     public GamePanel() {
         setBackground(Color.white);
-        setPreferredSize(new Dimension(PWIDTH, PHEIGHT));
+        setPreferredSize(new Dimension(P_WIDTH, P_HEIGHT));
     }
 
     @Override
@@ -39,7 +40,7 @@ public class GamePanel extends JPanel implements Runnable {
             this.animator.start();
 
             this.setMaxFPS(60);
-            this.setUPS(2);
+            this.setUPS(4);
 
             this.running = true;
         }
@@ -56,8 +57,6 @@ public class GamePanel extends JPanel implements Runnable {
     public void resume() {
         this.isPaused = false;
     }
-
-    TimerUtils timer = new TimerUtils();
 
     @Override
     public void run() {
@@ -101,7 +100,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     private void updateGame() {
-        if (this.isPaused) return;
+        if (this.isPaused || this.gameOver) return;
 
         if (GameLauncher.getGameInstance() == null) return;
 
@@ -115,7 +114,7 @@ public class GamePanel extends JPanel implements Runnable {
         if (this.isPaused) return;
 
         if (dbImage == null) {
-            dbImage = createImage(PWIDTH, PHEIGHT);
+            dbImage = createImage(P_WIDTH, P_HEIGHT);
 
             if (dbImage == null) {
                 System.out.println("dbImage is null");
@@ -151,10 +150,10 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void setupDimension(int width, int height) {
-        this.PWIDTH = width;
-        this.PHEIGHT = height;
+        this.P_WIDTH = width;
+        this.P_HEIGHT = height;
 
-        dbImage = createImage(PWIDTH, PHEIGHT);
+        dbImage = createImage(P_WIDTH, P_HEIGHT);
 
         if (dbImage == null) {
             System.out.println("dbImage is null");

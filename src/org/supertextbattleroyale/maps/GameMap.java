@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.beans.XMLDecoder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -79,6 +80,8 @@ public class GameMap implements Drawable {
             }
         }
     }
+
+
 
     private int getTileEdge(int panelWidth, int panelHeight) {
         int w1 = Math.floorDiv(panelWidth, this.matrixMap.length);
@@ -146,6 +149,16 @@ public class GameMap implements Drawable {
                 this.CELL_WIDTH * this.matrixMap.length,
                 this.CELL_HEIGHT * this.matrixMap[0].length,
                 null);
+
+        g.translate(X_DIST, Y_DIST);
+        MapUtils.getAllTilesFromType(this, Chest.class)
+                .forEach(p -> {
+                    Chest c = (Chest) this.getTileAt(p);
+                    g.translate(p.x * CELL_WIDTH, p.y * CELL_HEIGHT);
+                    c.draw(g);
+                    g.translate(-p.x * CELL_WIDTH, -p.y * CELL_HEIGHT);
+                });
+        g.translate(-X_DIST, -Y_DIST);
 
 //        this.printGrid(g); //debug
     }

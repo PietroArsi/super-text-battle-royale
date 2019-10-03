@@ -47,12 +47,12 @@ public class GameInstance {
         createRandomPlayer("Pit");
         createRandomPlayer("Dario");
         createRandomPlayer("Ari");
-        createRandomPlayer("Davide");
-        createRandomPlayer("Dani");
-        createRandomPlayer("Kien");
-        createRandomPlayer("Max");
-        createRandomPlayer("Paso");
-        createRandomPlayer("Giammi");
+//        createRandomPlayer("Davide");
+//        createRandomPlayer("Dani");
+//        createRandomPlayer("Kien");
+//        createRandomPlayer("Max");
+//        createRandomPlayer("Paso");
+//        createRandomPlayer("Giammi");
 
         this.setCurrentMap(allPlayers.get(0).getCurrentMap());
         GameLauncher.getMainFrame().getGamePanel().resume();

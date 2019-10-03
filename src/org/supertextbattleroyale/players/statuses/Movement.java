@@ -67,6 +67,7 @@ public class Movement extends Status {
                     getAttention();
 
                     return () -> {
+                        ((Chest) tile).open();
                         ((Chest) tile).collectItems(player);
                         player.decrementActionsLeft(1);
                         return new Movement(player, player.getNextDestination());
