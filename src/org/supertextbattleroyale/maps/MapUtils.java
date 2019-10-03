@@ -22,17 +22,27 @@ public class MapUtils {
      * @return a list of all tiles that are of the selected type
      */
     public static List<Point> getAllTilesFromType(GameMap map, Class<? extends Tile> type) {
-        long t1 = System.currentTimeMillis();
         List<Point> list = new ArrayList<>();
         for (int i = 0; i < map.getMatrixWidth(); i++) {
             for (int j = 0; j < map.getMatrixHeight(); j++) {
                 if (map.getMatrixMap()[i][j].getClass().equals(type)) list.add(new Point(i, j));
             }
         }
-        long t2 = System.currentTimeMillis();
-//        System.out.println("TIME FOR getAllTilesFromType " + (t2 - t1));
         return list;
     }
+
+    public static List<Point> getMapPoints(GameMap map) {
+        List<Point> list = new ArrayList<>();
+
+        for (int i = 0; i < map.getMatrixWidth(); i++) {
+            for (int j = 0; j < map.getMatrixHeight(); j++) {
+                list.add(new Point(i, j));
+            }
+        }
+
+        return list;
+    }
+
 
     public static void aStar(GameMap map, Point start, Point goal) {
         final int X = map.getMatrixWidth();
@@ -81,8 +91,6 @@ public class MapUtils {
      * @return a int matrix with the distance from the nearest source node
      */
     public static int[][] calculateDistances(GameMap map, TileFilter filter, List<Point> zeroTiles, boolean allowDiagonalMovement) {
-        long t1 = System.currentTimeMillis();
-
         //Initialize all tile with MAX_INT
         int[][] distances = new int[map.getMatrixWidth()][map.getMatrixHeight()];
         for (int i = 0; i < map.getMatrixWidth(); i++)
@@ -112,14 +120,10 @@ public class MapUtils {
                 }
             }
         }
-        long t2 = System.currentTimeMillis();
-//        System.out.println("TIME FOR distances " + (t2 - t1));
         return distances;
     }
 
     public static Optional<Point> getNextPathStep(GameMap map, int[][] distances, Point starting, boolean allowDiagonalMovement) {
-        long t1 = System.currentTimeMillis();
-
         int i = starting.x;
         int j = starting.y;
         ArrayList<Point> bestNeighbours = new ArrayList<>();
@@ -130,9 +134,6 @@ public class MapUtils {
                 bestNeighbours.add(p);
             }
         }
-
-        long t2 = System.currentTimeMillis();
-//        System.out.println("TIME FOR getNextPathStep " + (t2 - t1));
 
         if (bestNeighbours.isEmpty()) return Optional.empty();
         else
@@ -153,8 +154,6 @@ public class MapUtils {
      * @return A list of coordinates of the tiled crossed by the line between p1 and p2
      */
     public static ArrayList<Point> discretizeRay(GameMap map, Point p1, Point p2) {
-        long t1 = System.currentTimeMillis();
-
         ArrayList<Point> rayList = new ArrayList<>();
         int x1 = p1.x;
         int y1 = p1.y;
@@ -195,9 +194,6 @@ public class MapUtils {
             for (int i = currentX; (i <= x2 && dirX > 0) || (i >= x2 && dirX < 0); i += dirX)
                 rayList.add(new Point(i, currentY));
 
-        long t2 = System.currentTimeMillis();
-//        System.out.println("TIME FOR raytrace " + (t2 - t1));
-
         return rayList;
     }
 
@@ -209,7 +205,7 @@ public class MapUtils {
      * @return true if there aren't tiles that couldn't be crossed by the ray (based on func), false otherwise
      */
     public static boolean canRayReachTile(GameMap map, TileFilter func, Point p1, Point p2) {
-        return !discretizeRay(map, p1, p2).stream().anyMatch(i -> !func.canCross(map, i));
+        return discretizeRay(map, p1, p2).stream().allMatch(i -> func.canCross(map, i));
     }
 
     public static Point getBestObjective(Point from, GameMap map, TileFilter filter, List<Point> zeroTiles, boolean allowDiagonalMovement) {

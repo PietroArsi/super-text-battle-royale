@@ -95,12 +95,6 @@ public class Player implements Drawable {
     }
 
     public void onTick() {
-//        try {
-//            TimeUnit.MILLISECONDS.sleep(1000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
         if (!this.isAlive()) return;
 
         //to get players in the same map getCurrentMap().getPlayersOnMap(
@@ -114,7 +108,7 @@ public class Player implements Drawable {
         StatusAction action = currentStatus.getStatusAction();
 
 //        while (this.actionsLeft > 0) {
-        if(currentStatus.wantAttention()) {
+        if (currentStatus.wantAttention()) {
             GameLauncher.getGameInstance().setCurrentMap(this.getCurrentMap());
         }
         this.currentStatus = action.apply();
@@ -138,15 +132,21 @@ public class Player implements Drawable {
         return true; //TODO
     }
 
-    public List<Player> getPlayersSeen() {
+    public List<Player> getAlivePlayersSeenInRange() {
+        int range = 10; //TODO: make variable in player
+
         return this.getCurrentMap().getPlayersOnMap().stream()
                 .filter(p -> p != this)
                 .filter(p -> this.canSeeTile(p.getLocation()))
+                .filter(Player::isAlive)
+                .filter(p -> p.getLocation().distance(this.getLocation()) <= range)
                 .collect(Collectors.toList());
     }
 
     public List<Player> getAlivePlayersSeen() {
-        return this.getPlayersSeen().stream()
+        return this.getCurrentMap().getPlayersOnMap().stream()
+                .filter(p -> p != this)
+                .filter(p -> this.canSeeTile(p.getLocation()))
                 .filter(Player::isAlive)
                 .collect(Collectors.toList());
     }
@@ -154,7 +154,6 @@ public class Player implements Drawable {
     public Optional<Player> findTargetPlayer() {
         return this.getAlivePlayersSeen().stream().min(Comparator.comparingDouble(this::getDistanceToPlayer));
     }
-
 
     /**
      * @param damage The damage done to the player and to the armor
@@ -209,6 +208,16 @@ public class Player implements Drawable {
 
         MapUtils.getAllTilesFromType(this.getCurrentMap(), Chest.class).stream()
                 .filter(this::canSeeTile)
+                .filter(p -> !this.getKnownPlaces().contains(new Triplet<>(this.getCurrentMap(), this.getCurrentMap().getTileAt(p), p)))
+                .forEach(p -> this.getKnownPlaces().add(new Triplet<>(this.getCurrentMap(), this.getCurrentMap().getTileAt(p), p)));
+    }
+
+    public void acquireInfoInRange() {
+        int range = 10;//TODO: make variable for player
+
+        MapUtils.getMapPoints(this.getCurrentMap()).stream()
+                .filter(this::canSeeTile)//TODO: check
+                .filter(p -> p.distance(this.getLocation()) <= range)
                 .filter(p -> !this.getKnownPlaces().contains(new Triplet<>(this.getCurrentMap(), this.getCurrentMap().getTileAt(p), p)))
                 .forEach(p -> this.getKnownPlaces().add(new Triplet<>(this.getCurrentMap(), this.getCurrentMap().getTileAt(p), p)));
     }
@@ -374,11 +383,9 @@ public class Player implements Drawable {
         return this.hitPoints;
     }
 
-
     public boolean isAlive() {
         return this.hitPoints > 0;
     }
-
 
     public BufferedImage getImage() {
         return this.face;

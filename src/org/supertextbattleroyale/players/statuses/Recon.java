@@ -15,7 +15,6 @@ public class Recon extends Status {
     public StatusAction getStatusAction() {
         player.acquireInfo();
         player.decrementActionsLeft(1);
-        getAttention();
 
         List<Player> players = player.getAlivePlayersSeen();
 

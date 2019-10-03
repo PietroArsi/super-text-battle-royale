@@ -1,23 +1,16 @@
 package org.supertextbattleroyale.players.statuses;
 
-import org.javatuples.Pair;
 import org.javatuples.Triplet;
-import org.supertextbattleroyale.maps.Filters;
 import org.supertextbattleroyale.maps.GameMap;
-import org.supertextbattleroyale.maps.MapUtils;
 import org.supertextbattleroyale.maps.tiles.Chest;
 import org.supertextbattleroyale.maps.tiles.Door;
-import org.supertextbattleroyale.maps.tiles.Ground;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.players.StatusAction;
-import org.supertextbattleroyale.utils.RandomUtils;
 
 import java.awt.*;
-import java.util.*;
+import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class Movement extends Status {
 

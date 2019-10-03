@@ -35,4 +35,13 @@ public class Filters {
     public static TileFilter filterOpaque() {
         return (aMap, aPoint) -> aMap.getMatrixMap()[aPoint.x][aPoint.y].isTileTransparent();
     }
+
+    public static TileFilter filterOpaqueAndSeenPlayers(Player player) {
+        return (aMap, aPoint) -> aMap
+                .getPlayersOnMap().stream()
+                .filter(p -> p != player)
+                .filter(p -> player.getAlivePlayersSeen().contains(p))
+                .map(Player::getLocation)
+                .noneMatch(p -> p.equals(aPoint)) && aMap.getMatrixMap()[aPoint.x][aPoint.y].isTileTransparent();
+    }
 }

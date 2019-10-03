@@ -12,6 +12,7 @@ import org.supertextbattleroyale.maps.tiles.Door;
 import org.supertextbattleroyale.players.Player;
 import org.supertextbattleroyale.text.Scoreboard;
 import org.supertextbattleroyale.utils.RandomUtils;
+import org.supertextbattleroyale.utils.TimerUtils;
 
 import java.awt.*;
 import java.util.*;
@@ -93,12 +94,38 @@ public class GameInstance {
         }
     }
 
+    TimerUtils timer = new TimerUtils();
+
+    private Queue<GameMap> maps = new ArrayDeque<>();
+    private Queue<Player> playerQueue = new ArrayDeque<>();
+
     public void onTick() {
-        for (GameMap m : GameLauncher.getLoadedMaps()) {
-            for (Player player : m.getAlivePlayersOnMap()) {
-                player.onTick();
+        if (maps.isEmpty()) {
+            maps.addAll(GameLauncher.getLoadedMaps());
+        }
+
+        if (playerQueue.isEmpty()) {
+            playerQueue.addAll(maps.poll().getAlivePlayersOnMap());
+        }
+
+        Player p = playerQueue.poll();
+        if (p != null) {
+            p.onTick();
+
+            if(p.getCurrentMap() != getCurrentMap()) {
+                this.onTick();
             }
         }
+
+
+//        for (GameMap m : GameLauncher.getLoadedMaps()) {
+//            for (Player player : m.getAlivePlayersOnMap()) {
+////                if(timer.hasReach(1000)) {
+//                player.onTick();
+////                    timer.reset();
+////                }
+//            }
+//        }
     }
 
     public void drawComponents(Graphics2D g) {

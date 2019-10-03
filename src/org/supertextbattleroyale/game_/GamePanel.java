@@ -1,7 +1,7 @@
 package org.supertextbattleroyale.game_;
 
 import org.supertextbattleroyale.game.GameLauncher;
-import org.supertextbattleroyale.utils.RandomUtils;
+import org.supertextbattleroyale.utils.TimerUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +18,8 @@ public class GamePanel extends JPanel implements Runnable {
     private volatile boolean gameOver;
     private volatile boolean isPaused;
 
-    private volatile int period;
+    private volatile int fpsPeriod;
+    private volatile int upsPeriod;
 
     public GamePanel() {
         setBackground(Color.white);
@@ -38,6 +39,7 @@ public class GamePanel extends JPanel implements Runnable {
             this.animator.start();
 
             this.setMaxFPS(60);
+            this.setUPS(2);
 
             this.running = true;
         }
@@ -55,6 +57,8 @@ public class GamePanel extends JPanel implements Runnable {
         this.isPaused = false;
     }
 
+    TimerUtils timer = new TimerUtils();
+
     @Override
     public void run() {
         long before, timeDiff, sleepTime;
@@ -62,12 +66,15 @@ public class GamePanel extends JPanel implements Runnable {
         before = System.currentTimeMillis();
 
         while (running) {
-            this.updateGame();
+            if(timer.hasReach(upsPeriod)) {
+                this.updateGame();
+                timer.reset();
+            }
             this.updateRender();
             this.repaint();
 
             timeDiff = System.currentTimeMillis() - before;
-            sleepTime = period - timeDiff;
+            sleepTime = fpsPeriod - timeDiff;
 
             if (sleepTime <= 0) {
                 sleepTime = 5;
@@ -86,7 +93,11 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void setMaxFPS(int FPS) {
-        this.period = 1000 / FPS;
+        this.fpsPeriod = 1000 / FPS;
+    }
+
+    public void setUPS(int UPS) {
+        this.upsPeriod = 1000 / UPS;
     }
 
     private void updateGame() {
