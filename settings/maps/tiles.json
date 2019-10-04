@@ -1,5 +1,5 @@
 {
-  "Chest": "c",
+  "ChestTile": "c",
   "Ground": "0",
   "Door": "d",
   "LowObstacle": "l",

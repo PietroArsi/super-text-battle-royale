@@ -1,8 +1,9 @@
 package org.supertextbattleroyale.players.statuses;
 
 import org.javatuples.Triplet;
+import org.supertextbattleroyale.items.Chest;
 import org.supertextbattleroyale.maps.GameMap;
-import org.supertextbattleroyale.maps.tiles.Chest;
+import org.supertextbattleroyale.maps.tiles.ChestTile;
 import org.supertextbattleroyale.maps.tiles.Door;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.Player;
@@ -11,6 +12,7 @@ import org.supertextbattleroyale.players.StatusAction;
 import java.awt.*;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class Movement extends Status {
 
@@ -63,14 +65,21 @@ public class Movement extends Status {
                 }
 
                 //CASE DESTINATION CHEST
-                if (tile instanceof Chest) {
+                if (tile instanceof ChestTile) {
                     getAttention();
 
                     return () -> {
-                        ((Chest) tile).open();
-                        ((Chest) tile).collectItems(player);
-                        player.decrementActionsLeft(1);
-                        return new Movement(player, player.getNextDestination());
+                        Optional<Chest> chest = ((ChestTile) tile).getChest(player.getCurrentMap(), next);
+                        if(chest.isEmpty()) {
+                            System.out.println("this should not be happening");
+                            return new Movement(player, player.getNextDestination());
+                        } else {
+                            chest.get().open();
+                            chest.get().loot();
+                            chest.get().collectItems(player);
+                            player.decrementActionsLeft(1);
+                            return new Movement(player, player.getNextDestination());
+                        }
                     };
                 }
 

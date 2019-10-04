@@ -3,18 +3,18 @@ package org.supertextbattleroyale.players;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.supertextbattleroyale.exceptions.JsonLoadFailException;
 import org.supertextbattleroyale.game.GameLauncher;
 import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.items.Armor;
+import org.supertextbattleroyale.items.Chest;
 import org.supertextbattleroyale.items.Potion;
 import org.supertextbattleroyale.items.Weapon;
 import org.supertextbattleroyale.maps.Filters;
 import org.supertextbattleroyale.maps.GameMap;
 import org.supertextbattleroyale.maps.MapUtils;
-import org.supertextbattleroyale.maps.tiles.Chest;
+import org.supertextbattleroyale.maps.tiles.ChestTile;
 import org.supertextbattleroyale.maps.tiles.Door;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.statuses.Recon;
@@ -22,6 +22,7 @@ import org.supertextbattleroyale.players.statuses.Status;
 import org.supertextbattleroyale.utils.*;
 
 import javax.imageio.ImageIO;
+import javax.swing.text.html.Option;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -30,7 +31,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Player implements Drawable {
@@ -206,7 +206,7 @@ public class Player implements Drawable {
                 .filter(p -> !this.getKnownPlaces().contains(new Triplet<>(this.getCurrentMap(), this.getCurrentMap().getTileAt(p), p)))
                 .forEach(p -> this.getKnownPlaces().add(new Triplet<>(this.getCurrentMap(), this.getCurrentMap().getTileAt(p), p)));
 
-        MapUtils.getAllTilesFromType(this.getCurrentMap(), Chest.class).stream()
+        MapUtils.getAllTilesFromType(this.getCurrentMap(), ChestTile.class).stream()
                 .filter(this::canSeeTile)
                 .filter(p -> !this.getKnownPlaces().contains(new Triplet<>(this.getCurrentMap(), this.getCurrentMap().getTileAt(p), p)))
                 .forEach(p -> this.getKnownPlaces().add(new Triplet<>(this.getCurrentMap(), this.getCurrentMap().getTileAt(p), p)));
@@ -264,7 +264,12 @@ public class Player implements Drawable {
     private Optional<Point> getBestChest() {
         List<Point> chests = this.getKnownPlaces().stream()
                 .filter(tri -> tri.getValue0().equals(this.currentMap))
-                .filter(tri -> tri.getValue1() instanceof Chest)
+                .filter(tri -> tri.getValue1() instanceof ChestTile)
+                .filter(tri -> {
+                    ChestTile ct = ((ChestTile) tri.getValue1());
+                    Optional<Chest> chest = ct.getChest(getCurrentMap(), tri.getValue2());
+                    return chest.isPresent() && !chest.get().isEmpty();
+                })
                 .map(Triplet::getValue2)
                 .collect(Collectors.toList());
 

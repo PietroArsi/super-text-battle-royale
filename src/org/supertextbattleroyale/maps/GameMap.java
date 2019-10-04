@@ -6,6 +6,7 @@ import org.supertextbattleroyale.exceptions.MapLoadException;
 import org.supertextbattleroyale.game.GameLauncher;
 import org.supertextbattleroyale.interfaces.Drawable;
 import org.supertextbattleroyale.interfaces.TileFilter;
+import org.supertextbattleroyale.items.Chest;
 import org.supertextbattleroyale.maps.tiles.*;
 import org.supertextbattleroyale.maps.tiles.base.Tile;
 import org.supertextbattleroyale.players.Player;
@@ -15,13 +16,11 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.beans.XMLDecoder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class GameMap implements Drawable {
@@ -39,8 +38,11 @@ public class GameMap implements Drawable {
 
     private final int PATHFIND_DISTANCE_INCREMENT = 10;
 
+    private List<Chest> chests;
+
     public GameMap(File directory) throws MapLoadException {
         this.settingsFolder = directory;
+        this.chests = new ArrayList<>();
 
         this.setupMap(new File(directory, "map.data"));
         this.setupTexture(settingsFolder);
@@ -79,9 +81,11 @@ public class GameMap implements Drawable {
                 this.matrixMap[w][h] = t.get();
             }
         }
+
+        MapUtils.getAllTilesFromType(this, ChestTile.class).stream()
+                .map(Chest::new)
+                .forEach(chests::add);
     }
-
-
 
     private int getTileEdge(int panelWidth, int panelHeight) {
         int w1 = Math.floorDiv(panelWidth, this.matrixMap.length);
@@ -150,15 +154,7 @@ public class GameMap implements Drawable {
                 this.CELL_HEIGHT * this.matrixMap[0].length,
                 null);
 
-        g.translate(X_DIST, Y_DIST);
-        MapUtils.getAllTilesFromType(this, Chest.class)
-                .forEach(p -> {
-                    Chest c = (Chest) this.getTileAt(p);
-                    g.translate(p.x * CELL_WIDTH, p.y * CELL_HEIGHT);
-                    c.draw(g);
-                    g.translate(-p.x * CELL_WIDTH, -p.y * CELL_HEIGHT);
-                });
-        g.translate(-X_DIST, -Y_DIST);
+        chests.forEach(c -> c.draw(g));
 
 //        this.printGrid(g); //debug
     }
@@ -235,6 +231,10 @@ public class GameMap implements Drawable {
                 .collect(Collectors.toList());
     }
 
+    public List<Chest> getChestsOnMap() {
+        return this.chests;
+    }
+
     /**
      * Where all types of tiles are created
      *
@@ -243,7 +243,7 @@ public class GameMap implements Drawable {
      */
     public static void loadTileTypes(File config) throws JsonLoadFailException {
         tileTypes = new ArrayList<>();
-        tileTypes.add(new Chest(config));
+        tileTypes.add(new ChestTile(config));
         tileTypes.add(new Door(config));
         tileTypes.add(new Ground(config));
         tileTypes.add(new LowObstacle(config));
